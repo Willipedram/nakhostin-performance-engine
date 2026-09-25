@@ -1,0 +1,798 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Nakhostin Performance Engine 1.2.1\n"
+"Language: fa_IR\n"
+"Language-Team: Persian\n"
+"PO-Revision-Date: 2026-09-25 00:00+0000\n"
+"Last-Translator: Seyed Pedram Nakhostin\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Domain: nakhostin-performance-engine\n"
+
+msgid "%1$d nodes, %2$d relationships"
+msgstr "%1$d گره، %2$d رابطه"
+
+msgid "%1$d pending, %2$d running, %3$d failed"
+msgstr "%1$d در انتظار، %2$d در حال اجرا، %3$d ناموفق"
+
+msgid "%d seconds"
+msgstr "%d ثانیه"
+
+msgid "%s cached entries"
+msgstr "%s ورودی کش‌شده"
+
+msgid "A safe, measurable performance control center for WordPress."
+msgstr "مرکز کنترل امن و سنجش‌پذیر عملکرد وردپرس."
+
+msgid "Active"
+msgstr "فعال"
+
+msgid "Allowed query parameters (comma separated)"
+msgstr "پارامترهای مجاز پرس‌وجو (با ویرگول جدا شوند)"
+
+msgid "Analysis is explicit and uncertain scripts always retain their original loading behavior."
+msgstr "تحلیل فقط با درخواست صریح انجام می‌شود و اسکریپت‌های نامطمئن همیشه رفتار بارگذاری اصلی خود را حفظ می‌کنند."
+
+msgid "Analysis runs only when explicitly requested and stores no page HTML."
+msgstr "تحلیل فقط با درخواست صریح اجرا می‌شود و HTML صفحه را ذخیره نمی‌کند."
+
+msgid "Analyze Registered Scripts"
+msgstr "تحلیل اسکریپت‌های ثبت‌شده"
+
+msgid "Application-level caching is disabled by default. Private WordPress and WooCommerce requests are always bypassed."
+msgstr "کش سطح برنامه به‌طور پیش‌فرض غیرفعال است. درخواست‌های خصوصی وردپرس و ووکامرس همیشه از کش عبور داده نمی‌شوند."
+
+msgid "Asset Bundle"
+msgstr "بسته منابع"
+
+msgid "Asset requests"
+msgstr "درخواست‌های منابع"
+
+msgid "Attention required"
+msgstr "نیازمند توجه"
+
+msgid "Attributes"
+msgstr "ویژگی‌ها"
+
+msgid "Available"
+msgstr "در دسترس"
+
+msgid "Average"
+msgstr "میانگین"
+
+msgid "Average backend time"
+msgstr "میانگین زمان پردازش سمت سرور"
+
+msgid "Backend"
+msgstr "بک‌اند"
+
+msgid "Backend PHP generation"
+msgstr "تولید سمت سرور با PHP"
+
+msgid "Bundles"
+msgstr "بسته‌ها"
+
+msgid "CSS"
+msgstr "CSS"
+
+msgid "CSS Intelligence is reserved for a later phase. No stylesheet optimization is active."
+msgstr "هوشمندی CSS برای مرحله‌ای بعدی در نظر گرفته شده و اکنون هیچ بهینه‌سازی شیوه‌نامه‌ای فعال نیست."
+
+msgid "CSS dependencies"
+msgstr "وابستگی‌های CSS"
+
+msgid "CSS dependencies or sources"
+msgstr "وابستگی‌ها یا منابع CSS"
+
+msgid "CSS reduction"
+msgstr "کاهش حجم CSS"
+
+msgid "Cache"
+msgstr "کش"
+
+msgid "Cache Hit"
+msgstr "برخورد موفق با کش"
+
+msgid "Cache Hit Ratio"
+msgstr "نرخ برخورد موفق با کش"
+
+msgid "Cache Miss"
+msgstr "عدم وجود در کش"
+
+msgid "Cache Overview"
+msgstr "نمای کلی کش"
+
+msgid "Cache behavior"
+msgstr "رفتار کش"
+
+msgid "Cache hit ratio"
+msgstr "نرخ برخورد موفق با کش"
+
+msgid "Cache size"
+msgstr "حجم کش"
+
+msgid "Cache warmup"
+msgstr "پیش‌گرم‌سازی کش"
+
+msgid "Cache-state breakdown"
+msgstr "تفکیک بر اساس وضعیت کش"
+
+msgid "Classes"
+msgstr "کلاس‌ها"
+
+msgid "Clear performance history"
+msgstr "پاک کردن تاریخچه عملکرد"
+
+msgid "Collect a bounded, privacy-safe sample of backend PHP measurements. These values are not browser TTFB."
+msgstr "نمونه‌ای محدود و حریم‌خصوصی‌محور از اندازه‌گیری‌های PHP سمت سرور گردآوری کنید. این مقادیر TTFB مرورگر نیستند."
+
+msgid "Compatible"
+msgstr "سازگار"
+
+msgid "Compatible — avoid competing cache and optimization layers"
+msgstr "سازگار — جلوگیری از تداخل لایه‌های کش و بهینه‌سازی"
+
+msgid "Completed"
+msgstr "تکمیل‌شده"
+
+msgid "Component"
+msgstr "جزء"
+
+msgid "Component ID"
+msgstr "شناسه جزء"
+
+msgid "Component Intelligence"
+msgstr "هوشمندی اجزا"
+
+msgid "Component breakdown"
+msgstr "تفکیک بر اساس جزء"
+
+msgid "Component saved. Dependent bundle plans were invalidated where necessary."
+msgstr "جزء ذخیره شد و برنامه‌های بسته وابسته در صورت نیاز بی‌اعتبار شدند."
+
+msgid "Components"
+msgstr "اجزا"
+
+msgid "Configure NPE modules and conservative runtime defaults."
+msgstr "ماژول‌های NPE و پیش‌فرض‌های محافظه‌کارانه زمان اجرا را تنظیم کنید."
+
+msgid "Cooperative"
+msgstr "همکار"
+
+msgid "Cooperative — also share scoped tags, TTL, vary, and purge signals"
+msgstr "همکار — اشتراک برچسب‌های محدود، TTL، vary و سیگنال‌های پاک‌سازی"
+
+msgid "Custom Components"
+msgstr "اجزای سفارشی"
+
+msgid "DOM Intelligence"
+msgstr "هوشمندی DOM"
+
+msgid "DOM Manifest"
+msgstr "مانیفست ساختار DOM"
+
+msgid "DOM analysis completed."
+msgstr "تحلیل DOM تکمیل شد."
+
+msgid "DOM selectors"
+msgstr "انتخابگرهای DOM"
+
+msgid "DOM signature"
+msgstr "امضای DOM"
+
+msgid "Database"
+msgstr "پایگاه داده"
+
+msgid "Database query count"
+msgstr "تعداد پرس‌وجوهای پایگاه داده"
+
+msgid "Database query time when SAVEQUERIES is available"
+msgstr "زمان پرس‌وجوی پایگاه داده در صورت فعال بودن SAVEQUERIES"
+
+msgid "Debugging"
+msgstr "اشکال‌زدایی"
+
+msgid "Deferred scripts"
+msgstr "اسکریپت‌های به‌تعویق‌افتاده"
+
+msgid "Delayed scripts"
+msgstr "اسکریپت‌های با بارگذاری دیرهنگام"
+
+msgid "Dependencies"
+msgstr "وابستگی‌ها"
+
+msgid "Dependency graph"
+msgstr "گراف وابستگی"
+
+msgid "Dependency relationships"
+msgstr "روابط وابستگی"
+
+msgid "Detected and Registered Components"
+msgstr "اجزای شناسایی‌شده و ثبت‌شده"
+
+msgid "Detected object-cache backend"
+msgstr "بک‌اند کش شیء شناسایی‌شده"
+
+msgid "Diagnostics"
+msgstr "عیب‌یابی"
+
+msgid "Disabled"
+msgstr "غیرفعال"
+
+msgid "Dynamic states"
+msgstr "حالت‌های پویا"
+
+msgid "Elementor"
+msgstr "المنتور"
+
+msgid "Elementor Widget: %s"
+msgstr "ابزارک المنتور: %s"
+
+msgid "Elementor detected"
+msgstr "المنتور شناسایی شد"
+
+msgid "Elementor detection is available without changing Elementor settings or generated files."
+msgstr "شناسایی المنتور بدون تغییر تنظیمات یا فایل‌های تولیدشده المنتور انجام می‌شود."
+
+msgid "Elementor structures"
+msgstr "ساختارهای المنتور"
+
+msgid "Enable NPE full page cache"
+msgstr "فعال‌سازی کش کامل صفحه NPE"
+
+msgid "Enable automatic compatibility safeguards when LiteSpeed Cache is active"
+msgstr "فعال‌سازی محافظت‌های سازگاری هنگام فعال بودن LiteSpeed Cache"
+
+msgid "Enable diagnostic sampling"
+msgstr "فعال‌سازی نمونه‌برداری عیب‌یابی"
+
+msgid "Enable redacted debug logging when WordPress debugging is active"
+msgstr "فعال‌سازی گزارش اشکال‌زدایی پالایش‌شده هنگام فعال بودن اشکال‌زدایی وردپرس"
+
+msgid "Enabled"
+msgstr "فعال"
+
+msgid "Enter a valid URL on this WordPress site."
+msgstr "یک نشانی معتبر از همین سایت وردپرس وارد کنید."
+
+msgid "Enter one selector, dependency, or state per line."
+msgstr "در هر خط یک انتخابگر، وابستگی یا حالت وارد کنید."
+
+msgid "Entries"
+msgstr "ورودی‌ها"
+
+msgid "Excluded paths (one per line)"
+msgstr "مسیرهای مستثنا (هر مسیر در یک خط)"
+
+msgid "External object cache"
+msgstr "کش شیء خارجی"
+
+msgid "Failed jobs"
+msgstr "کارهای ناموفق"
+
+msgid "Files in the latest JavaScript analysis"
+msgstr "فایل‌های آخرین تحلیل جاوااسکریپت"
+
+msgid "Files with measured size"
+msgstr "فایل‌های دارای حجم اندازه‌گیری‌شده"
+
+msgid "Footer"
+msgstr "پابرگ"
+
+msgid "Fragment and Object Cache"
+msgstr "کش قطعه‌ای و کش شیء"
+
+msgid "Fragment backend"
+msgstr "بک‌اند کش قطعه‌ای"
+
+msgid "Fragment entries"
+msgstr "ورودی‌های کش قطعه‌ای"
+
+msgid "Fragment hit ratio"
+msgstr "نرخ برخورد موفق کش قطعه‌ای"
+
+msgid "Full Page Cache"
+msgstr "کش کامل صفحه"
+
+msgid "Future modules"
+msgstr "ماژول‌های آینده"
+
+msgid "General"
+msgstr "عمومی"
+
+msgid "HTTPS"
+msgstr "HTTPS"
+
+msgid "Handle"
+msgstr "شناسه"
+
+msgid "Header"
+msgstr "سربرگ"
+
+msgid "Hit rate"
+msgstr "نرخ برخورد موفق"
+
+msgid "Hits / misses"
+msgstr "برخورد موفق / عدم وجود در کش"
+
+msgid "IDs"
+msgstr "شناسه‌ها"
+
+msgid "Important product IDs (comma separated)"
+msgstr "شناسه محصولات مهم (با ویرگول جدا شوند)"
+
+msgid "Important product category IDs (comma separated)"
+msgstr "شناسه دسته‌های مهم محصول (با ویرگول جدا شوند)"
+
+msgid "Independent"
+msgstr "مستقل"
+
+msgid "Independent — NPE owns enabled cache and optimization layers"
+msgstr "مستقل — NPE مالک لایه‌های فعال کش و بهینه‌سازی است"
+
+msgid "Installed"
+msgstr "نصب‌شده"
+
+msgid "Integration mode"
+msgstr "حالت یکپارچه‌سازی"
+
+msgid "Invalidation dependencies"
+msgstr "وابستگی‌های بی‌اعتبارسازی"
+
+msgid "JS dependencies"
+msgstr "وابستگی‌های JS"
+
+msgid "JavaScript"
+msgstr "جاوااسکریپت"
+
+msgid "JavaScript Intelligence"
+msgstr "هوشمندی جاوااسکریپت"
+
+msgid "JavaScript dependencies or sources"
+msgstr "وابستگی‌ها یا منابع جاوااسکریپت"
+
+msgid "JavaScript reduction"
+msgstr "کاهش حجم جاوااسکریپت"
+
+msgid "Last purge reason"
+msgstr "آخرین دلیل پاک‌سازی"
+
+msgid "Last warmup result"
+msgstr "آخرین نتیجه پیش‌گرم‌سازی"
+
+msgid "Latest Analysis"
+msgstr "آخرین تحلیل"
+
+msgid "Latest Manifest"
+msgstr "آخرین مانیفست"
+
+msgid "Latest asynchronous warmup status"
+msgstr "آخرین وضعیت پیش‌گرم‌سازی غیرهم‌زمان"
+
+msgid "LiteSpeed"
+msgstr "لایت‌اسپید"
+
+msgid "LiteSpeed Cache"
+msgstr "LiteSpeed Cache"
+
+msgid "LiteSpeed Cache Integration"
+msgstr "یکپارچه‌سازی LiteSpeed Cache"
+
+msgid "LiteSpeed Cache compatibility"
+msgstr "سازگاری با LiteSpeed Cache"
+
+msgid "LiteSpeed Cache detected"
+msgstr "LiteSpeed Cache شناسایی شد"
+
+msgid "LiteSpeed cooperation uses public hooks and never changes LiteSpeed Cache configuration."
+msgstr "همکاری با لایت‌اسپید فقط از هوک‌های عمومی استفاده می‌کند و تنظیمات LiteSpeed Cache را تغییر نمی‌دهد."
+
+msgid "Logging is active"
+msgstr "ثبت گزارش فعال است"
+
+msgid "Logging is inactive"
+msgstr "ثبت گزارش غیرفعال است"
+
+msgid "Logs"
+msgstr "گزارش‌ها"
+
+msgid "Maximum"
+msgstr "بیشینه"
+
+msgid "Maximum samples"
+msgstr "حداکثر تعداد نمونه‌ها"
+
+msgid "Measured local JavaScript sources"
+msgstr "منابع محلی جاوااسکریپت اندازه‌گیری‌شده"
+
+msgid "Median"
+msgstr "میانه"
+
+msgid "Memcached extension"
+msgstr "افزونه Memcached"
+
+msgid "Metric"
+msgstr "شاخص"
+
+msgid "Mini Cart"
+msgstr "سبد خرید کوچک"
+
+msgid "Minimum"
+msgstr "کمینه"
+
+msgid "Mobile Menu"
+msgstr "منوی موبایل"
+
+msgid "Multisite"
+msgstr "چندسایتی"
+
+msgid "NPE"
+msgstr "NPE"
+
+msgid "NPE logging is redacted, disabled by default, and written through the WordPress debug destination. Log contents are not exposed in the browser."
+msgstr "گزارش‌نویسی NPE با حذف داده‌های حساس انجام می‌شود، به‌طور پیش‌فرض غیرفعال است و در مقصد اشکال‌زدایی وردپرس نوشته می‌شود. محتوای گزارش در مرورگر نمایش داده نمی‌شود."
+
+msgid "NPE plugin loading"
+msgstr "بارگذاری افزونه NPE"
+
+msgid "NPE provides an application-level cache. Generic hosting cannot bypass the WordPress bootstrap without a separately configured server adapter."
+msgstr "NPE کش سطح برنامه ارائه می‌دهد. در میزبانی عمومی، عبور از راه‌اندازی وردپرس بدون تنظیم جداگانه آداپتور سرور ممکن نیست."
+
+msgid "NPE uses only public LiteSpeed hooks and never changes LiteSpeed Cache settings."
+msgstr "NPE فقط از هوک‌های عمومی لایت‌اسپید استفاده می‌کند و تنظیمات LiteSpeed Cache را تغییر نمی‌دهد."
+
+msgid "Nakhostin Performance Engine"
+msgstr "موتور عملکرد نخستین"
+
+msgid "Name"
+msgstr "نام"
+
+msgid "Navigation"
+msgstr "ناوبری"
+
+msgid "No"
+msgstr "خیر"
+
+msgid "No DOM manifest has been generated yet."
+msgstr "هنوز مانیفست DOM تولید نشده است."
+
+msgid "No JavaScript analysis has been recorded."
+msgstr "هنوز تحلیل جاوااسکریپتی ثبت نشده است."
+
+msgid "None"
+msgstr "هیچ"
+
+msgid "Not available"
+msgstr "در دسترس نیست"
+
+msgid "Not measured in this phase"
+msgstr "در این مرحله اندازه‌گیری نمی‌شود"
+
+msgid "Not run"
+msgstr "اجرا نشده"
+
+msgid "Number of files"
+msgstr "تعداد فایل‌ها"
+
+msgid "Object cache API"
+msgstr "رابط کش شیء"
+
+msgid "Observed performance groups"
+msgstr "گروه‌های عملکرد مشاهده‌شده"
+
+msgid "Open settings"
+msgstr "باز کردن تنظیمات"
+
+msgid "Optimized JavaScript size"
+msgstr "حجم جاوااسکریپت بهینه‌شده"
+
+msgid "Original"
+msgstr "اصلی"
+
+msgid "Original JavaScript size"
+msgstr "حجم اصلی جاوااسکریپت"
+
+msgid "Overview"
+msgstr "نمای کلی"
+
+msgid "PHP generation"
+msgstr "تولید PHP"
+
+msgid "PHP generation; not network TTFB"
+msgstr "زمان تولید PHP؛ نه TTFB شبکه"
+
+msgid "PHP version"
+msgstr "نسخه PHP"
+
+msgid "Page type"
+msgstr "نوع صفحه"
+
+msgid "Page types"
+msgstr "انواع صفحه"
+
+msgid "Page-type breakdown"
+msgstr "تفکیک بر اساس نوع صفحه"
+
+msgid "Peak PHP memory"
+msgstr "بیشترین حافظه PHP"
+
+msgid "Performance"
+msgstr "عملکرد"
+
+msgid "Performance Engine"
+msgstr "موتور بهینه‌سازی"
+
+msgid "Performance Overview"
+msgstr "نمای کلی عملکرد"
+
+msgid "Performance monitoring"
+msgstr "پایش عملکرد"
+
+msgid "Performance sampling is disabled, so backend averages are unavailable."
+msgstr "نمونه‌برداری عملکرد غیرفعال است؛ بنابراین میانگین‌های سمت سرور در دسترس نیست."
+
+msgid "Performance summary"
+msgstr "خلاصه عملکرد"
+
+msgid "Persistent object cache"
+msgstr "کش شیء پایدار"
+
+msgid "Planned"
+msgstr "برنامه‌ریزی‌شده"
+
+msgid "Private"
+msgstr "خصوصی"
+
+msgid "Product Card"
+msgstr "کارت محصول"
+
+msgid "Product Filter"
+msgstr "فیلتر محصول"
+
+msgid "Product Gallery"
+msgstr "گالری محصول"
+
+msgid "Product Grid"
+msgstr "شبکه محصولات"
+
+msgid "Product Sorting"
+msgstr "مرتب‌سازی محصولات"
+
+msgid "Product Variation"
+msgstr "تنوع محصول"
+
+msgid "Public page URL"
+msgstr "نشانی عمومی صفحه"
+
+msgid "Public page-cache owner"
+msgstr "مالک کش عمومی صفحه"
+
+msgid "Purge and schedule rebuild"
+msgstr "پاک‌سازی و زمان‌بندی بازسازی"
+
+msgid "Purge cache"
+msgstr "پاک‌سازی کش"
+
+msgid "Purge queue"
+msgstr "صف پاک‌سازی"
+
+msgid "Queued jobs"
+msgstr "کارهای صف‌شده"
+
+msgid "Quick navigation"
+msgstr "دسترسی سریع"
+
+msgid "Read-only environment information. No configuration is changed from this screen."
+msgstr "اطلاعات محیط فقط خواندنی است و هیچ تنظیمی در این صفحه تغییر نمی‌کند."
+
+msgid "Redis detected"
+msgstr "ردیس شناسایی شد"
+
+msgid "Redis extension"
+msgstr "افزونه ردیس"
+
+msgid "Register Custom Component"
+msgstr "ثبت جزء سفارشی"
+
+msgid "Remove NPE settings when the plugin is uninstalled"
+msgstr "حذف تنظیمات NPE هنگام حذف افزونه"
+
+msgid "Response generation after template_redirect"
+msgstr "تولید پاسخ پس از template_redirect"
+
+msgid "Retention (days)"
+msgstr "مدت نگهداری (روز)"
+
+msgid "Reviews"
+msgstr "دیدگاه‌ها"
+
+msgid "Run Analysis"
+msgstr "اجرای تحلیل"
+
+msgid "Sample rate (percent)"
+msgstr "نرخ نمونه‌برداری (درصد)"
+
+msgid "Samples"
+msgstr "نمونه‌ها"
+
+msgid "Save Component"
+msgstr "ذخیره جزء"
+
+msgid "Scoped purge forwarding"
+msgstr "ارسال پاک‌سازی محدود"
+
+msgid "Server software"
+msgstr "نرم‌افزار سرور"
+
+msgid "Settings"
+msgstr "تنظیمات"
+
+msgid "Settings saved."
+msgstr "تنظیمات ذخیره شد."
+
+msgid "Shared"
+msgstr "اشتراکی"
+
+msgid "Signature"
+msgstr "امضا"
+
+msgid "Size"
+msgstr "حجم"
+
+msgid "Smart Purge"
+msgstr "پاک‌سازی هوشمند"
+
+msgid "Smart Purge and Warmup"
+msgstr "پاک‌سازی هوشمند و پیش‌گرم‌سازی کش"
+
+msgid "Stale window (seconds)"
+msgstr "بازه کش کهنه (ثانیه)"
+
+msgid "Status"
+msgstr "وضعیت"
+
+msgid "Strategy"
+msgstr "راهبرد"
+
+msgid "Successful public cache responses"
+msgstr "پاسخ‌های عمومی موفق از کش"
+
+msgid "TTL"
+msgstr "زمان ماندگاری (TTL)"
+
+msgid "TTL (seconds)"
+msgstr "TTL (ثانیه)"
+
+msgid "Template breakdown"
+msgstr "تفکیک بر اساس قالب"
+
+msgid "The NPE administration is ready."
+msgstr "مدیریت NPE آماده است."
+
+msgid "The NPE page cache is disabled."
+msgstr "کش صفحه NPE غیرفعال است."
+
+msgid "The PHP DOM extension is required for analysis."
+msgstr "افزونه DOM در PHP برای تحلیل لازم است."
+
+msgid "The component definition is invalid."
+msgstr "تعریف جزء معتبر نیست."
+
+msgid "The page could not be fetched safely."
+msgstr "صفحه به‌صورت امن قابل دریافت نبود."
+
+msgid "The page returned an empty response."
+msgstr "صفحه پاسخی خالی برگرداند."
+
+msgid "Theme setup"
+msgstr "راه‌اندازی پوسته"
+
+msgid "These are backend PHP generation measurements, not browser-observed TTFB or network latency."
+msgstr "این اعداد زمان تولید سمت سرور با PHP هستند، نه TTFB مشاهده‌شده در مرورگر یا تأخیر شبکه."
+
+msgid "These modules are reserved for future phases and cannot be enabled yet."
+msgstr "این ماژول‌ها برای مراحل آینده در نظر گرفته شده‌اند و هنوز قابل فعال‌سازی نیستند."
+
+msgid "Top fragments"
+msgstr "قطعه‌های برتر"
+
+msgid "Unavailable"
+msgstr "در دسترس نیست"
+
+msgid "Uncacheable"
+msgstr "غیرقابل کش"
+
+msgid "Unknown"
+msgstr "نامشخص"
+
+msgid "Usage"
+msgstr "میزان استفاده"
+
+msgid "Value"
+msgstr "مقدار"
+
+msgid "Warm the homepage after full cache invalidation"
+msgstr "پیش‌گرم‌سازی صفحه اصلی پس از بی‌اعتبارسازی کامل کش"
+
+msgid "Warmup"
+msgstr "پیش‌گرم‌سازی کش"
+
+msgid "Warmup queue"
+msgstr "صف پیش‌گرم‌سازی"
+
+msgid "Warnings"
+msgstr "هشدارها"
+
+msgid "Wishlist"
+msgstr "فهرست علاقه‌مندی‌ها"
+
+msgid "WooCommerce"
+msgstr "ووکامرس"
+
+msgid "WooCommerce compatibility is defensive and does not publicly cache customer-specific data."
+msgstr "سازگاری ووکامرس محافظه‌کارانه است و داده‌های اختصاصی مشتری را در کش عمومی قرار نمی‌دهد."
+
+msgid "WooCommerce detected"
+msgstr "ووکامرس شناسایی شد"
+
+msgid "WooCommerce structures"
+msgstr "ساختارهای ووکامرس"
+
+msgid "WoodMart"
+msgstr "وودمارت"
+
+msgid "WoodMart Structure"
+msgstr "ساختار وودمارت"
+
+msgid "WordPress bootstrap observed at plugins_loaded"
+msgstr "راه‌اندازی وردپرس مشاهده‌شده در plugins_loaded"
+
+msgid "WordPress version"
+msgstr "نسخه وردپرس"
+
+msgid "Yes"
+msgstr "بله"
+
+msgid "You are not allowed to analyze scripts."
+msgstr "شما اجازه تحلیل اسکریپت‌ها را ندارید."
+
+msgid "You are not allowed to clear performance diagnostics."
+msgstr "شما اجازه پاک کردن داده‌های عملکرد را ندارید."
+
+msgid "You are not allowed to manage NPE settings."
+msgstr "شما اجازه مدیریت تنظیمات NPE را ندارید."
+
+msgid "You are not allowed to manage components."
+msgstr "شما اجازه مدیریت اجزا را ندارید."
+
+msgid "You are not allowed to manage the page cache."
+msgstr "شما اجازه مدیریت کش صفحه را ندارید."
+
+msgid "You are not allowed to run DOM analysis."
+msgstr "شما اجازه اجرای تحلیل DOM را ندارید."
+
+msgid "You are not allowed to view DOM diagnostics."
+msgstr "شما اجازه مشاهده عیب‌یابی DOM را ندارید."
+
+msgid "You are not allowed to view JavaScript diagnostics."
+msgstr "شما اجازه مشاهده عیب‌یابی جاوااسکریپت را ندارید."
+
+msgid "You are not allowed to view components."
+msgstr "شما اجازه مشاهده اجزا را ندارید."
+
+msgid "You are not allowed to view diagnostics."
+msgstr "شما اجازه مشاهده عیب‌یابی را ندارید."
+
+msgid "You are not allowed to view logging diagnostics."
+msgstr "شما اجازه مشاهده وضعیت گزارش‌ها را ندارید."
+
+msgid "You are not allowed to view performance diagnostics."
+msgstr "شما اجازه مشاهده داده‌های عملکرد را ندارید."
+
+msgid "You are not allowed to view the NPE dashboard."
+msgstr "شما اجازه مشاهده پیشخوان NPE را ندارید."
+
+msgid "You are not allowed to view this NPE section."
+msgstr "شما اجازه مشاهده این بخش NPE را ندارید."
