@@ -1,0 +1,11 @@
+* text=auto eol=lf
+*.php text diff=php
+*.css text diff=css
+*.js text diff=javascript
+*.json text
+*.md text
+*.txt text
+*.po text
+*.pot text
+*.svg text diff=xml
+*.mo binary
