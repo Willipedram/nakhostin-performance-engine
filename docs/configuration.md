@@ -33,6 +33,12 @@ implementation and a validated enabled setting, so manually changing an option
 cannot start an unfinished module. DOM diagnostic analysis is an explicit administrator action;
 its default-off flag continues to prevent automatic execution.
 
+The release availability registry is centralized in
+`FeatureFlags::AVAILABLE_MODULES`: DOM Intelligence, JavaScript, Cache,
+LiteSpeed, and Performance are available. CSS, WooCommerce, Elementor, and
+WoodMart remain unavailable. Their reserved configuration groups and defensive
+detection adapters do not make unfinished optimization modules available.
+
 ## Administration security
 
 The top-level **NPE / Performance Engine** screen requires the WordPress

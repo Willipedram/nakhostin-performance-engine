@@ -6,6 +6,7 @@
 - Added deterministic translation compilation for distributable packages.
 - Classified SVG, PO, POT, and source formats as text and added a repository binary-file guard.
 - Documented secure SVG and release-artifact policy.
+- Corrected the administration module-availability panel so implemented and future modules are clearly distinguished.
 
 ## 1.2.0 — Release hardening
 

@@ -34,7 +34,11 @@ final class AdminPageTest extends TestCase {
 		$this->assertStringContainsString( 'dir="rtl"', $output );
 		$this->assertStringContainsString( 'name="_wpnonce"', $output );
 		$this->assertStringNotContainsString( '<script>', $output );
-		$this->assertStringContainsString( 'Not available', $output );
+		$this->assertStringContainsString( 'Module availability', $output );
+		$this->assertStringContainsString( '<strong>DOM Intelligence</strong>', $output );
+		$this->assertStringContainsString( '— Available', $output );
+		$this->assertStringContainsString( '<strong>CSS</strong>', $output );
+		$this->assertStringContainsString( '— Not available', $output );
 	}
 
 	public function test_unauthorized_user_cannot_render_screen(): void {

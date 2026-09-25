@@ -296,8 +296,8 @@ msgstr "نرخ برخورد موفق کش قطعه‌ای"
 msgid "Full Page Cache"
 msgstr "کش کامل صفحه"
 
-msgid "Future modules"
-msgstr "ماژول‌های آینده"
+msgid "Module availability"
+msgstr "وضعیت دسترسی ماژول‌ها"
 
 msgid "General"
 msgstr "عمومی"
@@ -692,8 +692,8 @@ msgstr "راه‌اندازی پوسته"
 msgid "These are backend PHP generation measurements, not browser-observed TTFB or network latency."
 msgstr "این اعداد زمان تولید سمت سرور با PHP هستند، نه TTFB مشاهده‌شده در مرورگر یا تأخیر شبکه."
 
-msgid "These modules are reserved for future phases and cannot be enabled yet."
-msgstr "این ماژول‌ها برای مراحل آینده در نظر گرفته شده‌اند و هنوز قابل فعال‌سازی نیستند."
+msgid "Availability reflects the modules implemented in this release. Unavailable modules remain reserved for future phases and cannot be enabled."
+msgstr "وضعیت دسترسی بر اساس ماژول‌های پیاده‌سازی‌شده در این نسخه نمایش داده می‌شود. ماژول‌های در دسترس‌نبودنی برای مراحل آینده محفوظ‌اند و امکان فعال‌سازی آن‌ها وجود ندارد."
 
 msgid "Top fragments"
 msgstr "قطعه‌های برتر"

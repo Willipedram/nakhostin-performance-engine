@@ -195,11 +195,11 @@ final class AdminPage {
 			</label>
 		</div>
 		<div class="npe-card">
-			<h2><?php echo esc_html__( 'Future modules', 'nakhostin-performance-engine' ); ?></h2>
+			<h2><?php echo esc_html__( 'Module availability', 'nakhostin-performance-engine' ); ?></h2>
 			<p>
 				<?php
 				echo esc_html__(
-					'These modules are reserved for future phases and cannot be enabled yet.',
+					'Availability reflects the modules implemented in this release. Unavailable modules remain reserved for future phases and cannot be enabled.',
 					'nakhostin-performance-engine'
 				);
 				?>

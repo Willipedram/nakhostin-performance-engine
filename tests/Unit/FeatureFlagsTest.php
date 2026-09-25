@@ -25,6 +25,18 @@ final class FeatureFlagsTest extends TestCase {
 		$this->assertFalse( $flags->is_enabled( 'css' ) );
 	}
 
+	public function test_release_availability_matches_implemented_modules(): void {
+		$flags = new FeatureFlags( new Settings() );
+
+		foreach ( array( 'dom', 'javascript', 'cache', 'litespeed', 'performance' ) as $feature ) {
+			$this->assertTrue( $flags->is_available( $feature ), $feature );
+		}
+
+		foreach ( array( 'css', 'woocommerce', 'elementor', 'woodmart' ) as $feature ) {
+			$this->assertFalse( $flags->is_available( $feature ), $feature );
+		}
+	}
+
 	public function test_available_feature_honors_validated_setting(): void {
 		$flags = new FeatureFlags( new Settings(), array( 'css' => true ) );
 

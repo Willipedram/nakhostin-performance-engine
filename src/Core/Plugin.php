@@ -178,10 +178,7 @@ final class Plugin {
 		$this->services->set(
 			FeatureFlags::class,
 			static function ( ServiceRegistry $services ): FeatureFlags {
-				return new FeatureFlags(
-					$services->get( Settings::class ),
-					array( 'dom' => true, 'javascript' => true, 'cache' => true, 'litespeed' => true, 'performance' => true )
-				);
+				return new FeatureFlags( $services->get( Settings::class ) );
 			}
 		);
 		$this->services->set(

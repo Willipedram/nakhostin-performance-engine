@@ -277,7 +277,7 @@ msgstr ""
 msgid "Full Page Cache"
 msgstr ""
 
-msgid "Future modules"
+msgid "Module availability"
 msgstr ""
 
 msgid "General"
@@ -664,7 +664,7 @@ msgstr ""
 msgid "These are backend PHP generation measurements, not browser-observed TTFB or network latency."
 msgstr ""
 
-msgid "These modules are reserved for future phases and cannot be enabled yet."
+msgid "Availability reflects the modules implemented in this release. Unavailable modules remain reserved for future phases and cannot be enabled."
 msgstr ""
 
 msgid "Top fragments"
