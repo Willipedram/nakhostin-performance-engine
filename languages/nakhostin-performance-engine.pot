@@ -1,0 +1,929 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Nakhostin Performance Engine 1.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "%1$d nodes, %2$d relationships"
+msgstr ""
+
+msgid "%1$d pending, %2$d running, %3$d failed"
+msgstr ""
+
+msgid "%d seconds"
+msgstr ""
+
+msgid "%s cached entries"
+msgstr ""
+
+msgid "A safe, measurable performance control center for WordPress."
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Allowed query parameters (comma separated)"
+msgstr ""
+
+msgid "Analysis is explicit and uncertain scripts always retain their original loading behavior."
+msgstr ""
+
+msgid "Analysis runs only when explicitly requested and stores no page HTML."
+msgstr ""
+
+msgid "Analyze Registered Scripts"
+msgstr ""
+
+msgid "Application-level caching is disabled by default. Private WordPress and WooCommerce requests are always bypassed."
+msgstr ""
+
+msgid "Asset requests"
+msgstr ""
+
+msgid "Attention required"
+msgstr ""
+
+msgid "Attributes"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Average"
+msgstr ""
+
+msgid "Average backend time"
+msgstr ""
+
+msgid "Backend"
+msgstr ""
+
+msgid "Backend PHP generation"
+msgstr ""
+
+msgid "Bundles"
+msgstr ""
+
+msgid "CSS"
+msgstr ""
+
+msgid "CSS Intelligence is reserved for a later phase. No stylesheet optimization is active."
+msgstr ""
+
+msgid "CSS dependencies"
+msgstr ""
+
+msgid "CSS dependencies or sources"
+msgstr ""
+
+msgid "CSS reduction"
+msgstr ""
+
+msgid "Cache"
+msgstr ""
+
+msgid "Cache Overview"
+msgstr ""
+
+msgid "Cache behavior"
+msgstr ""
+
+msgid "Cache hit ratio"
+msgstr ""
+
+msgid "Cache size"
+msgstr ""
+
+msgid "Cache warmup"
+msgstr ""
+
+msgid "Cache-state breakdown"
+msgstr ""
+
+msgid "Classes"
+msgstr ""
+
+msgid "Clear performance history"
+msgstr ""
+
+msgid "Collect a bounded, privacy-safe sample of backend PHP measurements. These values are not browser TTFB."
+msgstr ""
+
+msgid "Compatible"
+msgstr ""
+
+msgid "Compatible — avoid competing cache and optimization layers"
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
+msgid "Component"
+msgstr ""
+
+msgid "Component ID"
+msgstr ""
+
+msgid "Component Intelligence"
+msgstr ""
+
+msgid "Component breakdown"
+msgstr ""
+
+msgid "Component saved. Dependent bundle plans were invalidated where necessary."
+msgstr ""
+
+msgid "Components"
+msgstr ""
+
+msgid "Configure NPE modules and conservative runtime defaults."
+msgstr ""
+
+msgid "Cooperative"
+msgstr ""
+
+msgid "Cooperative — also share scoped tags, TTL, vary, and purge signals"
+msgstr ""
+
+msgid "Custom Components"
+msgstr ""
+
+msgid "DOM Intelligence"
+msgstr ""
+
+msgid "DOM analysis completed."
+msgstr ""
+
+msgid "DOM selectors"
+msgstr ""
+
+msgid "DOM signature"
+msgstr ""
+
+msgid "Database"
+msgstr ""
+
+msgid "Database query count"
+msgstr ""
+
+msgid "Database query time when SAVEQUERIES is available"
+msgstr ""
+
+msgid "Debugging"
+msgstr ""
+
+msgid "Deferred scripts"
+msgstr ""
+
+msgid "Delayed scripts"
+msgstr ""
+
+msgid "Dependencies"
+msgstr ""
+
+msgid "Dependency graph"
+msgstr ""
+
+msgid "Dependency relationships"
+msgstr ""
+
+msgid "Detected and Registered Components"
+msgstr ""
+
+msgid "Detected object-cache backend"
+msgstr ""
+
+msgid "Diagnostics"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid "Dynamic states"
+msgstr ""
+
+msgid "Elementor"
+msgstr ""
+
+msgid "Elementor Widget: %s"
+msgstr ""
+
+msgid "Elementor detected"
+msgstr ""
+
+msgid "Elementor detection is available without changing Elementor settings or generated files."
+msgstr ""
+
+msgid "Elementor structures"
+msgstr ""
+
+msgid "Enable NPE full page cache"
+msgstr ""
+
+msgid "Enable automatic compatibility safeguards when LiteSpeed Cache is active"
+msgstr ""
+
+msgid "Enable diagnostic sampling"
+msgstr ""
+
+msgid "Enable redacted debug logging when WordPress debugging is active"
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Enter a valid URL on this WordPress site."
+msgstr ""
+
+msgid "Enter one selector, dependency, or state per line."
+msgstr ""
+
+msgid "Entries"
+msgstr ""
+
+msgid "Excluded paths (one per line)"
+msgstr ""
+
+msgid "External object cache"
+msgstr ""
+
+msgid "Failed jobs"
+msgstr ""
+
+msgid "Files in the latest JavaScript analysis"
+msgstr ""
+
+msgid "Files with measured size"
+msgstr ""
+
+msgid "Footer"
+msgstr ""
+
+msgid "Fragment and Object Cache"
+msgstr ""
+
+msgid "Fragment backend"
+msgstr ""
+
+msgid "Fragment entries"
+msgstr ""
+
+msgid "Fragment hit ratio"
+msgstr ""
+
+msgid "Full Page Cache"
+msgstr ""
+
+msgid "Module availability"
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "HTTPS"
+msgstr ""
+
+msgid "Handle"
+msgstr ""
+
+msgid "Header"
+msgstr ""
+
+msgid "Hit rate"
+msgstr ""
+
+msgid "Hits / misses"
+msgstr ""
+
+msgid "IDs"
+msgstr ""
+
+msgid "Important product IDs (comma separated)"
+msgstr ""
+
+msgid "Important product category IDs (comma separated)"
+msgstr ""
+
+msgid "Independent"
+msgstr ""
+
+msgid "Independent — NPE owns enabled cache and optimization layers"
+msgstr ""
+
+msgid "Installed"
+msgstr ""
+
+msgid "Integration mode"
+msgstr ""
+
+msgid "Invalidation dependencies"
+msgstr ""
+
+msgid "JS dependencies"
+msgstr ""
+
+msgid "JavaScript"
+msgstr ""
+
+msgid "JavaScript Intelligence"
+msgstr ""
+
+msgid "JavaScript dependencies or sources"
+msgstr ""
+
+msgid "JavaScript reduction"
+msgstr ""
+
+msgid "Last purge reason"
+msgstr ""
+
+msgid "Last warmup result"
+msgstr ""
+
+msgid "Latest Analysis"
+msgstr ""
+
+msgid "Latest Manifest"
+msgstr ""
+
+msgid "Latest asynchronous warmup status"
+msgstr ""
+
+msgid "LiteSpeed"
+msgstr ""
+
+msgid "LiteSpeed Cache"
+msgstr ""
+
+msgid "LiteSpeed Cache Integration"
+msgstr ""
+
+msgid "LiteSpeed Cache compatibility"
+msgstr ""
+
+msgid "LiteSpeed Cache detected"
+msgstr ""
+
+msgid "LiteSpeed cooperation uses public hooks and never changes LiteSpeed Cache configuration."
+msgstr ""
+
+msgid "Logging is active"
+msgstr ""
+
+msgid "Logging is inactive"
+msgstr ""
+
+msgid "Logs"
+msgstr ""
+
+msgid "Maximum"
+msgstr ""
+
+msgid "Maximum samples"
+msgstr ""
+
+msgid "Measured local JavaScript sources"
+msgstr ""
+
+msgid "Median"
+msgstr ""
+
+msgid "Memcached extension"
+msgstr ""
+
+msgid "Metric"
+msgstr ""
+
+msgid "Mini Cart"
+msgstr ""
+
+msgid "Minimum"
+msgstr ""
+
+msgid "Mobile Menu"
+msgstr ""
+
+msgid "Multisite"
+msgstr ""
+
+msgid "NPE"
+msgstr ""
+
+msgid "NPE logging is redacted, disabled by default, and written through the WordPress debug destination. Log contents are not exposed in the browser."
+msgstr ""
+
+msgid "NPE plugin loading"
+msgstr ""
+
+msgid "NPE provides an application-level cache. Generic hosting cannot bypass the WordPress bootstrap without a separately configured server adapter."
+msgstr ""
+
+msgid "NPE uses only public LiteSpeed hooks and never changes LiteSpeed Cache settings."
+msgstr ""
+
+msgid "Nakhostin Performance Engine"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Navigation"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "No DOM manifest has been generated yet."
+msgstr ""
+
+msgid "No JavaScript analysis has been recorded."
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "Not available"
+msgstr ""
+
+msgid "Not measured in this phase"
+msgstr ""
+
+msgid "Not run"
+msgstr ""
+
+msgid "Number of files"
+msgstr ""
+
+msgid "Object cache API"
+msgstr ""
+
+msgid "Observed performance groups"
+msgstr ""
+
+msgid "Open settings"
+msgstr ""
+
+msgid "Optimized JavaScript size"
+msgstr ""
+
+msgid "Original"
+msgstr ""
+
+msgid "Original JavaScript size"
+msgstr ""
+
+msgid "Overview"
+msgstr ""
+
+msgid "PHP generation"
+msgstr ""
+
+msgid "PHP generation; not network TTFB"
+msgstr ""
+
+msgid "PHP version"
+msgstr ""
+
+msgid "Page type"
+msgstr ""
+
+msgid "Page types"
+msgstr ""
+
+msgid "Page-type breakdown"
+msgstr ""
+
+msgid "Peak PHP memory"
+msgstr ""
+
+msgid "Performance"
+msgstr ""
+
+msgid "Performance Engine"
+msgstr ""
+
+msgid "Performance Overview"
+msgstr ""
+
+msgid "Performance monitoring"
+msgstr ""
+
+msgid "Performance sampling is disabled, so backend averages are unavailable."
+msgstr ""
+
+msgid "Performance summary"
+msgstr ""
+
+msgid "Persistent object cache"
+msgstr ""
+
+msgid "Planned"
+msgstr ""
+
+msgid "Private"
+msgstr ""
+
+msgid "Product Card"
+msgstr ""
+
+msgid "Product Filter"
+msgstr ""
+
+msgid "Product Gallery"
+msgstr ""
+
+msgid "Product Grid"
+msgstr ""
+
+msgid "Product Sorting"
+msgstr ""
+
+msgid "Product Variation"
+msgstr ""
+
+msgid "Public page URL"
+msgstr ""
+
+msgid "Public page-cache owner"
+msgstr ""
+
+msgid "Purge and schedule rebuild"
+msgstr ""
+
+msgid "Purge cache"
+msgstr ""
+
+msgid "Purge queue"
+msgstr ""
+
+msgid "Queued jobs"
+msgstr ""
+
+msgid "Quick navigation"
+msgstr ""
+
+msgid "Read-only environment information. No configuration is changed from this screen."
+msgstr ""
+
+msgid "Redis detected"
+msgstr ""
+
+msgid "Redis extension"
+msgstr ""
+
+msgid "Register Custom Component"
+msgstr ""
+
+msgid "Remove NPE settings when the plugin is uninstalled"
+msgstr ""
+
+msgid "Response generation after template_redirect"
+msgstr ""
+
+msgid "Retention (days)"
+msgstr ""
+
+msgid "Reviews"
+msgstr ""
+
+msgid "Run Analysis"
+msgstr ""
+
+msgid "Sample rate (percent)"
+msgstr ""
+
+msgid "Samples"
+msgstr ""
+
+msgid "Save Component"
+msgstr ""
+
+msgid "Scoped purge forwarding"
+msgstr ""
+
+msgid "Server software"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Shared"
+msgstr ""
+
+msgid "Signature"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid "Smart Purge and Warmup"
+msgstr ""
+
+msgid "Stale window (seconds)"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Strategy"
+msgstr ""
+
+msgid "Successful public cache responses"
+msgstr ""
+
+msgid "TTL"
+msgstr ""
+
+msgid "TTL (seconds)"
+msgstr ""
+
+msgid "Template breakdown"
+msgstr ""
+
+msgid "The NPE page cache is disabled."
+msgstr ""
+
+msgid "The PHP DOM extension is required for analysis."
+msgstr ""
+
+msgid "The component definition is invalid."
+msgstr ""
+
+msgid "The page could not be fetched safely."
+msgstr ""
+
+msgid "The page returned an empty response."
+msgstr ""
+
+msgid "Theme setup"
+msgstr ""
+
+msgid "These are backend PHP generation measurements, not browser-observed TTFB or network latency."
+msgstr ""
+
+msgid "Availability reflects the modules implemented in this release. Unavailable modules remain reserved for future phases and cannot be enabled."
+msgstr ""
+
+msgid "Top fragments"
+msgstr ""
+
+msgid "Unavailable"
+msgstr ""
+
+msgid "Uncacheable"
+msgstr ""
+
+msgid "Unknown"
+msgstr ""
+
+msgid "Usage"
+msgstr ""
+
+msgid "Value"
+msgstr ""
+
+msgid "Warm the homepage after full cache invalidation"
+msgstr ""
+
+msgid "Warmup queue"
+msgstr ""
+
+msgid "Warnings"
+msgstr ""
+
+msgid "Wishlist"
+msgstr ""
+
+msgid "WooCommerce"
+msgstr ""
+
+msgid "WooCommerce compatibility is defensive and does not publicly cache customer-specific data."
+msgstr ""
+
+msgid "WooCommerce detected"
+msgstr ""
+
+msgid "WooCommerce structures"
+msgstr ""
+
+msgid "WoodMart"
+msgstr ""
+
+msgid "WoodMart Structure"
+msgstr ""
+
+msgid "WordPress bootstrap observed at plugins_loaded"
+msgstr ""
+
+msgid "WordPress version"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "You are not allowed to analyze scripts."
+msgstr ""
+
+msgid "You are not allowed to clear performance diagnostics."
+msgstr ""
+
+msgid "You are not allowed to manage NPE settings."
+msgstr ""
+
+msgid "You are not allowed to manage components."
+msgstr ""
+
+msgid "You are not allowed to manage the page cache."
+msgstr ""
+
+msgid "You are not allowed to run DOM analysis."
+msgstr ""
+
+msgid "You are not allowed to view DOM diagnostics."
+msgstr ""
+
+msgid "You are not allowed to view JavaScript diagnostics."
+msgstr ""
+
+msgid "You are not allowed to view components."
+msgstr ""
+
+msgid "You are not allowed to view diagnostics."
+msgstr ""
+
+msgid "You are not allowed to view logging diagnostics."
+msgstr ""
+
+msgid "You are not allowed to view performance diagnostics."
+msgstr ""
+
+msgid "You are not allowed to view the NPE dashboard."
+msgstr ""
+
+msgid "You are not allowed to view this NPE section."
+msgstr ""
+
+msgid "Analyze CSS usage"
+msgstr ""
+
+msgid "Analyze stylesheet usage"
+msgstr ""
+
+msgid "CSS Intelligence"
+msgstr ""
+
+msgid "Caps stored history so monitoring data cannot grow without limit."
+msgstr ""
+
+msgid "Effect: prevents overlapping NPE and LiteSpeed optimization behavior. It does not change any LiteSpeed setting."
+msgstr ""
+
+msgid "Effect: queues a non-blocking homepage request after a full invalidation so the first visitor is less likely to encounter a cold cache."
+msgstr ""
+
+msgid "Effect: records bounded backend timing and memory samples without storing private URLs, cookies, or request bodies."
+msgstr ""
+
+msgid "Effect: stores eligible public HTML responses. Logged-in, private, cart, checkout, account, session, and sensitive requests continue to bypass the cache."
+msgstr ""
+
+msgid "Effect: when WordPress deletes the plugin, NPE-owned settings, manifests, metrics, queues, and cache files are permanently removed."
+msgstr ""
+
+msgid "Effect: writes redacted diagnostic messages only while WordPress debugging is also enabled; secrets and personal data are filtered."
+msgstr ""
+
+msgid "First analyze the target page under DOM Intelligence, then paste the corresponding stylesheet below. Dynamic selectors and uncertain rules are preserved."
+msgstr ""
+
+msgid "How JavaScript decisions are made"
+msgstr ""
+
+msgid "How long a fresh public cache entry may be served."
+msgstr ""
+
+msgid "How long an expired entry may remain available for controlled stale handling."
+msgstr ""
+
+msgid "Latest CSS analysis"
+msgstr ""
+
+msgid "Loading strategy"
+msgstr ""
+
+msgid "Lower values reduce monitoring overhead; 10 percent is the conservative default."
+msgstr ""
+
+msgid "Matched selectors"
+msgstr ""
+
+msgid "Matching URL paths always bypass the NPE page cache."
+msgstr ""
+
+msgid "NPE compares selectors with the latest DOM manifest. It only reports review candidates and never removes or rewrites CSS automatically."
+msgstr ""
+
+msgid "No CSS usage analysis has been recorded."
+msgstr ""
+
+msgid "Not required on this page: the script is registered but is outside the dependency closure of the current page."
+msgstr ""
+
+msgid "Older performance samples are removed after this period."
+msgstr ""
+
+msgid "Only these non-sensitive query parameters may create separate public cache variants. Leave empty unless required."
+msgstr ""
+
+msgid "Page requirement"
+msgstr ""
+
+msgid "Possible unused does not mean safe to delete. Verify interactive states and templates before making any manual change."
+msgstr ""
+
+msgid "Possible unused selectors"
+msgstr ""
+
+msgid "Preserved dynamic or uncertain selectors"
+msgstr ""
+
+msgid "Preserved: scripts with inline data, localization, sensitive integrations, missing dependencies, or uncertain behavior keep their original loading."
+msgstr ""
+
+msgid "Registered but not requested by this page"
+msgstr ""
+
+msgid "Registered but not required on this page"
+msgstr ""
+
+msgid "Required by this page or its dependencies"
+msgstr ""
+
+msgid "Required scripts"
+msgstr ""
+
+msgid "Required: the script is enqueued for this page, required by another script, or declared by a detected component."
+msgstr ""
+
+msgid "Running analysis does not change frontend scripts. Optimization strategies are applied only through separately enabled safe controls."
+msgstr ""
+
+msgid "Selectors analyzed"
+msgstr ""
+
+msgid "Stylesheet size"
+msgstr ""
+
+msgid "Stylesheet source"
+msgstr ""
+
+msgid "The stylesheet is empty or exceeds the one megabyte analysis limit."
+msgstr ""
+
+msgid "The submitted CSS is processed in memory and is not stored. Only selector counts and the compact analysis manifest are saved."
+msgstr ""
+
+msgid "These product categories are prioritized for asynchronous cache warmup."
+msgstr ""
+
+msgid "These products are prioritized for asynchronous cache warmup; publishing is not blocked."
+msgstr ""
+
+msgid "You are not allowed to analyze stylesheets."
+msgstr ""
+
+msgid "You are not allowed to view CSS diagnostics."
+msgstr ""
+
+msgid "Analyze DOM, CSS, JavaScript, and Components"
+msgstr ""
+
+msgid "Analyze Page Assets"
+msgstr ""
+
+msgid "One click analyzes the rendered DOM, detected components, same-origin stylesheets, and registered JavaScript dependencies. Full page HTML and submitted source code are not stored."
+msgstr ""
+
+msgid "Page asset analysis completed."
+msgstr ""
+
+msgid "For automatic collection, run Analyze Page Assets under DOM Intelligence. The form below is an advanced fallback for a stylesheet you want to inspect manually."
+msgstr ""
+
+msgid "Open automatic page analysis"
+msgstr ""
+
+msgid "Manual stylesheet analysis (advanced)"
+msgstr ""
+
+msgid "This action automatically revisits the latest analyzed public page and refreshes its DOM, component, CSS, and JavaScript manifests together."
+msgstr ""
+
+msgid "Refresh Page Asset Analysis"
+msgstr ""
+
+msgid "The page loaded, but one or more asset manifests could not be created safely."
+msgstr ""
