@@ -7,6 +7,8 @@
 
 namespace {
 	defined( 'MINUTE_IN_SECONDS' ) || define( 'MINUTE_IN_SECONDS', 60 );
+	defined( 'HOUR_IN_SECONDS' ) || define( 'HOUR_IN_SECONDS', 3600 );
+	defined( 'DAY_IN_SECONDS' ) || define( 'DAY_IN_SECONDS', 86400 );
 	$GLOBALS['npe_test_actions']            = array();
 	$GLOBALS['npe_test_filters']            = array();
 	$GLOBALS['npe_test_fired_actions']      = array();
@@ -233,6 +235,10 @@ namespace {
 	}
 
 	function wp_doing_ajax(): bool {
+		return false;
+	}
+
+	function wp_doing_cron(): bool {
 		return false;
 	}
 

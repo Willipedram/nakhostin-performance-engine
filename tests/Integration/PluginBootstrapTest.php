@@ -21,7 +21,7 @@ final class PluginBootstrapTest extends TestCase {
 	}
 
 	public function test_bootstrap_defines_plugin_constants(): void {
-		$this->assertSame( '1.4.0', NPE_VERSION );
+		$this->assertSame( '1.5.0', NPE_VERSION );
 		$this->assertSame( 'nakhostin-performance-engine.php', NPE_BASENAME );
 	}
 

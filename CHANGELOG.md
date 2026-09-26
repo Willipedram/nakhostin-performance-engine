@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0 — Gradual automatic DOM learning
+
+- Added a bounded, deduplicated WP-Cron queue that learns from sampled anonymous public page requests without delaying visitors.
+- Added same-origin normalization, sensitive-route exclusions, cooldowns, retry backoff, failed-job visibility, and conservative production controls.
+
 ## 1.4.0 — Automated page intelligence
 
 - Replaced separate manual DOM/CSS/JavaScript diagnostics with a one-click, one-time frontend page asset capture and safe fallback.

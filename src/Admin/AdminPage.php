@@ -127,6 +127,22 @@ final class AdminPage {
 			<p class="description"><?php echo esc_html__( 'Effect: when WordPress deletes the plugin, NPE-owned settings, manifests, metrics, queues, and cache files are permanently removed.', 'nakhostin-performance-engine' ); ?></p>
 		</div>
 		<div class="npe-card">
+			<h2><?php echo esc_html__( 'Automatic DOM learning', 'nakhostin-performance-engine' ); ?></h2>
+			<p><?php echo esc_html__( 'Gradually learns from eligible public pages that real visitors request. Analysis runs later through WP-Cron and never blocks the visitor response.', 'nakhostin-performance-engine' ); ?></p>
+			<label>
+				<input type="hidden" name="npe_settings[dom][enabled]" value="0">
+				<input type="checkbox" name="npe_settings[dom][enabled]" value="1" <?php checked( $settings['dom']['enabled'] ); ?>>
+				<?php echo esc_html__( 'Enable automatic DOM learning', 'nakhostin-performance-engine' ); ?>
+			</label>
+			<p class="description"><?php echo esc_html__( 'Effect: only anonymous, query-free, same-site public URLs are queued. Account, cart, checkout, administration, logged-in, and analysis requests are excluded.', 'nakhostin-performance-engine' ); ?></p>
+			<p><label><?php echo esc_html__( 'Daily sampling rate (percent)', 'nakhostin-performance-engine' ); ?><br>
+				<input type="number" min="1" max="100" name="npe_settings[dom][sample_rate]" value="<?php echo esc_attr( $settings['dom']['sample_rate'] ); ?>">
+			</label><span class="description"><?php echo esc_html__( 'A deterministic daily sample limits database writes and background traffic. Ten percent is recommended for normal production sites.', 'nakhostin-performance-engine' ); ?></span></p>
+			<p><label><?php echo esc_html__( 'Rescan cooldown (hours)', 'nakhostin-performance-engine' ); ?><br>
+				<input type="number" min="1" max="720" name="npe_settings[dom][cooldown_hours]" value="<?php echo esc_attr( $settings['dom']['cooldown_hours'] ); ?>">
+			</label><span class="description"><?php echo esc_html__( 'The same normalized page is not queued again during this interval. Query strings are never stored.', 'nakhostin-performance-engine' ); ?></span></p>
+		</div>
+		<div class="npe-card">
 			<h2><?php echo esc_html__( 'LiteSpeed Cache compatibility', 'nakhostin-performance-engine' ); ?></h2>
 			<p><?php echo esc_html__( 'NPE uses only public LiteSpeed hooks and never changes LiteSpeed Cache settings.', 'nakhostin-performance-engine' ); ?></p>
 			<label>

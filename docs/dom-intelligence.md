@@ -2,9 +2,10 @@
 
 ## Scope
 
-The DOM Intelligence subsystem turns an explicitly supplied rendered HTML page
-into a compact, reusable DOM Usage Manifest. It does not rewrite markup, remove
-CSS, optimize JavaScript, cache pages, or run on ordinary frontend requests.
+The DOM Intelligence subsystem turns rendered HTML into a compact, reusable DOM
+Usage Manifest. It does not rewrite markup, remove CSS, optimize JavaScript, or
+cache pages. Analysis can be started manually or learned gradually from public
+traffic through an opt-in asynchronous queue.
 
 Administrators can run an analysis from **NPE → DOM Intelligence**. The action
 requires `manage_options`, a valid nonce, and a public HTTP(S) URL whose host
@@ -17,6 +18,22 @@ detected component usage, same-origin CSS usage manifest, and JavaScript
 dependency manifest together. The high-entropy capture token is single-use and
 expires after five minutes. If loopback capture is unavailable, NPE falls back to
 a bounded safe HTTP fetch so DOM, component, and CSS analysis can still complete.
+
+## Automatic gradual learning
+
+When **Automatic DOM learning** is enabled, a lightweight `template_redirect`
+observer considers anonymous GET requests. It rejects administration, login,
+cart, checkout, account, AJAX, cron, authenticated, query-string, and internal
+capture requests before doing any queue work. Eligible URLs are normalized to a
+same-origin path with no query or fragment, sampled in a deterministic daily
+bucket, deduplicated, and protected by a configurable rescan cooldown.
+
+The bounded queue stores at most 100 normalized URLs and schedules a single
+WP-Cron event. Each worker invocation claims only one page, performs the existing
+single-use loopback capture, and then completes or retries the job with exponential
+backoff. Three failed attempts leave a visible failed job instead of creating a
+loop. The visitor request never performs DOM parsing or remote fetches. Queue
+progress appears on **NPE → DOM Intelligence**.
 
 ## Pipeline
 
@@ -86,7 +103,9 @@ untrusted data and escape all displayed values.
 - Static analysis cannot discover JavaScript-only states or post-interaction DOM.
 - Detection is heuristic and reports evidence; it does not activate or modify
   WooCommerce, Elementor, themes, or other plugins.
-- Only the latest site manifest is retained. Per-template histories and scheduled
-  learning are intentionally deferred.
+- Only the latest site manifest is retained; the queue is discovery state, not a
+  per-page manifest history.
+- WP-Cron depends on site traffic unless the operator configures a real system
+  cron to invoke WordPress cron processing.
 - Shadow DOM, iframe documents, CSS pseudo-elements, and browser accessibility
   trees are outside this phase.

@@ -2,7 +2,7 @@
 /** Generated text translation catalog. @package NakhostinPerformanceEngine */
 
 return array (
-  'project-id-version' => 'Nakhostin Performance Engine 1.4.0',
+  'project-id-version' => 'Nakhostin Performance Engine 1.5.0',
   'language' => 'fa_IR',
   'language-team' => 'Persian',
   'po-revision-date' => '2026-09-25 00:00+0000',
@@ -330,5 +330,18 @@ return array (
     'This action automatically revisits the latest analyzed public page and refreshes its DOM, component, CSS, and JavaScript manifests together.' => 'این عملیات به‌صورت خودکار آخرین صفحهٔ عمومی تحلیل‌شده را دوباره بازدید می‌کند و مانیفست‌های DOM، اجزا، CSS و جاوااسکریپت را هم‌زمان به‌روزرسانی می‌کند.',
     'Refresh Page Asset Analysis' => 'به‌روزرسانی تحلیل منابع صفحه',
     'The page loaded, but one or more asset manifests could not be created safely.' => 'صفحه بارگذاری شد، اما ایجاد ایمن یک یا چند مانیفست منابع امکان‌پذیر نبود.',
+    'Automatic DOM learning' => 'یادگیری خودکار DOM',
+    'Gradually learns from eligible public pages that real visitors request. Analysis runs later through WP-Cron and never blocks the visitor response.' => 'به‌تدریج از صفحه‌های عمومی واجد شرایط که بازدیدکنندگان واقعی درخواست می‌کنند یاد می‌گیرد. تحلیل بعداً با WP-Cron انجام می‌شود و هرگز پاسخ بازدیدکننده را متوقف نمی‌کند.',
+    'Enable automatic DOM learning' => 'فعال‌سازی یادگیری خودکار DOM',
+    'Effect: only anonymous, query-free, same-site public URLs are queued. Account, cart, checkout, administration, logged-in, and analysis requests are excluded.' => 'اثر: فقط نشانی‌های عمومی همان سایت، بدون پارامتر و متعلق به بازدیدکننده ناشناس در صف قرار می‌گیرند. حساب کاربری، سبد خرید، تسویه‌حساب، مدیریت، کاربران واردشده و درخواست‌های تحلیل مستثنا هستند.',
+    'Daily sampling rate (percent)' => 'نرخ نمونه‌برداری روزانه (درصد)',
+    'A deterministic daily sample limits database writes and background traffic. Ten percent is recommended for normal production sites.' => 'نمونه‌برداری روزانه قطعی، نوشتن در پایگاه داده و ترافیک پس‌زمینه را محدود می‌کند. برای سایت‌های عادی در حال بهره‌برداری، ۱۰ درصد پیشنهاد می‌شود.',
+    'Rescan cooldown (hours)' => 'فاصله بررسی دوباره (ساعت)',
+    'The same normalized page is not queued again during this interval. Query strings are never stored.' => 'در این بازه، همان صفحه استانداردشده دوباره وارد صف نمی‌شود. پارامترهای نشانی هرگز ذخیره نمی‌شوند.',
+    'Automatic learning queue' => 'صف یادگیری خودکار',
+    'Eligible visitor requests are deduplicated and analyzed asynchronously, one page per cron run.' => 'درخواست‌های واجد شرایط بازدیدکنندگان تکرارزدایی می‌شوند و در هر اجرای زمان‌بندی، یک صفحه به‌صورت غیرهم‌زمان تحلیل می‌شود.',
+    'Pending' => 'در انتظار',
+    'Running' => 'در حال اجرا',
+    'Failed' => 'ناموفق',
   ),
 );

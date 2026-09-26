@@ -3,7 +3,7 @@ Contributors: nakhostin
 Tags: performance, cache, optimization, woocommerce
 Requires at least: 6.4
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ A modular, integration-friendly performance engine foundation for WordPress.
 == Description ==
 
 Nakhostin Performance Engine (NPE) is being built as an independent performance
-platform for WordPress and WooCommerce. Version 1.4.0 adds one-click page intelligence that captures DOM, components, same-origin CSS, and the real frontend JavaScript registry together. Automatic CSS tree shaking remains intentionally unavailable.
+platform for WordPress and WooCommerce. Version 1.5.0 adds opt-in, gradual page intelligence that queues sampled public requests and analyzes them asynchronously. Automatic CSS tree shaking remains intentionally unavailable.
 
 == Installation ==
 
@@ -21,6 +21,10 @@ platform for WordPress and WooCommerce. Version 1.4.0 adds one-click page intell
 3. Optionally generate the optimized Composer autoloader when deploying from source; NPE has no required production Composer packages.
 
 == Changelog ==
+
+= 1.5.0 =
+* Add opt-in automatic DOM learning from eligible anonymous public page requests.
+* Process a bounded deduplicated queue through WP-Cron with cooldowns, retries, and sensitive-route exclusions.
 
 = 1.4.0 =
 * Add one-click, one-time frontend capture for DOM, component, CSS, and JavaScript manifests.

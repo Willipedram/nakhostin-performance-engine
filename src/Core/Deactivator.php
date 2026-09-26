@@ -13,5 +13,6 @@ final class Deactivator {
 		wp_clear_scheduled_hook( 'npe/cache/run_warmup' );
 		wp_clear_scheduled_hook( 'npe/cache/process_purge_queue' );
 		wp_clear_scheduled_hook( 'npe/cache/process_warmup_queue' );
+		wp_clear_scheduled_hook( 'npe/dom/process_analysis_queue' );
 	}
 }

@@ -3,7 +3,7 @@
  * Plugin Name:       Nakhostin Performance Engine
  * Plugin URI:        https://github.com/nakhostin/nakhostin-performance-engine
  * Description:       A modular performance foundation for WordPress and WooCommerce.
- * Version:           1.4.0
+ * Version:           1.5.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Seyed Pedram Nakhostin
@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'NPE_BOOTSTRAP_START', microtime( true ) );
 
-define( 'NPE_VERSION', '1.4.0' );
+define( 'NPE_VERSION', '1.5.0' );
 define( 'NPE_FILE', __FILE__ );
 define( 'NPE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'NPE_URL', plugin_dir_url( __FILE__ ) );

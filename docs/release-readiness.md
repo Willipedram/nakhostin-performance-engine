@@ -1,4 +1,4 @@
-# Release Readiness Report — 1.4.0
+# Release Readiness Report — 1.5.0
 
 ## Completed modules
 
@@ -41,7 +41,7 @@ DOM analysis and asset builds are explicit administrator/build operations, not n
 
 ## Release decision
 
-Recommended version: **1.4.0**. It is suitable for a controlled production release with conservative defaults. Page intelligence uses an explicit one-time frontend capture and CSS analysis remains diagnostic-only. Modern WordPress loads the committed text-based Persian catalog; release packaging must additionally compile the MO fallback for WordPress 6.4. Operators should stage-test their theme/commerce flows, retain backups, verify cache directory protections for their web server, and initially leave optional runtime features disabled.
+Recommended version: **1.5.0**. It is suitable for a controlled production release with conservative defaults. Page intelligence supports explicit capture plus opt-in bounded asynchronous learning; CSS analysis remains diagnostic-only. Modern WordPress loads the committed text-based Persian catalog; release packaging must additionally compile the MO fallback for WordPress 6.4. Operators should stage-test their theme/commerce flows, retain backups, verify cache directory protections for their web server, and initially leave optional runtime features disabled.
 
 The capture listener performs only an empty query-parameter check on ordinary
 frontend requests. DOM parsing, stylesheet HTTP requests, script discovery, and

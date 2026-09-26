@@ -56,6 +56,8 @@ use Nakhostin\PerformanceEngine\CSS\CSSAnalyzer;
 use Nakhostin\PerformanceEngine\CSS\CSSStorage;
 use Nakhostin\PerformanceEngine\CSS\StylesheetSourceCollector;
 use Nakhostin\PerformanceEngine\DOM\DOMAnalyzer;
+use Nakhostin\PerformanceEngine\DOM\DOMAnalysisQueue;
+use Nakhostin\PerformanceEngine\DOM\DOMAutoLearning;
 use Nakhostin\PerformanceEngine\DOM\DOMComponentDetector;
 use Nakhostin\PerformanceEngine\DOM\DOMSignature;
 use Nakhostin\PerformanceEngine\DOM\DOMStateRegistry;
@@ -141,6 +143,7 @@ final class Plugin {
 		}
 		$this->services->get( PerformanceMonitor::class )->register();
 		$this->services->get( PageAnalysisCoordinator::class )->register();
+		$this->services->get( DOMAutoLearning::class )->register();
 
 		$this->services->get( CacheWarmer::class )->register();
 		$this->services->get( CacheWarmupManager::class )->register();
@@ -334,6 +337,17 @@ final class Plugin {
 				);
 			}
 		);
+		$this->services->set( DOMAnalysisQueue::class, new DOMAnalysisQueue() );
+		$this->services->set(
+			DOMAutoLearning::class,
+			static function ( ServiceRegistry $services ): DOMAutoLearning {
+				return new DOMAutoLearning(
+					$services->get( DOMAnalysisQueue::class ),
+					$services->get( PageAnalysisCoordinator::class ),
+					$services->get( Settings::class )
+				);
+			}
+		);
 		$this->services->set(
 			DOMAdminPage::class,
 			static function ( ServiceRegistry $services ): DOMAdminPage {
@@ -342,7 +356,8 @@ final class Plugin {
 					$services->get( DOMStorageInterface::class ),
 					$services->get( Capabilities::class ),
 					$services->get( ComponentRegistry::class ),
-					$services->get( PageAnalysisCoordinator::class )
+					$services->get( PageAnalysisCoordinator::class ),
+					$services->get( DOMAnalysisQueue::class )
 				);
 			}
 		);

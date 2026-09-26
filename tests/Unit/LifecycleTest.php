@@ -18,7 +18,7 @@ final class LifecycleTest extends TestCase {
 		$GLOBALS['npe_test_options']       = array();
 		$GLOBALS['npe_test_cleared_hooks'] = array();
 		if ( ! defined( 'NPE_VERSION' ) ) {
-			define( 'NPE_VERSION', '1.4.0' );
+			define( 'NPE_VERSION', '1.5.0' );
 		}
 	}
 

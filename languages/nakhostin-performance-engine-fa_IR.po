@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Nakhostin Performance Engine 1.4.0\n"
+"Project-Id-Version: Nakhostin Performance Engine 1.5.0\n"
 "Language: fa_IR\n"
 "Language-Team: Persian\n"
 "PO-Revision-Date: 2026-09-25 00:00+0000\n"
@@ -958,3 +958,55 @@ msgstr "به‌روزرسانی تحلیل منابع صفحه"
 
 msgid "The page loaded, but one or more asset manifests could not be created safely."
 msgstr "صفحه بارگذاری شد، اما ایجاد ایمن یک یا چند مانیفست منابع امکان‌پذیر نبود."
+
+
+msgid "Automatic DOM learning"
+msgstr "یادگیری خودکار DOM"
+
+
+msgid "Gradually learns from eligible public pages that real visitors request. Analysis runs later through WP-Cron and never blocks the visitor response."
+msgstr "به‌تدریج از صفحه‌های عمومی واجد شرایط که بازدیدکنندگان واقعی درخواست می‌کنند یاد می‌گیرد. تحلیل بعداً با WP-Cron انجام می‌شود و هرگز پاسخ بازدیدکننده را متوقف نمی‌کند."
+
+
+msgid "Enable automatic DOM learning"
+msgstr "فعال‌سازی یادگیری خودکار DOM"
+
+
+msgid "Effect: only anonymous, query-free, same-site public URLs are queued. Account, cart, checkout, administration, logged-in, and analysis requests are excluded."
+msgstr "اثر: فقط نشانی‌های عمومی همان سایت، بدون پارامتر و متعلق به بازدیدکننده ناشناس در صف قرار می‌گیرند. حساب کاربری، سبد خرید، تسویه‌حساب، مدیریت، کاربران واردشده و درخواست‌های تحلیل مستثنا هستند."
+
+
+msgid "Daily sampling rate (percent)"
+msgstr "نرخ نمونه‌برداری روزانه (درصد)"
+
+
+msgid "A deterministic daily sample limits database writes and background traffic. Ten percent is recommended for normal production sites."
+msgstr "نمونه‌برداری روزانه قطعی، نوشتن در پایگاه داده و ترافیک پس‌زمینه را محدود می‌کند. برای سایت‌های عادی در حال بهره‌برداری، ۱۰ درصد پیشنهاد می‌شود."
+
+
+msgid "Rescan cooldown (hours)"
+msgstr "فاصله بررسی دوباره (ساعت)"
+
+
+msgid "The same normalized page is not queued again during this interval. Query strings are never stored."
+msgstr "در این بازه، همان صفحه استانداردشده دوباره وارد صف نمی‌شود. پارامترهای نشانی هرگز ذخیره نمی‌شوند."
+
+
+msgid "Automatic learning queue"
+msgstr "صف یادگیری خودکار"
+
+
+msgid "Eligible visitor requests are deduplicated and analyzed asynchronously, one page per cron run."
+msgstr "درخواست‌های واجد شرایط بازدیدکنندگان تکرارزدایی می‌شوند و در هر اجرای زمان‌بندی، یک صفحه به‌صورت غیرهم‌زمان تحلیل می‌شود."
+
+
+msgid "Pending"
+msgstr "در انتظار"
+
+
+msgid "Running"
+msgstr "در حال اجرا"
+
+
+msgid "Failed"
+msgstr "ناموفق"

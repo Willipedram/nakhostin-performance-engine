@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Nakhostin Performance Engine 1.4.0\n"
+"Project-Id-Version: Nakhostin Performance Engine 1.5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -926,4 +926,56 @@ msgid "Refresh Page Asset Analysis"
 msgstr ""
 
 msgid "The page loaded, but one or more asset manifests could not be created safely."
+msgstr ""
+
+
+msgid "Automatic DOM learning"
+msgstr ""
+
+
+msgid "Gradually learns from eligible public pages that real visitors request. Analysis runs later through WP-Cron and never blocks the visitor response."
+msgstr ""
+
+
+msgid "Enable automatic DOM learning"
+msgstr ""
+
+
+msgid "Effect: only anonymous, query-free, same-site public URLs are queued. Account, cart, checkout, administration, logged-in, and analysis requests are excluded."
+msgstr ""
+
+
+msgid "Daily sampling rate (percent)"
+msgstr ""
+
+
+msgid "A deterministic daily sample limits database writes and background traffic. Ten percent is recommended for normal production sites."
+msgstr ""
+
+
+msgid "Rescan cooldown (hours)"
+msgstr ""
+
+
+msgid "The same normalized page is not queued again during this interval. Query strings are never stored."
+msgstr ""
+
+
+msgid "Automatic learning queue"
+msgstr ""
+
+
+msgid "Eligible visitor requests are deduplicated and analyzed asynchronously, one page per cron run."
+msgstr ""
+
+
+msgid "Pending"
+msgstr ""
+
+
+msgid "Running"
+msgstr ""
+
+
+msgid "Failed"
 msgstr ""

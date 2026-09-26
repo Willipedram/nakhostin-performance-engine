@@ -66,7 +66,8 @@ The preferred workflow uses the one-time frontend capture initiated from DOM
 Intelligence. Script discovery runs after the public page has rendered, when the
 actual WordPress queue is available. Refreshing JavaScript analysis revisits the
 latest analyzed public URL and refreshes DOM, component, CSS, and JavaScript
-manifests as one consistent snapshot. It never runs on ordinary frontend traffic.
+manifests as one consistent snapshot. Heavy analysis never runs inside an ordinary
+visitor response; opt-in DOM learning only enqueues eligible URLs for WP-Cron.
 
 `JavaScriptPlanner` produces three narrow layers instead of one global bundle:
 

@@ -19,6 +19,11 @@ Redis, Memcached, WooCommerce, Elementor, WoodMart, and LiteSpeed Cache are opti
 4. Review **NPE → Settings**. Runtime caching, monitoring, and debugging are disabled by default.
 5. Verify filesystem and object-cache status under **NPE → Cache** and **NPE → Diagnostics** before enabling cache features.
 
+Automatic DOM learning is opt-in under **NPE → Settings**. When enabled, NPE only
+observes sampled anonymous, query-free public requests and places normalized URLs
+in a bounded queue. WP-Cron analyzes one page at a time after the visitor response;
+account, cart, checkout, administration, and logged-in requests are excluded.
+
 Persian works in modern WordPress installations through the committed text-based
 `languages/nakhostin-performance-engine-fa_IR.l10n.php` catalog. Before creating
 a release ZIP, run `composer build-php-translations` to synchronize it and

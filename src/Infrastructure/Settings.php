@@ -35,6 +35,11 @@ final class Settings {
 		foreach ( self::MODULE_GROUPS as $group ) {
 			$defaults[ $group ] = array( 'enabled' => false );
 		}
+		$defaults['dom'] = array(
+			'enabled'        => false,
+			'sample_rate'    => 10,
+			'cooldown_hours' => 24,
+		);
 		$defaults['cache'] = array(
 			'enabled'                  => false,
 			'ttl'                      => 300,
@@ -103,6 +108,9 @@ final class Settings {
 		$sanitized['performance']['sample_rate']    = max( 1, min( 100, absint( $performance['sample_rate'] ?? 10 ) ) );
 		$sanitized['performance']['retention_days'] = max( 1, min( 90, absint( $performance['retention_days'] ?? 7 ) ) );
 		$sanitized['performance']['max_samples']    = max( 10, min( 2000, absint( $performance['max_samples'] ?? 500 ) ) );
+		$dom = isset( $input['dom'] ) && is_array( $input['dom'] ) ? $input['dom'] : array();
+		$sanitized['dom']['sample_rate']    = max( 1, min( 100, absint( $dom['sample_rate'] ?? 10 ) ) );
+		$sanitized['dom']['cooldown_hours'] = max( 1, min( 720, absint( $dom['cooldown_hours'] ?? 24 ) ) );
 		$cache = isset( $input['cache'] ) && is_array( $input['cache'] ) ? $input['cache'] : array();
 		$sanitized['cache']['ttl']       = max( 30, min( 86400, absint( $cache['ttl'] ?? 300 ) ) );
 		$sanitized['cache']['stale_ttl'] = max( 0, min( 3600, (int) ( $cache['stale_ttl'] ?? 60 ) ) );

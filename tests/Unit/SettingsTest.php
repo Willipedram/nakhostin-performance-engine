@@ -69,4 +69,11 @@ final class SettingsTest extends TestCase {
 		$this->assertSame( 1, $result['performance']['retention_days'] );
 		$this->assertSame( 2000, $result['performance']['max_samples'] );
 	}
+
+	public function test_dom_learning_configuration_is_bounded(): void {
+		$result = ( new Settings() )->sanitize( array( 'dom' => array( 'enabled' => 'on', 'sample_rate' => 500, 'cooldown_hours' => 0 ) ) );
+		$this->assertTrue( $result['dom']['enabled'] );
+		$this->assertSame( 100, $result['dom']['sample_rate'] );
+		$this->assertSame( 1, $result['dom']['cooldown_hours'] );
+	}
 }

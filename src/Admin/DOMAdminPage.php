@@ -10,6 +10,7 @@ namespace Nakhostin\PerformanceEngine\Admin;
 use Nakhostin\PerformanceEngine\Core\Capabilities;
 use Nakhostin\PerformanceEngine\Components\ComponentRegistry;
 use Nakhostin\PerformanceEngine\DOM\DOMAnalyzer;
+use Nakhostin\PerformanceEngine\DOM\DOMAnalysisQueue;
 use Nakhostin\PerformanceEngine\DOM\DOMManifest;
 use Nakhostin\PerformanceEngine\DOM\DOMSnapshot;
 use Nakhostin\PerformanceEngine\DOM\DOMStorageInterface;
@@ -33,19 +34,23 @@ final class DOMAdminPage {
 
 	/** @var PageAnalysisCoordinator|null */
 	private $coordinator;
+	/** @var DOMAnalysisQueue|null */
+	private $queue;
 
 	public function __construct(
 		DOMAnalyzer $analyzer,
 		DOMStorageInterface $storage,
 		Capabilities $capabilities,
 		?ComponentRegistry $components = null,
-		?PageAnalysisCoordinator $coordinator = null
+		?PageAnalysisCoordinator $coordinator = null,
+		?DOMAnalysisQueue $queue = null
 	) {
 		$this->analyzer     = $analyzer;
 		$this->storage      = $storage;
 		$this->capabilities = $capabilities;
 		$this->components   = $components;
 		$this->coordinator  = $coordinator;
+		$this->queue        = $queue;
 	}
 
 	public function register(): void {
@@ -143,6 +148,7 @@ final class DOMAdminPage {
 				?>
 			</p>
 			<?php $this->render_notice(); ?>
+			<?php $this->render_queue(); ?>
 			<div class="npe-card">
 				<h2><?php echo esc_html__( 'Analyze Page Assets', 'nakhostin-performance-engine' ); ?></h2>
 				<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
@@ -155,6 +161,30 @@ final class DOMAdminPage {
 				</form>
 			</div>
 			<?php $this->render_manifest( $manifest ); ?>
+		</div>
+		<?php
+	}
+
+	private function render_queue(): void {
+		if ( null === $this->queue ) {
+			return;
+		}
+		$counts = array( 'pending' => 0, 'running' => 0, 'failed' => 0 );
+		foreach ( $this->queue->all() as $job ) {
+			$status = (string) ( $job['status'] ?? '' );
+			if ( isset( $counts[ $status ] ) ) {
+				++$counts[ $status ];
+			}
+		}
+		?>
+		<div class="npe-card">
+			<h2><?php echo esc_html__( 'Automatic learning queue', 'nakhostin-performance-engine' ); ?></h2>
+			<p><?php echo esc_html__( 'Eligible visitor requests are deduplicated and analyzed asynchronously, one page per cron run.', 'nakhostin-performance-engine' ); ?></p>
+			<ul>
+				<li><?php echo esc_html__( 'Pending', 'nakhostin-performance-engine' ); ?>: <strong><?php echo esc_html( (string) $counts['pending'] ); ?></strong></li>
+				<li><?php echo esc_html__( 'Running', 'nakhostin-performance-engine' ); ?>: <strong><?php echo esc_html( (string) $counts['running'] ); ?></strong></li>
+				<li><?php echo esc_html__( 'Failed', 'nakhostin-performance-engine' ); ?>: <strong><?php echo esc_html( (string) $counts['failed'] ); ?></strong></li>
+			</ul>
 		</div>
 		<?php
 	}
