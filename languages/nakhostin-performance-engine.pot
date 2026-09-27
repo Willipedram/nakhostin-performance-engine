@@ -1390,3 +1390,9 @@ msgstr ""
 
 msgid "Save and verify your public pages"
 msgstr ""
+
+msgid "Retry failed scans"
+msgstr ""
+
+msgid "Failed scans were queued for another attempt."
+msgstr ""

@@ -46,6 +46,7 @@ final class PageAnalysisCoordinator {
 	/** @var string */ private $capture_url = '';
 	/** @var string */ private $html_buffer = '';
 	/** @var bool */ private $last_success = false;
+	/** @var string */ private $last_error = '';
 
 	public function __construct( DOMAnalyzer $dom_analyzer, DOMStorageInterface $dom_storage, ComponentRegistry $components, CSSAnalyzer $css_analyzer, CSSStorage $css_storage, StylesheetSourceCollector $stylesheets, ScriptDiscovery $script_discovery, LocalScriptSourceProvider $script_sources, ObservedScriptResolver $script_resolver, JavaScriptAnalyzer $javascript_analyzer, JavaScriptStorage $javascript_storage, Settings $settings, ?FontAnalyzer $font_analyzer = null, ?FontStorage $font_storage = null ) {
 		$this->dom_analyzer = $dom_analyzer; $this->dom_storage = $dom_storage; $this->components = $components; $this->css_analyzer = $css_analyzer; $this->css_storage = $css_storage; $this->stylesheets = $stylesheets; $this->script_discovery = $script_discovery; $this->script_sources = $script_sources; $this->script_resolver = $script_resolver; $this->javascript_analyzer = $javascript_analyzer; $this->javascript_storage = $javascript_storage; $this->settings = $settings;
@@ -57,18 +58,51 @@ final class PageAnalysisCoordinator {
 	}
 
 	public function request( string $url ): bool {
+		$this->last_success = false;
+		$this->last_error = '';
 		$token = strtolower( wp_generate_password( 32, false, false ) );
 		set_transient( self::TRANSIENT_PREFIX . $token, array( 'url' => $url ), 5 * MINUTE_IN_SECONDS );
 		$response = wp_safe_remote_get(
-			add_query_arg( self::QUERY_ARG, rawurlencode( $token ), $url ),
-			array( 'timeout' => 30, 'redirection' => 2, 'limit_response_size' => DOMSnapshot::MAX_BYTES, 'user-agent' => 'NPE Page Intelligence/' . NPE_VERSION )
+			add_query_arg( array( self::QUERY_ARG => $token ), $url ),
+			array(
+				'timeout'             => 30,
+				'redirection'         => 2,
+				'limit_response_size' => DOMSnapshot::MAX_BYTES,
+				'user-agent'          => 'NPE Page Intelligence/' . NPE_VERSION,
+				'headers'             => array( 'Cache-Control' => 'no-cache', 'X-NPE-Analysis' => '1' ),
+			)
 		);
 		$result = get_transient( self::RESULT_PREFIX . $token );
 		delete_transient( self::TRANSIENT_PREFIX . $token );
 		delete_transient( self::RESULT_PREFIX . $token );
-		return ! is_wp_error( $response )
-			&& 200 === wp_remote_retrieve_response_code( $response )
-			&& in_array( $result, array( 'success', 'partial' ), true );
+		if ( is_wp_error( $response ) ) {
+			$this->last_error = 'http-' . sanitize_key( $response->get_error_code() ?: 'request-failed' );
+			return false;
+		}
+		$status = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $status ) {
+			$this->last_error = 'http-status-' . absint( $status );
+			return false;
+		}
+		if ( in_array( $result, array( 'success', 'partial' ), true ) ) {
+			return true;
+		}
+
+		// A reverse proxy or page cache can serve the analysis URL without running
+		// the capture callback. Analyze the bounded response locally instead of
+		// turning a valid public page into a permanently failed queue item.
+		$html = wp_remote_retrieve_body( $response );
+		if ( is_string( $html ) && preg_match( '/<(?:!doctype\s+html|html|body)\b/i', $html ) ) {
+			$this->capture( $html, '', $url );
+			if ( $this->last_success ) {
+				return true;
+			}
+		}
+
+		if ( '' === $this->last_error ) {
+			$this->last_error = 'capture-' . ( is_string( $result ) && '' !== $result ? sanitize_key( $result ) : 'result-missing' );
+		}
+		return false;
 	}
 
 	public function maybe_capture(): void {
@@ -79,6 +113,8 @@ final class PageAnalysisCoordinator {
 		delete_transient( self::TRANSIENT_PREFIX . $token );
 		$this->capture_url = esc_url_raw( (string) $job['url'] );
 		if ( ! defined( 'DONOTCACHEPAGE' ) ) { define( 'DONOTCACHEPAGE', true ); }
+		if ( ! defined( 'DONOTCACHEDB' ) ) { define( 'DONOTCACHEDB', true ); }
+		do_action( 'litespeed_control_set_nocache', 'NPE DOM analysis' );
 		nocache_headers();
 		ob_start( function ( string $html, int $phase = 0 ) use ( $token ): string {
 			$this->html_buffer .= $html;
@@ -92,6 +128,7 @@ final class PageAnalysisCoordinator {
 
 	public function capture( string $html, string $token = '', string $source_url = '' ): string {
 		$this->last_success = false;
+		$this->last_error = '';
 		try {
 			$source_url = '' !== $source_url ? $source_url : $this->capture_url;
 			$manifest = $this->dom_analyzer->create_manifest( new DOMSnapshot( $html, array( 'source_url' => $source_url, 'versions' => $this->versions() ) ) );
@@ -139,6 +176,7 @@ final class PageAnalysisCoordinator {
 			$this->last_success = true;
 			if ( '' !== $token ) { set_transient( self::RESULT_PREFIX . $token, $complete ? 'success' : 'partial', MINUTE_IN_SECONDS ); }
 		} catch ( Throwable $error ) {
+			$this->last_error = 'dom-' . sanitize_key( get_class( $error ) );
 			if ( '' !== $token ) { set_transient( self::RESULT_PREFIX . $token, 'failed', MINUTE_IN_SECONDS ); }
 			do_action( 'npe/analysis/error', 'dom', get_class( $error ) );
 		}
@@ -147,6 +185,10 @@ final class PageAnalysisCoordinator {
 
 	public function succeeded(): bool {
 		return $this->last_success;
+	}
+
+	public function last_error(): string {
+		return $this->last_error;
 	}
 
 	private function versions(): array {

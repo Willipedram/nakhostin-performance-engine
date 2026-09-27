@@ -1421,3 +1421,9 @@ msgstr "اثر و نکته ایمنی را بررسی کنید"
 
 msgid "Save and verify your public pages"
 msgstr "ذخیره کنید و صفحات عمومی را بررسی کنید"
+
+msgid "Retry failed scans"
+msgstr "تلاش دوباره برای اسکن‌های ناموفق"
+
+msgid "Failed scans were queued for another attempt."
+msgstr "اسکن‌های ناموفق برای تلاش دوباره وارد صف شدند."

@@ -29,6 +29,34 @@ use Nakhostin\PerformanceEngine\JavaScript\ScriptSafetyPolicy;
 use PHPUnit\Framework\TestCase;
 
 final class PageAnalysisCoordinatorTest extends TestCase {
+	public function test_request_falls_back_to_bounded_response_when_cache_bypasses_capture_callback(): void {
+		$GLOBALS['npe_test_options'] = array();
+		$GLOBALS['npe_test_transients'] = array();
+		$GLOBALS['npe_test_remote_response'] = array(
+			'response' => array( 'code' => 200 ),
+			'body'     => '<!doctype html><html><head></head><body><main class="fallback"></main></body></html>',
+		);
+		$dom_storage = new DOMStorage();
+		$coordinator = new PageAnalysisCoordinator(
+			new DOMAnalyzer( new DOMComponentDetector(), new DOMStateRegistry(), new DOMSignature() ),
+			$dom_storage,
+			new ComponentRegistry( new ComponentStorage(), new BundleIndex() ),
+			new CSSAnalyzer(),
+			new CSSStorage(),
+			new StylesheetSourceCollector(),
+			new ScriptDiscovery(),
+			new LocalScriptSourceProvider(),
+			new ObservedScriptResolver(),
+			new JavaScriptAnalyzer( new JavaScriptPlanner( new ScriptSafetyPolicy(), new ConservativeMinifier() ) ),
+			new JavaScriptStorage(),
+			new Settings()
+		);
+
+		$this->assertTrue( $coordinator->request( 'https://example.test/fallback/' ) );
+		$this->assertNotNull( $dom_storage->latest() );
+		$this->assertSame( '', $coordinator->last_error() );
+	}
+
 	public function test_single_capture_builds_dom_css_component_and_javascript_manifests(): void {
 		$GLOBALS['npe_test_options'] = array();
 		$GLOBALS['npe_test_remote_response'] = array( 'response' => array( 'code' => 200 ), 'body' => '.card{color:red}.missing{display:none}' );

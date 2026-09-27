@@ -450,5 +450,7 @@ return array (
     'Choose a section' => 'یک بخش را انتخاب کنید',
     'Review the effect and safety note' => 'اثر و نکته ایمنی را بررسی کنید',
     'Save and verify your public pages' => 'ذخیره کنید و صفحات عمومی را بررسی کنید',
+    'Retry failed scans' => 'تلاش دوباره برای اسکن‌های ناموفق',
+    'Failed scans were queued for another attempt.' => 'اسکن‌های ناموفق برای تلاش دوباره وارد صف شدند.',
   ),
 );

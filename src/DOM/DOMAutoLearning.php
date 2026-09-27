@@ -76,7 +76,8 @@ final class DOMAutoLearning {
 			if ( $this->coordinator->request( (string) $job['url'] ) ) {
 				$this->queue->complete( (string) $job['id'], microtime( true ) - $job_started );
 			} else {
-				$this->queue->retry( (string) $job['id'] );
+				$error = $this->coordinator->last_error();
+				$this->queue->retry( (string) $job['id'], '' !== $error ? $error : 'analysis-failed' );
 			}
 		}
 		if ( $this->queue->has_pending() ) {

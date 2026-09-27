@@ -162,6 +162,30 @@ final class DOMAnalysisQueue {
 		);
 	}
 
+	public function retry_failed(): int {
+		$retried = (int) $this->with_lock(
+			static function ( array $jobs, array $state ): array {
+				$count = 0;
+				foreach ( $jobs as $id => $job ) {
+					if ( ! is_array( $job ) || 'failed' !== ( $job['status'] ?? '' ) ) {
+						continue;
+					}
+					$jobs[ $id ]['status'] = 'pending';
+					$jobs[ $id ]['attempts'] = 0;
+					$jobs[ $id ]['available_at'] = time();
+					$jobs[ $id ]['last_error'] = '';
+					++$count;
+				}
+				$state['run_failed'] = max( 0, (int) ( $state['run_failed'] ?? 0 ) - $count );
+				return array( $jobs, $state, $count );
+			}
+		);
+		if ( $retried > 0 ) {
+			$this->schedule( 0 );
+		}
+		return $retried;
+	}
+
 	public function all(): array {
 		$jobs = get_option( self::OPTION, array() );
 		return is_array( $jobs ) ? array_values( array_filter( $jobs, 'is_array' ) ) : array();

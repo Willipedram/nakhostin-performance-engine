@@ -23,6 +23,7 @@ final class DOMAdminPage {
 	public const STATUS_ACTION = 'npe_dom_queue_status';
 	public const START_QUEUE_ACTION = 'npe_start_dom_learning';
 	public const RUN_QUEUE_ACTION = 'npe_run_dom_learning_queue';
+	public const RETRY_QUEUE_ACTION = 'npe_retry_failed_dom_learning';
 
 	/** @var DOMAnalyzer */
 	private $analyzer;
@@ -68,6 +69,7 @@ final class DOMAdminPage {
 		add_action( 'wp_ajax_' . self::STATUS_ACTION, array( $this, 'queue_status' ) );
 		add_action( 'admin_post_' . self::START_QUEUE_ACTION, array( $this, 'start_queue' ) );
 		add_action( 'admin_post_' . self::RUN_QUEUE_ACTION, array( $this, 'run_queue' ) );
+		add_action( 'admin_post_' . self::RETRY_QUEUE_ACTION, array( $this, 'retry_queue' ) );
 	}
 
 	public function enqueue_progress_script( string $hook_suffix ): void {
@@ -121,6 +123,15 @@ final class DOMAdminPage {
 			do_action( DOMAnalysisQueue::CRON_HOOK );
 		}
 		$this->redirect( 'queue-processed' );
+	}
+
+	public function retry_queue(): void {
+		$this->authorize_queue_action( self::RETRY_QUEUE_ACTION );
+		if ( $this->settings && $this->settings->get( 'dom.enabled', false ) && $this->queue ) {
+			$this->queue->retry_failed();
+			do_action( DOMAnalysisQueue::CRON_HOOK );
+		}
+		$this->redirect( 'queue-retried' );
 	}
 
 	public function add_menu(): void {
@@ -268,6 +279,7 @@ final class DOMAdminPage {
 				<div class="npe-actions">
 					<?php $this->queue_action_form( self::START_QUEUE_ACTION, __( 'Start or rescan homepage', 'nakhostin-performance-engine' ) ); ?>
 					<?php $this->queue_action_form( self::RUN_QUEUE_ACTION, __( 'Process queue now', 'nakhostin-performance-engine' ) ); ?>
+					<?php if ( $report['failed'] > 0 ) { $this->queue_action_form( self::RETRY_QUEUE_ACTION, __( 'Retry failed scans', 'nakhostin-performance-engine' ) ); } ?>
 				</div>
 			<?php endif; ?>
 		</div>
@@ -331,6 +343,7 @@ final class DOMAdminPage {
 			'analysis-failed' => __( 'The page loaded, but one or more asset manifests could not be created safely.', 'nakhostin-performance-engine' ),
 			'queue-started'   => __( 'The homepage was added to the automatic learning queue.', 'nakhostin-performance-engine' ),
 			'queue-processed' => __( 'The automatic learning worker was run.', 'nakhostin-performance-engine' ),
+			'queue-retried'   => __( 'Failed scans were queued for another attempt.', 'nakhostin-performance-engine' ),
 		);
 
 		if ( ! isset( $notices[ $status ] ) ) {

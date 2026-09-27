@@ -1,3 +1,8 @@
+## 2.3.3
+
+- Made automatic DOM learning analyze a bounded 200 response locally when a reverse proxy or page cache bypasses the capture callback.
+- Added cache-bypass signals, actionable HTTP/capture error codes, and an explicit retry action for failed scans.
+
 ## 2.3.2
 
 - Removed the fragile `media=print` stylesheet deferral path that could leave first visits unstyled and inflate Speed Index.

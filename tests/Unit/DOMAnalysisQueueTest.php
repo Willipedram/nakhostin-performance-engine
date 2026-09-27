@@ -53,6 +53,26 @@ final class DOMAnalysisQueueTest extends TestCase {
 		$this->assertSame( 0, $report['estimated_seconds'] );
 	}
 
+	public function test_failed_jobs_can_be_explicitly_retried(): void {
+		$queue = new DOMAnalysisQueue();
+		$queue->enqueue( 'https://example.test/retry/' );
+		$job = $queue->claim();
+		for ( $attempt = 0; $attempt < 3; ++$attempt ) {
+			$queue->retry( $job['id'], 'http-status-403' );
+			if ( $attempt < 2 ) {
+				$stored = $queue->all()[0];
+				$stored['available_at'] = time() - 1;
+				$GLOBALS['npe_test_options'][ DOMAnalysisQueue::OPTION ][ $job['id'] ] = $stored;
+				$job = $queue->claim();
+			}
+		}
+
+		$this->assertSame( 1, $queue->retry_failed() );
+		$this->assertSame( 'pending', $queue->all()[0]['status'] );
+		$this->assertSame( '', $queue->all()[0]['last_error'] );
+		$this->assertSame( 0, $queue->report()['progress'] );
+	}
+
 	public function test_cache_invalidation_requeues_previously_completed_pages(): void {
 		$queue = new DOMAnalysisQueue();
 		$queue->enqueue( 'https://example.test/product/watch/' );
