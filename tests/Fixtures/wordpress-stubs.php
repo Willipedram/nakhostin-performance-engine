@@ -29,6 +29,8 @@ namespace {
 	$GLOBALS['npe_test_conditionals']       = array();
 	$GLOBALS['npe_test_admin_pages']        = array();
 	$GLOBALS['npe_test_styles']             = array();
+	$GLOBALS['npe_test_scripts']            = array();
+	$GLOBALS['npe_test_localized_scripts']  = array();
 	$GLOBALS['npe_test_transients']         = array();
 
 	function plugin_dir_path( string $file ): string {
@@ -75,6 +77,19 @@ namespace {
 
 	function wp_enqueue_style( string $handle, string $source = '', array $dependencies = array(), $version = false ): void {
 		$GLOBALS['npe_test_styles'][ $handle ] = compact( 'source', 'dependencies', 'version' );
+	}
+
+	function wp_enqueue_script( string $handle, string $source = '', array $dependencies = array(), $version = false, bool $in_footer = false ): void {
+		$GLOBALS['npe_test_scripts'][ $handle ] = compact( 'source', 'dependencies', 'version', 'in_footer' );
+	}
+
+	function wp_localize_script( string $handle, string $object_name, array $data ): bool {
+		$GLOBALS['npe_test_localized_scripts'][ $handle ] = compact( 'object_name', 'data' );
+		return true;
+	}
+
+	function wp_create_nonce( string $action = '-1' ): string {
+		return 'nonce-' . $action;
 	}
 
 	function load_plugin_textdomain( string $domain, bool $deprecated = false, string $path = '' ): bool {

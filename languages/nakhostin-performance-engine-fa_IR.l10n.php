@@ -2,7 +2,7 @@
 /** Generated text translation catalog. @package NakhostinPerformanceEngine */
 
 return array (
-  'project-id-version' => 'Nakhostin Performance Engine 1.5.0',
+  'project-id-version' => 'Nakhostin Performance Engine 1.6.0',
   'language' => 'fa_IR',
   'language-team' => 'Persian',
   'po-revision-date' => '2026-09-25 00:00+0000',
@@ -343,5 +343,17 @@ return array (
     'Pending' => 'در انتظار',
     'Running' => 'در حال اجرا',
     'Failed' => 'ناموفق',
+    'Pages per scan batch' => 'تعداد صفحه در هر نوبت اسکن',
+    'Processes several pages quickly while enforcing a short execution budget. Three pages is the recommended balance.' => 'چند صفحه را با سرعت و در یک بازه اجرای کوتاه پردازش می‌کند. سه صفحه، مقدار متعادل پیشنهادی است.',
+    'Delay between scan batches (seconds)' => 'فاصله میان نوبت‌های اسکن (ثانیه)',
+    'Schedules the next WP-Cron batch after this delay. Actual execution depends on WordPress cron traffic.' => 'نوبت بعدی WP-Cron پس از این فاصله زمان‌بندی می‌شود. زمان اجرای واقعی به فعالیت زمان‌بندی وردپرس وابسته است.',
+    'Eligible visitor requests are deduplicated and analyzed asynchronously in small fast batches.' => 'درخواست‌های واجد شرایط بازدیدکنندگان تکرارزدایی می‌شوند و در نوبت‌های کوچک و سریع، به‌صورت غیرهم‌زمان تحلیل می‌شوند.',
+    'Current scan progress' => 'پیشرفت اسکن جاری',
+    'Pages analyzed' => 'صفحه‌های تحلیل‌شده',
+    'Estimated time remaining' => 'زمان تقریبی باقی‌مانده',
+    'Last completed scan' => 'آخرین اسکن تکمیل‌شده',
+    'After an NPE or LiteSpeed full cache purge, previously discovered pages are automatically queued for a fresh scan.' => 'پس از پاک‌سازی کامل کش NPE یا LiteSpeed، صفحه‌های شناسایی‌شده قبلی به‌طور خودکار برای اسکن تازه وارد صف می‌شوند.',
+    'About %d minutes' => 'حدود %d دقیقه',
+    'Automatic DOM scan progress: %d%%' => 'پیشرفت اسکن خودکار DOM: %d٪',
   ),
 );

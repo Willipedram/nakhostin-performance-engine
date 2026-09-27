@@ -6,6 +6,7 @@ use Nakhostin\PerformanceEngine\Cache\CacheMetrics;
 use Nakhostin\PerformanceEngine\Cache\CacheOperationsState;
 use Nakhostin\PerformanceEngine\Cache\PageCacheStoreInterface;
 use Nakhostin\PerformanceEngine\Core\Capabilities;
+use Nakhostin\PerformanceEngine\DOM\DOMAnalysisQueue;
 use Nakhostin\PerformanceEngine\Infrastructure\Settings;
 use Nakhostin\PerformanceEngine\JavaScript\JavaScriptStorage;
 use Nakhostin\PerformanceEngine\Performance\PerformanceAggregator;
@@ -20,9 +21,11 @@ final class DashboardPage {
 	/** @var PerformanceAggregator */ private $aggregator;
 	/** @var JavaScriptStorage */ private $javascript;
 	/** @var Capabilities */ private $capabilities;
+	/** @var DOMAnalysisQueue|null */ private $dom_queue;
 
-	public function __construct( Settings $settings, PageCacheStoreInterface $cache_store, CacheMetrics $cache_metrics, CacheOperationsState $operations, PerformanceStorage $performance, PerformanceAggregator $aggregator, JavaScriptStorage $javascript, Capabilities $capabilities ) {
+	public function __construct( Settings $settings, PageCacheStoreInterface $cache_store, CacheMetrics $cache_metrics, CacheOperationsState $operations, PerformanceStorage $performance, PerformanceAggregator $aggregator, JavaScriptStorage $javascript, Capabilities $capabilities, ?DOMAnalysisQueue $dom_queue = null ) {
 		$this->settings = $settings; $this->cache_store = $cache_store; $this->cache_metrics = $cache_metrics; $this->operations = $operations; $this->performance = $performance; $this->aggregator = $aggregator; $this->javascript = $javascript; $this->capabilities = $capabilities;
+		$this->dom_queue = $dom_queue;
 	}
 
 	public function register(): void { add_action( 'admin_menu', array( $this, 'add_menu' ), 5 ); }
@@ -43,6 +46,7 @@ final class DashboardPage {
 		$js_data     = $js ? $js->to_array() : array();
 		$sizes       = $js_data;
 		$state       = $this->operations->all();
+		$dom         = $this->dom_queue ? $this->dom_queue->report( (int) $this->settings->get( 'dom.batch_size', 3 ), (int) $this->settings->get( 'dom.scan_interval', 10 ) ) : array( 'completed' => 0, 'progress' => 0, 'estimated_seconds' => 0 );
 		?>
 		<div class="wrap npe-admin npe-dashboard" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
 			<div class="npe-hero"><div><h1><?php echo esc_html__( 'Nakhostin Performance Engine', 'nakhostin-performance-engine' ); ?></h1><p><?php echo esc_html__( 'A safe, measurable performance control center for WordPress.', 'nakhostin-performance-engine' ); ?></p></div><span class="npe-version npe-technical" dir="ltr"><?php echo esc_html( 'NPE ' . NPE_VERSION ); ?></span></div>
@@ -56,6 +60,7 @@ final class DashboardPage {
 				<?php $this->metric( __( 'JavaScript reduction', 'nakhostin-performance-engine' ), $this->reduction( $sizes ), __( 'Measured local JavaScript sources', 'nakhostin-performance-engine' ) ); ?>
 				<?php $this->metric( __( 'Asset requests', 'nakhostin-performance-engine' ), number_format_i18n( (int) ( $sizes['measured_files'] ?? 0 ) ), __( 'Files in the latest JavaScript analysis', 'nakhostin-performance-engine' ) ); ?>
 				<?php $this->metric( __( 'Cache warmup', 'nakhostin-performance-engine' ), empty( $state['last_warmup'] ) ? __( 'Not run', 'nakhostin-performance-engine' ) : __( 'Completed', 'nakhostin-performance-engine' ), __( 'Latest asynchronous warmup status', 'nakhostin-performance-engine' ) ); ?>
+				<?php $this->metric( __( 'Pages analyzed', 'nakhostin-performance-engine' ), number_format_i18n( (int) $dom['completed'] ), sprintf( __( 'Automatic DOM scan progress: %d%%', 'nakhostin-performance-engine' ), (int) $dom['progress'] ) ); ?>
 			</div>
 			<div class="npe-card"><h2><?php echo esc_html__( 'Quick navigation', 'nakhostin-performance-engine' ); ?></h2><div class="npe-quick-links">
 			<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=' . DOMAdminPage::SLUG ) ); ?>"><?php echo esc_html__( 'Analyze Page Assets', 'nakhostin-performance-engine' ); ?></a>

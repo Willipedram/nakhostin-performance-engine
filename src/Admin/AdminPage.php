@@ -141,6 +141,12 @@ final class AdminPage {
 			<p><label><?php echo esc_html__( 'Rescan cooldown (hours)', 'nakhostin-performance-engine' ); ?><br>
 				<input type="number" min="1" max="720" name="npe_settings[dom][cooldown_hours]" value="<?php echo esc_attr( $settings['dom']['cooldown_hours'] ); ?>">
 			</label><span class="description"><?php echo esc_html__( 'The same normalized page is not queued again during this interval. Query strings are never stored.', 'nakhostin-performance-engine' ); ?></span></p>
+			<p><label><?php echo esc_html__( 'Pages per scan batch', 'nakhostin-performance-engine' ); ?><br>
+				<input type="number" min="1" max="5" name="npe_settings[dom][batch_size]" value="<?php echo esc_attr( $settings['dom']['batch_size'] ); ?>">
+			</label><span class="description"><?php echo esc_html__( 'Processes several pages quickly while enforcing a short execution budget. Three pages is the recommended balance.', 'nakhostin-performance-engine' ); ?></span></p>
+			<p><label><?php echo esc_html__( 'Delay between scan batches (seconds)', 'nakhostin-performance-engine' ); ?><br>
+				<input type="number" min="5" max="300" name="npe_settings[dom][scan_interval]" value="<?php echo esc_attr( $settings['dom']['scan_interval'] ); ?>">
+			</label><span class="description"><?php echo esc_html__( 'Schedules the next WP-Cron batch after this delay. Actual execution depends on WordPress cron traffic.', 'nakhostin-performance-engine' ); ?></span></p>
 		</div>
 		<div class="npe-card">
 			<h2><?php echo esc_html__( 'LiteSpeed Cache compatibility', 'nakhostin-performance-engine' ); ?></h2>

@@ -7,6 +7,7 @@ use Nakhostin\PerformanceEngine\Cache\CacheMetrics;
 use Nakhostin\PerformanceEngine\Cache\CacheOperationsState;
 use Nakhostin\PerformanceEngine\Cache\FilesystemCacheStore;
 use Nakhostin\PerformanceEngine\Core\Capabilities;
+use Nakhostin\PerformanceEngine\DOM\DOMAnalysisQueue;
 use Nakhostin\PerformanceEngine\Infrastructure\Settings;
 use Nakhostin\PerformanceEngine\JavaScript\JavaScriptStorage;
 use Nakhostin\PerformanceEngine\Performance\PerformanceAggregator;
@@ -24,11 +25,12 @@ final class DashboardPageTest extends TestCase {
 		$this->assertStringContainsString( 'role="list"', $output );
 		$this->assertStringContainsString( 'Cache hit ratio', $output );
 		$this->assertStringContainsString( 'PHP generation; not network TTFB', $output );
+		$this->assertStringContainsString( 'Pages analyzed', $output );
 		$this->assertStringContainsString( 'dir="ltr"', $output );
 	}
 
 	public function test_dashboard_uses_rtl_document_direction(): void { $GLOBALS['npe_test_is_rtl'] = true; ob_start(); $this->page()->render(); $output = (string) ob_get_clean(); $this->assertStringContainsString( 'dir="rtl"', $output ); $this->assertStringContainsString( 'class="npe-metric-value npe-technical" dir="ltr"', $output ); }
 	public function test_dashboard_requires_capability(): void { $GLOBALS['npe_test_can_manage'] = false; $this->expectException( \RuntimeException::class ); $this->page()->render(); }
 
-	private function page(): DashboardPage { return new DashboardPage( new Settings(), new FilesystemCacheStore( $this->directory . '/pages' ), new CacheMetrics( $this->directory . '/metrics.json' ), new CacheOperationsState(), new PerformanceStorage(), new PerformanceAggregator(), new JavaScriptStorage(), new Capabilities() ); }
+	private function page(): DashboardPage { return new DashboardPage( new Settings(), new FilesystemCacheStore( $this->directory . '/pages' ), new CacheMetrics( $this->directory . '/metrics.json' ), new CacheOperationsState(), new PerformanceStorage(), new PerformanceAggregator(), new JavaScriptStorage(), new Capabilities(), new DOMAnalysisQueue() ); }
 }

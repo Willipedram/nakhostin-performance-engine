@@ -15,10 +15,12 @@ use Nakhostin\PerformanceEngine\DOM\DOMManifest;
 use Nakhostin\PerformanceEngine\DOM\DOMSnapshot;
 use Nakhostin\PerformanceEngine\DOM\DOMStorageInterface;
 use Nakhostin\PerformanceEngine\DOM\PageAnalysisCoordinator;
+use Nakhostin\PerformanceEngine\Infrastructure\Settings;
 
 final class DOMAdminPage {
 	public const SLUG = 'npe-dom-intelligence';
 	public const ACTION = 'npe_run_dom_analysis';
+	public const STATUS_ACTION = 'npe_dom_queue_status';
 
 	/** @var DOMAnalyzer */
 	private $analyzer;
@@ -36,6 +38,8 @@ final class DOMAdminPage {
 	private $coordinator;
 	/** @var DOMAnalysisQueue|null */
 	private $queue;
+	/** @var Settings|null */
+	private $settings;
 
 	public function __construct(
 		DOMAnalyzer $analyzer,
@@ -43,7 +47,8 @@ final class DOMAdminPage {
 		Capabilities $capabilities,
 		?ComponentRegistry $components = null,
 		?PageAnalysisCoordinator $coordinator = null,
-		?DOMAnalysisQueue $queue = null
+		?DOMAnalysisQueue $queue = null,
+		?Settings $settings = null
 	) {
 		$this->analyzer     = $analyzer;
 		$this->storage      = $storage;
@@ -51,11 +56,47 @@ final class DOMAdminPage {
 		$this->components   = $components;
 		$this->coordinator  = $coordinator;
 		$this->queue        = $queue;
+		$this->settings     = $settings;
 	}
 
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_menu' ) );
 		add_action( 'admin_post_' . self::ACTION, array( $this, 'handle_analysis' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_progress_script' ) );
+		add_action( 'wp_ajax_' . self::STATUS_ACTION, array( $this, 'queue_status' ) );
+	}
+
+	public function enqueue_progress_script( string $hook_suffix ): void {
+		if ( false === strpos( $hook_suffix, '_page_' . self::SLUG ) ) {
+			return;
+		}
+		wp_enqueue_script( 'npe-dom-progress', NPE_URL . 'assets/admin/dom-progress.js', array(), NPE_VERSION, true );
+		wp_localize_script(
+			'npe-dom-progress',
+			'npeDomProgress',
+			array(
+				'url'       => admin_url( 'admin-ajax.php' ),
+				'action'    => self::STATUS_ACTION,
+				'nonce'     => wp_create_nonce( self::STATUS_ACTION ),
+				'completed' => __( 'Completed', 'nakhostin-performance-engine' ),
+				'seconds'   => __( '%d seconds', 'nakhostin-performance-engine' ),
+				'minutes'   => __( 'About %d minutes', 'nakhostin-performance-engine' ),
+				'notRun'    => __( 'Not run', 'nakhostin-performance-engine' ),
+			)
+		);
+	}
+
+	public function queue_status(): void {
+		if ( ! $this->capabilities->can_manage() ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to view DOM diagnostics.', 'nakhostin-performance-engine' ) ), 403 );
+		}
+		check_ajax_referer( self::STATUS_ACTION, 'nonce' );
+		wp_send_json_success(
+			null === $this->queue ? array() : $this->queue->report(
+				(int) ( $this->settings ? $this->settings->get( 'dom.batch_size', 3 ) : 3 ),
+				(int) ( $this->settings ? $this->settings->get( 'dom.scan_interval', 10 ) : 10 )
+			)
+		);
 	}
 
 	public function add_menu(): void {
@@ -169,24 +210,39 @@ final class DOMAdminPage {
 		if ( null === $this->queue ) {
 			return;
 		}
-		$counts = array( 'pending' => 0, 'running' => 0, 'failed' => 0 );
-		foreach ( $this->queue->all() as $job ) {
-			$status = (string) ( $job['status'] ?? '' );
-			if ( isset( $counts[ $status ] ) ) {
-				++$counts[ $status ];
-			}
-		}
+		$report = $this->queue->report(
+			(int) ( $this->settings ? $this->settings->get( 'dom.batch_size', 3 ) : 3 ),
+			(int) ( $this->settings ? $this->settings->get( 'dom.scan_interval', 10 ) : 10 )
+		);
+		$last_completed = $report['last_completed_at'] > 0 ? gmdate( 'Y-m-d H:i:s', $report['last_completed_at'] ) . ' UTC' : __( 'Not run', 'nakhostin-performance-engine' );
 		?>
 		<div class="npe-card">
 			<h2><?php echo esc_html__( 'Automatic learning queue', 'nakhostin-performance-engine' ); ?></h2>
-			<p><?php echo esc_html__( 'Eligible visitor requests are deduplicated and analyzed asynchronously, one page per cron run.', 'nakhostin-performance-engine' ); ?></p>
-			<ul>
-				<li><?php echo esc_html__( 'Pending', 'nakhostin-performance-engine' ); ?>: <strong><?php echo esc_html( (string) $counts['pending'] ); ?></strong></li>
-				<li><?php echo esc_html__( 'Running', 'nakhostin-performance-engine' ); ?>: <strong><?php echo esc_html( (string) $counts['running'] ); ?></strong></li>
-				<li><?php echo esc_html__( 'Failed', 'nakhostin-performance-engine' ); ?>: <strong><?php echo esc_html( (string) $counts['failed'] ); ?></strong></li>
+			<p><?php echo esc_html__( 'Eligible visitor requests are deduplicated and analyzed asynchronously in small fast batches.', 'nakhostin-performance-engine' ); ?></p>
+			<label for="npe-dom-progress"><?php echo esc_html__( 'Current scan progress', 'nakhostin-performance-engine' ); ?></label>
+			<progress id="npe-dom-progress" class="npe-progress" max="100" value="<?php echo esc_attr( (string) $report['progress'] ); ?>"><?php echo esc_html( (string) $report['progress'] ); ?>%</progress>
+			<p class="npe-progress-value npe-technical" dir="ltr"><?php echo esc_html( (string) $report['progress'] ); ?>%</p>
+			<ul class="npe-progress-details">
+				<li><?php echo esc_html__( 'Pending', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-pending"><?php echo esc_html( (string) $report['pending'] ); ?></strong></li>
+				<li><?php echo esc_html__( 'Running', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-running"><?php echo esc_html( (string) $report['running'] ); ?></strong></li>
+				<li><?php echo esc_html__( 'Failed', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-failed"><?php echo esc_html( (string) $report['failed'] ); ?></strong></li>
+				<li><?php echo esc_html__( 'Pages analyzed', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-completed"><?php echo esc_html( (string) $report['completed'] ); ?></strong></li>
+				<li><?php echo esc_html__( 'Estimated time remaining', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-eta"><?php echo esc_html( $this->format_duration( (int) $report['estimated_seconds'] ) ); ?></strong></li>
+				<li><?php echo esc_html__( 'Last completed scan', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-last-completed" class="npe-technical" dir="ltr"><?php echo esc_html( $last_completed ); ?></strong></li>
 			</ul>
+			<p class="description"><?php echo esc_html__( 'After an NPE or LiteSpeed full cache purge, previously discovered pages are automatically queued for a fresh scan.', 'nakhostin-performance-engine' ); ?></p>
 		</div>
 		<?php
+	}
+
+	private function format_duration( int $seconds ): string {
+		if ( $seconds <= 0 ) {
+			return __( 'Completed', 'nakhostin-performance-engine' );
+		}
+		if ( $seconds < MINUTE_IN_SECONDS ) {
+			return sprintf( __( '%d seconds', 'nakhostin-performance-engine' ), $seconds );
+		}
+		return sprintf( __( 'About %d minutes', 'nakhostin-performance-engine' ), (int) ceil( $seconds / MINUTE_IN_SECONDS ) );
 	}
 
 	private function render_manifest( ?DOMManifest $manifest ): void {

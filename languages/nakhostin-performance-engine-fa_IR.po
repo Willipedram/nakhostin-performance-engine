@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Nakhostin Performance Engine 1.5.0\n"
+"Project-Id-Version: Nakhostin Performance Engine 1.6.0\n"
 "Language: fa_IR\n"
 "Language-Team: Persian\n"
 "PO-Revision-Date: 2026-09-25 00:00+0000\n"
@@ -1010,3 +1010,51 @@ msgstr "در حال اجرا"
 
 msgid "Failed"
 msgstr "ناموفق"
+
+
+msgid "Pages per scan batch"
+msgstr "تعداد صفحه در هر نوبت اسکن"
+
+
+msgid "Processes several pages quickly while enforcing a short execution budget. Three pages is the recommended balance."
+msgstr "چند صفحه را با سرعت و در یک بازه اجرای کوتاه پردازش می‌کند. سه صفحه، مقدار متعادل پیشنهادی است."
+
+
+msgid "Delay between scan batches (seconds)"
+msgstr "فاصله میان نوبت‌های اسکن (ثانیه)"
+
+
+msgid "Schedules the next WP-Cron batch after this delay. Actual execution depends on WordPress cron traffic."
+msgstr "نوبت بعدی WP-Cron پس از این فاصله زمان‌بندی می‌شود. زمان اجرای واقعی به فعالیت زمان‌بندی وردپرس وابسته است."
+
+
+msgid "Eligible visitor requests are deduplicated and analyzed asynchronously in small fast batches."
+msgstr "درخواست‌های واجد شرایط بازدیدکنندگان تکرارزدایی می‌شوند و در نوبت‌های کوچک و سریع، به‌صورت غیرهم‌زمان تحلیل می‌شوند."
+
+
+msgid "Current scan progress"
+msgstr "پیشرفت اسکن جاری"
+
+
+msgid "Pages analyzed"
+msgstr "صفحه‌های تحلیل‌شده"
+
+
+msgid "Estimated time remaining"
+msgstr "زمان تقریبی باقی‌مانده"
+
+
+msgid "Last completed scan"
+msgstr "آخرین اسکن تکمیل‌شده"
+
+
+msgid "After an NPE or LiteSpeed full cache purge, previously discovered pages are automatically queued for a fresh scan."
+msgstr "پس از پاک‌سازی کامل کش NPE یا LiteSpeed، صفحه‌های شناسایی‌شده قبلی به‌طور خودکار برای اسکن تازه وارد صف می‌شوند."
+
+
+msgid "About %d minutes"
+msgstr "حدود %d دقیقه"
+
+
+msgid "Automatic DOM scan progress: %d%%"
+msgstr "پیشرفت اسکن خودکار DOM: %d٪"

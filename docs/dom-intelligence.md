@@ -29,11 +29,19 @@ same-origin path with no query or fragment, sampled in a deterministic daily
 bucket, deduplicated, and protected by a configurable rescan cooldown.
 
 The bounded queue stores at most 100 normalized URLs and schedules a single
-WP-Cron event. Each worker invocation claims only one page, performs the existing
-single-use loopback capture, and then completes or retries the job with exponential
+WP-Cron event. Each worker invocation claims a configurable batch of up to five
+pages within a 20-second execution budget, performs the existing single-use
+loopback capture, and then completes or retries each job with exponential
 backoff. Three failed attempts leave a visible failed job instead of creating a
 loop. The visitor request never performs DOM parsing or remote fetches. Queue
-progress appears on **NPE → DOM Intelligence**.
+progress, analyzed-page totals, last completion time, and an estimate based on
+measured scan duration appear on **NPE → DOM Intelligence** and the overview.
+
+NPE retains only a bounded set of normalized discovered URLs. A full NPE cache
+purge or the public `litespeed_purge_all` request hook requeues that set, while
+scoped URL purges requeue only the affected same-origin URL. Existing queue
+deduplication prevents the NPE-to-LiteSpeed purge bridge from adding duplicate
+jobs or creating a purge loop.
 
 ## Pipeline
 

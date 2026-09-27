@@ -211,7 +211,7 @@ final class Plugin {
 		$this->services->set(
 			DashboardPage::class,
 			static function ( ServiceRegistry $services ): DashboardPage {
-				return new DashboardPage( $services->get( Settings::class ), $services->get( PageCacheStoreInterface::class ), $services->get( CacheMetrics::class ), $services->get( CacheOperationsState::class ), $services->get( PerformanceStorage::class ), $services->get( PerformanceAggregator::class ), $services->get( JavaScriptStorage::class ), $services->get( Capabilities::class ) );
+				return new DashboardPage( $services->get( Settings::class ), $services->get( PageCacheStoreInterface::class ), $services->get( CacheMetrics::class ), $services->get( CacheOperationsState::class ), $services->get( PerformanceStorage::class ), $services->get( PerformanceAggregator::class ), $services->get( JavaScriptStorage::class ), $services->get( Capabilities::class ), $services->get( DOMAnalysisQueue::class ) );
 			}
 		);
 		$this->services->set( DiagnosticsAdminPage::class, static function ( ServiceRegistry $services ): DiagnosticsAdminPage { return new DiagnosticsAdminPage( $services->get( Diagnostics::class ), $services->get( Capabilities::class ) ); } );
@@ -357,7 +357,8 @@ final class Plugin {
 					$services->get( Capabilities::class ),
 					$services->get( ComponentRegistry::class ),
 					$services->get( PageAnalysisCoordinator::class ),
-					$services->get( DOMAnalysisQueue::class )
+					$services->get( DOMAnalysisQueue::class ),
+					$services->get( Settings::class )
 				);
 			}
 		);

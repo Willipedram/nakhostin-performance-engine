@@ -39,6 +39,8 @@ final class Settings {
 			'enabled'        => false,
 			'sample_rate'    => 10,
 			'cooldown_hours' => 24,
+			'batch_size'     => 3,
+			'scan_interval'  => 10,
 		);
 		$defaults['cache'] = array(
 			'enabled'                  => false,
@@ -111,6 +113,8 @@ final class Settings {
 		$dom = isset( $input['dom'] ) && is_array( $input['dom'] ) ? $input['dom'] : array();
 		$sanitized['dom']['sample_rate']    = max( 1, min( 100, absint( $dom['sample_rate'] ?? 10 ) ) );
 		$sanitized['dom']['cooldown_hours'] = max( 1, min( 720, absint( $dom['cooldown_hours'] ?? 24 ) ) );
+		$sanitized['dom']['batch_size']     = max( 1, min( 5, absint( $dom['batch_size'] ?? 3 ) ) );
+		$sanitized['dom']['scan_interval']  = max( 5, min( 300, absint( $dom['scan_interval'] ?? 10 ) ) );
 		$cache = isset( $input['cache'] ) && is_array( $input['cache'] ) ? $input['cache'] : array();
 		$sanitized['cache']['ttl']       = max( 30, min( 86400, absint( $cache['ttl'] ?? 300 ) ) );
 		$sanitized['cache']['stale_ttl'] = max( 0, min( 3600, (int) ( $cache['stale_ttl'] ?? 60 ) ) );

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Nakhostin Performance Engine 1.5.0\n"
+"Project-Id-Version: Nakhostin Performance Engine 1.6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-09-25 00:00+0000\n"
 "MIME-Version: 1.0\n"
@@ -978,4 +978,52 @@ msgstr ""
 
 
 msgid "Failed"
+msgstr ""
+
+
+msgid "Pages per scan batch"
+msgstr ""
+
+
+msgid "Processes several pages quickly while enforcing a short execution budget. Three pages is the recommended balance."
+msgstr ""
+
+
+msgid "Delay between scan batches (seconds)"
+msgstr ""
+
+
+msgid "Schedules the next WP-Cron batch after this delay. Actual execution depends on WordPress cron traffic."
+msgstr ""
+
+
+msgid "Eligible visitor requests are deduplicated and analyzed asynchronously in small fast batches."
+msgstr ""
+
+
+msgid "Current scan progress"
+msgstr ""
+
+
+msgid "Pages analyzed"
+msgstr ""
+
+
+msgid "Estimated time remaining"
+msgstr ""
+
+
+msgid "Last completed scan"
+msgstr ""
+
+
+msgid "After an NPE or LiteSpeed full cache purge, previously discovered pages are automatically queued for a fresh scan."
+msgstr ""
+
+
+msgid "About %d minutes"
+msgstr ""
+
+
+msgid "Automatic DOM scan progress: %d%%"
 msgstr ""

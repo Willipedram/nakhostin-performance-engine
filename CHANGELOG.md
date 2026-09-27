@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0 — Fast managed DOM scans
+
+- Process automatic DOM scans in short bounded batches and report progress, completion totals, last completion time, and estimated remaining time.
+- Retain a bounded list of discovered public pages and requeue affected pages after NPE or public LiteSpeed purge signals without creating purge loops.
+
 ## 1.5.0 — Gradual automatic DOM learning
 
 - Added a bounded, deduplicated WP-Cron queue that learns from sampled anonymous public page requests without delaying visitors.

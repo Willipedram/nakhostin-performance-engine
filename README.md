@@ -21,8 +21,12 @@ Redis, Memcached, WooCommerce, Elementor, WoodMart, and LiteSpeed Cache are opti
 
 Automatic DOM learning is opt-in under **NPE → Settings**. When enabled, NPE only
 observes sampled anonymous, query-free public requests and places normalized URLs
-in a bounded queue. WP-Cron analyzes one page at a time after the visitor response;
+in a bounded queue. WP-Cron analyzes small bounded batches after the visitor response;
 account, cart, checkout, administration, and logged-in requests are excluded.
+
+Version 1.6 processes that queue in configurable short batches, displays progress,
+analyzed-page totals and an estimated completion time, and safely requeues known
+pages after full NPE or public LiteSpeed cache purge signals.
 
 Persian works in modern WordPress installations through the committed text-based
 `languages/nakhostin-performance-engine-fa_IR.l10n.php` catalog. Before creating

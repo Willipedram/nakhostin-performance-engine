@@ -20,6 +20,9 @@
 .npe-notice ul { list-style: disc; padding-inline-start: 22px; }
 .npe-admin :focus-visible { outline: 2px solid #2271b1; outline-offset: 2px; }
 .npe-technical { font-variant-numeric: tabular-nums; }
+.npe-progress { block-size: 18px; display: block; inline-size: 100%; margin-block-start: 10px; }
+.npe-progress-value { font-size: 18px; font-weight: 700; margin-block: 6px 0; }
+.npe-progress-details { display: grid; gap: 8px 24px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
 .npe-card {
 	background: #fff;
@@ -52,6 +55,7 @@
 	.npe-module-list {
 		columns: 1;
 	}
+	.npe-progress-details { grid-template-columns: 1fr; }
 	.npe-admin .widefat { display: block; overflow-x: auto; white-space: nowrap; }
 }
 

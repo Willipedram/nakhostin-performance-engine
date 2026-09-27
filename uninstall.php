@@ -47,6 +47,7 @@ $npe_remove_site_data = static function () {
 	delete_option( 'npe_cache_operations_state' );
 	delete_option( 'npe_performance_samples' );
 	delete_option( 'npe_dom_analysis_queue' );
+	delete_option( 'npe_dom_analysis_state' );
 	delete_option( 'npe_dom_analysis_queue_lock' );
 
 	if ( defined( 'WP_CONTENT_DIR' ) ) {

@@ -45,7 +45,21 @@ final class DOMAnalysisQueueTest extends TestCase {
 		$queue = new DOMAnalysisQueue();
 		$queue->enqueue( 'https://example.test/' );
 		$job = $queue->claim();
-		$queue->complete( $job['id'] );
+		$queue->complete( $job['id'], 0.5 );
 		$this->assertSame( array(), $queue->all() );
+		$report = $queue->report();
+		$this->assertSame( 1, $report['completed'] );
+		$this->assertSame( 100, $report['progress'] );
+		$this->assertSame( 0, $report['estimated_seconds'] );
+	}
+
+	public function test_cache_invalidation_requeues_previously_completed_pages(): void {
+		$queue = new DOMAnalysisQueue();
+		$queue->enqueue( 'https://example.test/product/watch/' );
+		$job = $queue->claim();
+		$queue->complete( $job['id'], 1.0 );
+		$this->assertSame( 1, $queue->requeue_known( 'cache-purged' ) );
+		$this->assertCount( 1, $queue->all() );
+		$this->assertSame( 1, $queue->report()['invalidations'] );
 	}
 }

@@ -71,9 +71,11 @@ final class SettingsTest extends TestCase {
 	}
 
 	public function test_dom_learning_configuration_is_bounded(): void {
-		$result = ( new Settings() )->sanitize( array( 'dom' => array( 'enabled' => 'on', 'sample_rate' => 500, 'cooldown_hours' => 0 ) ) );
+		$result = ( new Settings() )->sanitize( array( 'dom' => array( 'enabled' => 'on', 'sample_rate' => 500, 'cooldown_hours' => 0, 'batch_size' => 99, 'scan_interval' => 1 ) ) );
 		$this->assertTrue( $result['dom']['enabled'] );
 		$this->assertSame( 100, $result['dom']['sample_rate'] );
 		$this->assertSame( 1, $result['dom']['cooldown_hours'] );
+		$this->assertSame( 5, $result['dom']['batch_size'] );
+		$this->assertSame( 5, $result['dom']['scan_interval'] );
 	}
 }

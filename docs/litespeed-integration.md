@@ -51,6 +51,12 @@ When Compatible or Cooperative mode is active, the adapter returns `false` throu
 
 The purge bridge listens to NPE's normalized `npe/cache/purged` event. URL and dependency purges are forwarded individually. A full LiteSpeed purge is never synthesized from a product, post, category, component, page-type, or asset event; it is forwarded only from a real NPE full purge.
 
+When automatic DOM learning is enabled, NPE also observes the documented public
+`litespeed_purge_all` and `litespeed_purge_url` request actions. A full request
+requeues the bounded set of previously discovered public pages; a URL request
+requeues only that normalized same-origin page. Queue deduplication ensures that
+purges forwarded by NPE are not processed twice and never trigger another purge.
+
 ## Fallback and limitations
 
 - LiteSpeed Cache may operate through infrastructure PHP cannot identify. Operators may use the capability filter after confirming their deployment.

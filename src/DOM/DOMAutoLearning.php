@@ -22,6 +22,10 @@ final class DOMAutoLearning {
 
 	public function register(): void {
 		add_action( DOMAnalysisQueue::CRON_HOOK, array( $this, 'process_queue' ) );
+		add_action( 'npe/cache/purged', array( $this, 'cache_purged' ), 20, 2 );
+		// Public LiteSpeed purge request hooks. No LiteSpeed classes or internals are used.
+		add_action( 'litespeed_purge_all', array( $this, 'litespeed_cache_purged' ), 20 );
+		add_action( 'litespeed_purge_url', array( $this, 'litespeed_url_purged' ), 20, 1 );
 		if ( $this->settings->get( 'dom.enabled', false ) ) {
 			add_action( 'template_redirect', array( $this, 'observe_request' ), 1000 );
 		}
@@ -43,20 +47,47 @@ final class DOMAutoLearning {
 		if ( ! $this->settings->get( 'dom.enabled', false ) ) {
 			return;
 		}
-		$job = $this->queue->claim();
-		if ( null === $job ) {
-			if ( $this->queue->has_pending() ) {
-				$this->queue->schedule( 60 );
+		$batch_size = (int) $this->settings->get( 'dom.batch_size', 3 );
+		$started = microtime( true );
+		for ( $processed = 0; $processed < $batch_size && microtime( true ) - $started < 20; ++$processed ) {
+			$job = $this->queue->claim();
+			if ( null === $job ) {
+				break;
 			}
-			return;
-		}
-		if ( $this->coordinator->request( (string) $job['url'] ) ) {
-			$this->queue->complete( (string) $job['id'] );
-		} else {
-			$this->queue->retry( (string) $job['id'] );
+			$job_started = microtime( true );
+			if ( $this->coordinator->request( (string) $job['url'] ) ) {
+				$this->queue->complete( (string) $job['id'], microtime( true ) - $job_started );
+			} else {
+				$this->queue->retry( (string) $job['id'] );
+			}
 		}
 		if ( $this->queue->has_pending() ) {
-			$this->queue->schedule( 60 );
+			$this->queue->schedule( (int) $this->settings->get( 'dom.scan_interval', 10 ) );
+		}
+	}
+
+	public function cache_purged( string $scope, array $values ): void {
+		if ( ! $this->settings->get( 'dom.enabled', false ) ) {
+			return;
+		}
+		if ( 'all' === $scope ) {
+			$this->queue->requeue_known( 'npe-cache-purged' );
+		} elseif ( 'urls' === $scope ) {
+			foreach ( $values as $url ) {
+				$this->queue->enqueue( (string) $url, 'npe-url-purged', HOUR_IN_SECONDS, true );
+			}
+		}
+	}
+
+	public function litespeed_cache_purged(): void {
+		if ( $this->settings->get( 'dom.enabled', false ) ) {
+			$this->queue->requeue_known( 'litespeed-cache-purged' );
+		}
+	}
+
+	public function litespeed_url_purged( string $url = '' ): void {
+		if ( $this->settings->get( 'dom.enabled', false ) ) {
+			$this->queue->enqueue( $url, 'litespeed-url-purged', HOUR_IN_SECONDS, true );
 		}
 	}
 
