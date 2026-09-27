@@ -1,0 +1,120 @@
+.npe-admin {
+	max-inline-size: 1200px;
+}
+
+.npe-hero { align-items: center; background: linear-gradient(135deg, #172554, #1d4ed8); border-radius: 12px; color: #fff; display: flex; gap: 24px; justify-content: space-between; margin-block: 20px; padding: 24px; }
+.npe-hero h1 { color: inherit; margin: 0 0 8px; }
+.npe-hero p { font-size: 15px; margin: 0; }
+.npe-version { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 6px 12px; white-space: nowrap; }
+.npe-metric-grid { display: grid; gap: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-block: 20px; }
+.npe-metric { background: #fff; border: 1px solid #c3c4c7; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.04); min-inline-size: 0; padding: 18px; }
+.npe-metric h2 { font-size: 13px; margin: 0 0 12px; }
+.npe-metric-value { color: #1d4ed8; display: block; font-size: 26px; line-height: 1.2; overflow-wrap: anywhere; }
+.npe-metric p { color: #50575e; margin: 10px 0 0; }
+.npe-quick-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.npe-quick-links a { background: #f6f7f7; border: 1px solid #c3c4c7; border-radius: 4px; padding: 9px 14px; text-decoration: none; }
+.npe-quick-links a:focus, .npe-quick-links a:hover { background: #fff; border-color: #2271b1; box-shadow: 0 0 0 1px #2271b1; }
+.npe-status { align-items: center; display: inline-flex; font-weight: 600; gap: 6px; }
+.npe-status.is-enabled { color: #087a35; }
+.npe-status.is-disabled { color: #8a2424; }
+.npe-notice ul { list-style: disc; padding-inline-start: 22px; }
+.npe-admin :focus-visible { outline: 2px solid #2271b1; outline-offset: 2px; }
+.npe-technical { font-variant-numeric: tabular-nums; }
+.npe-progress { block-size: 18px; display: block; inline-size: 100%; margin-block-start: 10px; }
+.npe-progress-value { font-size: 18px; font-weight: 700; margin-block: 6px 0; }
+.npe-progress-details { display: grid; gap: 8px 24px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.npe-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	margin-block: 16px;
+	padding: 20px;
+}
+
+.npe-card h2 {
+	margin-block-start: 0;
+}
+
+.npe-explainer { border-inline-start: 4px solid #2271b1; }
+.npe-explainer ul { list-style: disc; margin-block-end: 0; padding-inline-start: 22px; }
+.npe-code-input { box-sizing: border-box; margin-block-start: 10px; max-inline-size: 100%; }
+.npe-token-list { display: flex; flex-wrap: wrap; gap: 8px; margin-block-start: 16px; }
+.npe-token-list code { overflow-wrap: anywhere; white-space: normal; }
+.npe-admin details > summary { cursor: pointer; }
+.npe-admin label + .description, .npe-admin label ~ .description { display: block; margin-block-start: 6px; }
+
+.npe-module-list {
+	columns: 2;
+}
+
+@media (max-width: 782px) {
+	.npe-hero { align-items: flex-start; flex-direction: column; }
+	.npe-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.npe-module-list {
+		columns: 1;
+	}
+	.npe-progress-details { grid-template-columns: 1fr; }
+	.npe-admin .widefat { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+@media (max-width: 480px) {
+	.npe-metric-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.npe-admin * { scroll-behavior: auto !important; transition: none !important; }
+}
+
+/* Settings screen: composed from WordPress nav tabs, buttons, notices, inputs and Dashicons. */
+.npe-settings-page { --npe-wp-blue: #2271b1; --npe-border: #c3c4c7; --npe-surface: #fff; }
+.npe-settings-header { align-items: center; background: var(--npe-surface); border: 1px solid var(--npe-border); border-inline-start: 4px solid var(--npe-wp-blue); display: flex; gap: 24px; justify-content: space-between; margin-block: 20px 16px; padding: 20px 24px; }
+.npe-settings-header h1 { margin: 0 0 6px; padding: 0; }
+.npe-settings-header p { color: #50575e; margin: 0; max-inline-size: 720px; }
+.npe-settings-header .npe-version { background: #f0f6fc; border-color: #72aee6; color: #135e96; }
+.npe-settings-tabs { display: flex; flex-wrap: wrap; margin-block-end: 0; }
+.npe-settings-tabs .nav-tab { align-items: center; display: inline-flex; gap: 6px; }
+.npe-settings-tabs .dashicons { font-size: 18px; block-size: 18px; inline-size: 18px; }
+.npe-settings-layout { align-items: start; display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr) 300px; }
+.npe-settings-main { min-inline-size: 0; }
+.npe-settings-panel { border-radius: 0; border-top: 3px solid #dcdcde; box-shadow: 0 1px 2px rgba(0,0,0,.04); margin-block-start: 20px; }
+.npe-settings-panel[hidden] { display: none; }
+.npe-settings-panel > h2 { border-block-end: 1px solid #dcdcde; font-size: 17px; margin: -4px -4px 18px; padding: 0 4px 14px; }
+.npe-settings-panel > p:not(.description) { color: #50575e; max-inline-size: 780px; }
+.npe-settings-panel input[type="number"] { inline-size: 110px; }
+.npe-settings-panel input[type="text"], .npe-settings-panel textarea { max-inline-size: 680px; inline-size: 100%; }
+.npe-settings-panel fieldset { border: 1px solid #dcdcde; margin-block-start: 18px; padding: 16px; }
+.npe-settings-panel legend { font-weight: 600; padding-inline: 6px; }
+.npe-settings-panel label { font-weight: 500; }
+.npe-settings-panel label input[type="checkbox"] { margin-inline-end: 6px; }
+.npe-settings-panel .description { color: #646970; font-weight: 400; line-height: 1.6; max-inline-size: 780px; }
+.npe-settings-sidebar { position: sticky; top: 48px; }
+.npe-settings-sidebar .npe-card { margin-block-start: 20px; padding: 16px; }
+.npe-settings-sidebar h2 { align-items: center; display: flex; font-size: 14px; gap: 7px; }
+.npe-settings-sidebar h2 .dashicons { color: var(--npe-wp-blue); }
+.npe-settings-summary ul { margin: 0; }
+.npe-settings-summary li { align-items: center; border-block-start: 1px solid #f0f0f1; display: flex; gap: 10px; justify-content: space-between; padding-block: 10px; }
+.npe-settings-summary li:first-child { border-block-start: 0; }
+.npe-status-badge { align-items: center; border-radius: 999px; display: inline-flex; font-size: 11px; font-weight: 600; gap: 2px; padding: 3px 7px; white-space: nowrap; }
+.npe-status-badge .dashicons { block-size: 14px; font-size: 14px; inline-size: 14px; }
+.npe-status-badge.is-enabled { background: #edfaef; color: #116329; }
+.npe-status-badge.is-disabled { background: #f0f0f1; color: #50575e; }
+.npe-settings-help p { color: #50575e; line-height: 1.6; }
+.npe-settings-actions { align-items: center; background: #fff; border: 1px solid var(--npe-border); bottom: 0; box-shadow: 0 -2px 8px rgba(0,0,0,.08); display: flex; gap: 16px; justify-content: flex-end; margin-block-start: 20px; padding: 12px 16px; position: sticky; z-index: 20; }
+.npe-settings-actions > span { color: #646970; }
+
+@media (max-width: 960px) {
+	.npe-settings-layout { grid-template-columns: 1fr; }
+	.npe-settings-sidebar { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); position: static; }
+	.npe-settings-sidebar .npe-card { margin-block-start: 0; }
+}
+
+@media (max-width: 782px) {
+	.npe-settings-header { align-items: flex-start; flex-direction: column; }
+	.npe-settings-tabs { gap: 4px; }
+	.npe-settings-tabs .nav-tab { border: 1px solid var(--npe-border); margin: 0; }
+	.npe-settings-sidebar { grid-template-columns: 1fr; }
+	.npe-settings-actions { align-items: stretch; flex-direction: column; }
+	.npe-settings-actions .button { inline-size: 100%; min-block-size: 40px; }
+}
