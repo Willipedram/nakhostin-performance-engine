@@ -73,15 +73,24 @@
 .npe-settings-header h1 { margin: 0 0 6px; padding: 0; }
 .npe-settings-header p { color: #50575e; margin: 0; max-inline-size: 720px; }
 .npe-settings-header .npe-version { background: #f0f6fc; border-color: #72aee6; color: #135e96; }
-.npe-settings-tabs { display: flex; flex-wrap: wrap; margin-block-end: 0; }
-.npe-settings-tabs .nav-tab { align-items: center; display: inline-flex; gap: 6px; }
+.npe-settings-tabs { background: #f0f0f1; display: flex; flex-wrap: wrap; margin-block-end: 0; padding: 8px 8px 0; position: sticky; top: 32px; z-index: 15; }
+.npe-settings-tabs .nav-tab { align-items: center; border-radius: 4px 4px 0 0; display: inline-flex; gap: 6px; min-block-size: 38px; }
+.npe-settings-tabs .nav-tab-active { background: #fff; border-bottom-color: #fff; color: #135e96; }
 .npe-settings-tabs .dashicons { font-size: 18px; block-size: 18px; inline-size: 18px; }
+.npe-settings-steps { counter-reset: npe-step; display: flex; flex-wrap: wrap; gap: 8px 18px; list-style: none; margin: 16px 0 0; padding: 0; }
+.npe-settings-steps li { align-items: center; color: #3c434a; display: inline-flex; font-size: 13px; gap: 7px; }
+.npe-settings-steps li::before { align-items: center; background: #2271b1; border-radius: 50%; color: #fff; content: counter(npe-step); counter-increment: npe-step; display: inline-flex; font-size: 11px; font-weight: 700; block-size: 22px; inline-size: 22px; justify-content: center; }
 .npe-settings-layout { align-items: start; display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr) 300px; }
 .npe-settings-main { min-inline-size: 0; }
 .npe-settings-panel { border-radius: 0; border-top: 3px solid #dcdcde; box-shadow: 0 1px 2px rgba(0,0,0,.04); margin-block-start: 20px; }
-.npe-settings-panel[hidden] { display: none; }
+.npe-settings-panel[hidden] { display: none !important; }
 .npe-settings-panel > h2 { border-block-end: 1px solid #dcdcde; font-size: 17px; margin: -4px -4px 18px; padding: 0 4px 14px; }
 .npe-settings-panel > p:not(.description) { color: #50575e; max-inline-size: 780px; }
+.npe-settings-panel > label { background: #f6f7f7; border: 1px solid #dcdcde; border-radius: 6px; box-sizing: border-box; display: block; margin-block-start: 12px; padding: 14px 16px; }
+.npe-settings-panel > label + .description { background: #f6f7f7; border: 1px solid #dcdcde; border-block-start: 0; border-radius: 0 0 6px 6px; box-sizing: border-box; margin-block-start: -6px; padding: 0 16px 14px; }
+.npe-settings-panel > p:has(> label) { background: #f6f7f7; border: 1px solid #dcdcde; border-radius: 6px; box-sizing: border-box; margin-block: 12px; padding: 14px 16px; }
+.npe-settings-panel > p:has(> label) label { display: block; }
+.npe-settings-panel > p:has(> label) .description { margin-block-start: 8px; }
 .npe-settings-panel input[type="number"] { inline-size: 110px; }
 .npe-settings-panel input[type="text"], .npe-settings-panel textarea { max-inline-size: 680px; inline-size: 100%; }
 .npe-settings-panel fieldset { border: 1px solid #dcdcde; margin-block-start: 18px; padding: 16px; }
@@ -113,6 +122,7 @@
 @media (max-width: 782px) {
 	.npe-settings-header { align-items: flex-start; flex-direction: column; }
 	.npe-settings-tabs { gap: 4px; }
+	.npe-settings-tabs { flex-wrap: nowrap; overflow-x: auto; position: static; }
 	.npe-settings-tabs .nav-tab { border: 1px solid var(--npe-border); margin: 0; }
 	.npe-settings-sidebar { grid-template-columns: 1fr; }
 	.npe-settings-actions { align-items: stretch; flex-direction: column; }

@@ -1,3 +1,9 @@
+## 2.3.0
+
+- Rebuilt Settings navigation with reliable server-rendered tabs and progressive JavaScript enhancement.
+- Added accessible keyboard tab navigation, robust asset routing, clearer card grouping, guided setup steps, and mobile-friendly tabs.
+- Added visible descriptions and Persian translations for the revised settings workflow.
+
 ## 2.2.0
 
 - Fixed automatic DOM learning startup by seeding the homepage, immediately scheduling WP-Cron, and dispatching the worker non-blockingly after visitor responses.

@@ -1412,3 +1412,12 @@ msgstr "به‌روزرسانی وضعیت صف ممکن نشد. صفحه را �
 
 msgid "Automatic learning is disabled."
 msgstr "یادگیری خودکار غیرفعال است."
+
+msgid "Choose a section"
+msgstr "یک بخش را انتخاب کنید"
+
+msgid "Review the effect and safety note"
+msgstr "اثر و نکته ایمنی را بررسی کنید"
+
+msgid "Save and verify your public pages"
+msgstr "ذخیره کنید و صفحات عمومی را بررسی کنید"

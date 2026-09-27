@@ -1381,3 +1381,12 @@ msgstr ""
 
 msgid "Automatic learning is disabled."
 msgstr ""
+
+msgid "Choose a section"
+msgstr ""
+
+msgid "Review the effect and safety note"
+msgstr ""
+
+msgid "Save and verify your public pages"
+msgstr ""

@@ -51,3 +51,9 @@ All screens derive their `dir` value from WordPress. Base CSS uses logical prope
 ## Asset loading
 
 Admin styles load only for the NPE top-level page and NPE submenu hook suffixes. The RTL override loads only when `is_rtl()` is true. No dashboard JavaScript or third-party UI framework is loaded.
+
+## Settings navigation
+
+Settings tabs use real WordPress admin URLs with an allowlisted `section` query parameter. The server renders only the requested group, so navigation remains functional if JavaScript is blocked or delayed. JavaScript progressively enhances those links into instant tabs after `DOMContentLoaded`, maintains the URL, applies ARIA state, and supports Arrow, Home, and End keys.
+
+Each subsystem remains a separate WordPress-style card. Option groups visually separate the control, its effect, and its safety description. The sticky save area and configuration summary remain visible without obscuring mobile content.

@@ -57,4 +57,18 @@ final class AdminPageTest extends TestCase {
 		$this->expectException( \RuntimeException::class );
 		$page->render();
 	}
+
+	public function test_server_rendered_tabs_work_without_javascript(): void {
+		$_GET['section'] = 'cache';
+		$settings = new Settings();
+		$page = new AdminPage( $settings, new Diagnostics(), new Capabilities(), new FeatureFlags( $settings ) );
+		ob_start();
+		$page->render();
+		$output = (string) ob_get_clean();
+		unset( $_GET['section'] );
+
+		$this->assertStringContainsString( 'data-npe-tab="cache" aria-current="page"', $output );
+		$this->assertMatchesRegularExpression( '/id="npe-settings-cache"[^>]*data-npe-section="cache"[^>]*>/', $output );
+		$this->assertMatchesRegularExpression( '/id="npe-settings-general"[^>]*hidden/', $output );
+	}
 }

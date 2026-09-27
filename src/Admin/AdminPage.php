@@ -71,7 +71,10 @@ final class AdminPage {
 	}
 
 	public function enqueue_assets( string $hook_suffix ): void {
-		if ( 'toplevel_page_' . self::SLUG !== $hook_suffix && 0 !== strpos( $hook_suffix, self::SLUG . '_page_' ) ) {
+		// Hook suffixes differ when another plugin changes menu registration. The
+		// allowlisted page query is the stable WordPress identifier for our screens.
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only asset routing.
+		if ( 'toplevel_page_' . self::SLUG !== $hook_suffix && 0 !== strpos( $hook_suffix, self::SLUG . '_page_' ) && self::SLUG !== $page && self::SETTINGS_SLUG !== $page ) {
 			return;
 		}
 
@@ -79,7 +82,7 @@ final class AdminPage {
 		if ( is_rtl() ) {
 			wp_enqueue_style( 'npe-admin-rtl', NPE_URL . 'assets/admin/admin-rtl.css', array( 'npe-admin' ), NPE_VERSION );
 		}
-		if ( self::SLUG . '_page_' . self::SETTINGS_SLUG === $hook_suffix ) {
+		if ( self::SETTINGS_SLUG === $page || false !== strpos( $hook_suffix, '_page_' . self::SETTINGS_SLUG ) ) {
 			wp_enqueue_script( 'npe-settings', NPE_URL . 'assets/admin/settings.js', array(), NPE_VERSION, true );
 		}
 	}
@@ -89,22 +92,27 @@ final class AdminPage {
 			wp_die( esc_html__( 'You are not allowed to manage NPE settings.', 'nakhostin-performance-engine' ) );
 		}
 
+		$tabs = $this->settings_tabs();
+		$active_tab = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : 'general'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only navigation state.
+		if ( ! isset( $tabs[ $active_tab ] ) ) {
+			$active_tab = 'general';
+		}
 		?>
 		<div class="wrap npe-admin npe-settings-page" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
 			<div class="npe-settings-header">
-				<div><h1><?php echo esc_html__( 'NPE Settings', 'nakhostin-performance-engine' ); ?></h1><p><?php echo esc_html__( 'Configure performance features with safe defaults. Every option explains its effect before you enable it.', 'nakhostin-performance-engine' ); ?></p></div>
+				<div><h1><?php echo esc_html__( 'NPE Settings', 'nakhostin-performance-engine' ); ?></h1><p><?php echo esc_html__( 'Configure performance features with safe defaults. Every option explains its effect before you enable it.', 'nakhostin-performance-engine' ); ?></p><ol class="npe-settings-steps"><li><?php echo esc_html__( 'Choose a section', 'nakhostin-performance-engine' ); ?></li><li><?php echo esc_html__( 'Review the effect and safety note', 'nakhostin-performance-engine' ); ?></li><li><?php echo esc_html__( 'Save and verify your public pages', 'nakhostin-performance-engine' ); ?></li></ol></div>
 				<span class="npe-version npe-technical" dir="ltr"><?php echo esc_html( 'NPE ' . NPE_VERSION ); ?></span>
 			</div>
 			<?php if ( function_exists( 'settings_errors' ) ) { settings_errors( Settings::OPTION ); } ?>
 			<nav class="nav-tab-wrapper npe-settings-tabs" role="tablist" aria-label="<?php echo esc_attr__( 'Settings sections', 'nakhostin-performance-engine' ); ?>">
-				<?php foreach ( $this->settings_tabs() as $key => $tab ) : ?>
-					<a class="nav-tab<?php echo 'general' === $key ? ' nav-tab-active' : ''; ?>" href="#npe-settings-<?php echo esc_attr( $key ); ?>" data-npe-tab="<?php echo esc_attr( $key ); ?>" aria-controls="<?php echo esc_attr( $tab['controls'] ); ?>" <?php echo 'general' === $key ? 'aria-current="page"' : ''; ?>><span class="dashicons <?php echo esc_attr( $tab['icon'] ); ?>" aria-hidden="true"></span><?php echo esc_html( $tab['label'] ); ?></a>
+				<?php foreach ( $tabs as $key => $tab ) : ?>
+					<a id="npe-settings-tab-<?php echo esc_attr( $key ); ?>" class="nav-tab<?php echo $active_tab === $key ? ' nav-tab-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( array( 'page' => self::SETTINGS_SLUG, 'section' => $key ), admin_url( 'admin.php' ) ) . '#npe-settings-' . $key ); ?>" data-npe-tab="<?php echo esc_attr( $key ); ?>" <?php echo $active_tab === $key ? 'aria-current="page" aria-selected="true" tabindex="0"' : 'aria-selected="false" tabindex="-1"'; ?>><span class="dashicons <?php echo esc_attr( $tab['icon'] ); ?>" aria-hidden="true"></span><?php echo esc_html( $tab['label'] ); ?></a>
 				<?php endforeach; ?>
 			</nav>
 
 			<form action="options.php" method="post" class="npe-settings-form">
 				<?php settings_fields( 'npe_settings_group' ); ?>
-				<div class="npe-settings-layout"><main class="npe-settings-main"><?php $this->render_settings(); ?></main><?php $this->render_settings_sidebar(); ?></div>
+				<div class="npe-settings-layout"><main class="npe-settings-main"><?php $this->render_settings( $active_tab ); ?></main><?php $this->render_settings_sidebar(); ?></div>
 				<div class="npe-settings-actions"><span><?php echo esc_html__( 'Changes take effect after saving.', 'nakhostin-performance-engine' ); ?></span><?php submit_button( __( 'Save settings', 'nakhostin-performance-engine' ), 'primary', 'submit', false ); ?></div>
 			</form>
 
@@ -112,10 +120,10 @@ final class AdminPage {
 		<?php
 	}
 
-	private function render_settings(): void {
+	private function render_settings( string $active_tab = 'general' ): void {
 		$settings = $this->settings->all();
 		?>
-		<section id="npe-settings-general" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="general">
+		<section id="npe-settings-general" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-general" data-npe-section="general" <?php echo 'general' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'General', 'nakhostin-performance-engine' ); ?></h2>
 			<label>
 				<input type="hidden" name="npe_settings[general][remove_data_on_uninstall]" value="0">
@@ -130,13 +138,13 @@ final class AdminPage {
 			</label>
 			<p class="description"><?php echo esc_html__( 'Effect: when WordPress deletes the plugin, NPE-owned settings, manifests, metrics, queues, and cache files are permanently removed.', 'nakhostin-performance-engine' ); ?></p>
 		</section>
-		<section id="npe-settings-fonts" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="intelligence">
+		<section id="npe-settings-fonts" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-intelligence" data-npe-section="intelligence" <?php echo 'intelligence' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'Page-aware font loading', 'nakhostin-performance-engine' ); ?></h2>
 			<p><?php echo esc_html__( 'Detects font families, formats, weights, source URLs, and the pages that actually reference them during automatic page analysis.', 'nakhostin-performance-engine' ); ?></p>
 			<label><input type="hidden" name="npe_settings[fonts][enabled]" value="0"><input type="checkbox" name="npe_settings[fonts][enabled]" value="1" <?php checked( $settings['fonts']['enabled'] ); ?>> <?php echo esc_html__( 'Replace analyzed font-only stylesheets with only the required font faces', 'nakhostin-performance-engine' ); ?></label>
 			<p class="description"><?php echo esc_html__( 'Effect: on a previously analyzed public page, NPE can dequeue a stylesheet containing only @font-face rules and recreate only the required variants. Mixed stylesheets, unknown pages, logged-in users, uncertain fonts, and LiteSpeed-compatible CSS optimization remain unchanged.', 'nakhostin-performance-engine' ); ?></p>
 		</section>
-		<section id="npe-settings-optimization" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="intelligence">
+		<section id="npe-settings-optimization" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-intelligence" data-npe-section="intelligence" <?php echo 'intelligence' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'Frontend optimization runtime', 'nakhostin-performance-engine' ); ?></h2>
 			<p><?php echo esc_html__( 'Runtime changes use only fresh precomputed page manifests. Missing, stale, uncertain, cart, checkout, account, and logged-in contexts keep every original asset.', 'nakhostin-performance-engine' ); ?></p>
 			<label><input type="hidden" name="npe_settings[optimization][enabled]" value="0"><input type="checkbox" name="npe_settings[optimization][enabled]" value="1" <?php checked( $settings['optimization']['enabled'] ); ?>> <?php echo esc_html__( 'Enable manifest-driven frontend optimization', 'nakhostin-performance-engine' ); ?></label><br>
@@ -149,7 +157,7 @@ final class AdminPage {
 			<p><label><input type="checkbox" name="npe_settings[fonts][preload_enabled]" value="1" <?php checked( $settings['fonts']['preload_enabled'] ); ?>> <?php echo esc_html__( 'Preload up to two critical WOFF2-preferred fonts', 'nakhostin-performance-engine' ); ?></label></p>
 			<p class="description"><?php echo esc_html__( 'JavaScript delay and asset unloading are aggressive controls and remain off by default. NPE does not optimize images or media.', 'nakhostin-performance-engine' ); ?></p>
 		</section>
-		<section id="npe-settings-dom" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="intelligence">
+		<section id="npe-settings-dom" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-intelligence" data-npe-section="intelligence" <?php echo 'intelligence' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'Automatic DOM learning', 'nakhostin-performance-engine' ); ?></h2>
 			<p><?php echo esc_html__( 'Gradually learns from eligible public pages that real visitors request. Analysis runs later through WP-Cron and never blocks the visitor response.', 'nakhostin-performance-engine' ); ?></p>
 			<label>
@@ -171,7 +179,7 @@ final class AdminPage {
 				<input type="number" min="5" max="300" name="npe_settings[dom][scan_interval]" value="<?php echo esc_attr( $settings['dom']['scan_interval'] ); ?>">
 			</label><span class="description"><?php echo esc_html__( 'Schedules the next WP-Cron batch after this delay. Actual execution depends on WordPress cron traffic.', 'nakhostin-performance-engine' ); ?></span></p>
 		</section>
-		<section id="npe-settings-litespeed" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="integrations">
+		<section id="npe-settings-litespeed" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-integrations" data-npe-section="integrations" <?php echo 'integrations' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'LiteSpeed Cache compatibility', 'nakhostin-performance-engine' ); ?></h2>
 			<p><?php echo esc_html__( 'NPE uses only public LiteSpeed hooks and never changes LiteSpeed Cache settings.', 'nakhostin-performance-engine' ); ?></p>
 			<label>
@@ -187,7 +195,7 @@ final class AdminPage {
 				<label><input type="radio" name="npe_settings[litespeed][mode]" value="cooperative" <?php checked( $settings['litespeed']['mode'], 'cooperative' ); ?>> <?php echo esc_html__( 'Cooperative — also share scoped tags, TTL, vary, and purge signals', 'nakhostin-performance-engine' ); ?></label>
 			</fieldset>
 		</section>
-		<section id="npe-settings-cache" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="cache">
+		<section id="npe-settings-cache" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-cache" data-npe-section="cache" <?php echo 'cache' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'Full Page Cache', 'nakhostin-performance-engine' ); ?></h2>
 			<p><?php echo esc_html__( 'Application-level caching is disabled by default. Private WordPress and WooCommerce requests are always bypassed.', 'nakhostin-performance-engine' ); ?></p>
 			<label>
@@ -227,7 +235,7 @@ final class AdminPage {
 				<input type="text" class="regular-text" name="npe_settings[cache][important_category_ids]" value="<?php echo esc_attr( implode( ', ', $settings['cache']['important_category_ids'] ) ); ?>">
 			</label><span class="description"><?php echo esc_html__( 'These product categories are prioritized for asynchronous cache warmup.', 'nakhostin-performance-engine' ); ?></span></p>
 		</section>
-		<section id="npe-settings-performance" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="monitoring">
+		<section id="npe-settings-performance" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-monitoring" data-npe-section="monitoring" <?php echo 'monitoring' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'Performance monitoring', 'nakhostin-performance-engine' ); ?></h2>
 			<p><?php echo esc_html__( 'Collect a bounded, privacy-safe sample of backend PHP measurements. These values are not browser TTFB.', 'nakhostin-performance-engine' ); ?></p>
 			<label><input type="hidden" name="npe_settings[performance][enabled]" value="0"><input type="checkbox" name="npe_settings[performance][enabled]" value="1" <?php checked( $settings['performance']['enabled'] ); ?>> <?php echo esc_html__( 'Enable diagnostic sampling', 'nakhostin-performance-engine' ); ?></label>
@@ -236,7 +244,7 @@ final class AdminPage {
 			<p><label><?php echo esc_html__( 'Retention (days)', 'nakhostin-performance-engine' ); ?><br><input type="number" min="1" max="90" name="npe_settings[performance][retention_days]" value="<?php echo esc_attr( $settings['performance']['retention_days'] ); ?>"></label><span class="description"><?php echo esc_html__( 'Older performance samples are removed after this period.', 'nakhostin-performance-engine' ); ?></span></p>
 			<p><label><?php echo esc_html__( 'Maximum samples', 'nakhostin-performance-engine' ); ?><br><input type="number" min="10" max="2000" name="npe_settings[performance][max_samples]" value="<?php echo esc_attr( $settings['performance']['max_samples'] ); ?>"></label><span class="description"><?php echo esc_html__( 'Caps stored history so monitoring data cannot grow without limit.', 'nakhostin-performance-engine' ); ?></span></p>
 		</section>
-		<section id="npe-settings-debug" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="general">
+		<section id="npe-settings-debug" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-general" data-npe-section="general" <?php echo 'general' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'Debugging', 'nakhostin-performance-engine' ); ?></h2>
 			<label>
 				<input type="hidden" name="npe_settings[debugging][enabled]" value="0">
@@ -251,7 +259,7 @@ final class AdminPage {
 			</label>
 			<p class="description"><?php echo esc_html__( 'Effect: writes redacted diagnostic messages only while WordPress debugging is also enabled; secrets and personal data are filtered.', 'nakhostin-performance-engine' ); ?></p>
 		</section>
-		<section id="npe-settings-modules" class="npe-card npe-settings-panel" role="tabpanel" data-npe-section="general">
+		<section id="npe-settings-modules" class="npe-card npe-settings-panel" role="tabpanel" aria-labelledby="npe-settings-tab-general" data-npe-section="general" <?php echo 'general' !== $active_tab ? 'hidden' : ''; ?>>
 			<h2><?php echo esc_html__( 'Module availability', 'nakhostin-performance-engine' ); ?></h2>
 			<p>
 				<?php

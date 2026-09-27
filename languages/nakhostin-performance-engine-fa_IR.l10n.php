@@ -447,5 +447,8 @@ return array (
     'Eligible visits are sampled over time; cooldown and URL deduplication limit database writes and background traffic. Ten percent is recommended for normal production sites.' => 'بازدیدهای واجد شرایط به‌مرور نمونه‌برداری می‌شوند؛ فاصله بازاسکن و تکرارزدایی نشانی‌ها نوشتن پایگاه داده و ترافیک پس‌زمینه را محدود می‌کند. ده درصد برای سایت‌های عادی پیشنهاد می‌شود.',
     'Could not refresh queue status. Reload the page and verify admin-ajax.php access.' => 'به‌روزرسانی وضعیت صف ممکن نشد. صفحه را دوباره بارگذاری و دسترسی admin-ajax.php را بررسی کنید.',
     'Automatic learning is disabled.' => 'یادگیری خودکار غیرفعال است.',
+    'Choose a section' => 'یک بخش را انتخاب کنید',
+    'Review the effect and safety note' => 'اثر و نکته ایمنی را بررسی کنید',
+    'Save and verify your public pages' => 'ذخیره کنید و صفحات عمومی را بررسی کنید',
   ),
 );
