@@ -1,0 +1,3 @@
+<?php
+namespace Nakhostin\PerformanceEngine\Assets;
+final class AssetRuntimeOptimizer { public function apply( array $decisions ): array { $applied = array(); foreach ( $decisions as $decision ) { if ( ! is_array( $decision ) || AssetDecision::UNLOAD !== ( $decision['decision'] ?? '' ) || (int) ( $decision['confidence'] ?? 0 ) < 90 ) { continue; } $handle = sanitize_key( (string) ( $decision['handle'] ?? '' ) ); $type = sanitize_key( (string) ( $decision['type'] ?? '' ) ); if ( 'style' === $type ) { wp_dequeue_style( $handle ); $applied[] = $handle; } elseif ( 'script' === $type && function_exists( 'wp_dequeue_script' ) ) { wp_dequeue_script( $handle ); $applied[] = $handle; } } return $applied; } }

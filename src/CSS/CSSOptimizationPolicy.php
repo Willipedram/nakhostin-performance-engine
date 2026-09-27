@@ -1,0 +1,3 @@
+<?php
+namespace Nakhostin\PerformanceEngine\CSS;
+final class CSSOptimizationPolicy { public const KEEP = 'keep'; public const DEFER = 'defer'; public const INLINE_CRITICAL = 'inline_critical'; public const UNLOAD = 'unload'; public const UNKNOWN = 'unknown'; public function decide( array $evidence, bool $safe_mode = true ): string { $decision = (string) ( $evidence['decision'] ?? self::UNKNOWN ); if ( self::UNLOAD === $decision && ( $safe_mode || empty( $evidence['high_confidence'] ) ) ) { return self::KEEP; } return in_array( $decision, array( self::KEEP, self::DEFER, self::INLINE_CRITICAL, self::UNLOAD ), true ) ? $decision : self::KEEP; } }

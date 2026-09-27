@@ -1,0 +1,26 @@
+.npe-admin {
+	direction: rtl;
+	text-align: right;
+}
+
+.npe-admin .npe-technical,
+.npe-admin code,
+.npe-admin pre,
+.npe-admin input[type="url"] {
+	direction: ltr;
+	text-align: left;
+	unicode-bidi: isolate;
+}
+
+.npe-admin .notice {
+	border-inline-start-width: 4px;
+	border-inline-end-width: 0;
+}
+
+.npe-settings-page input[type="number"],
+.npe-settings-page input[type="text"],
+.npe-settings-page textarea {
+	direction: ltr;
+	text-align: left;
+	unicode-bidi: isolate;
+}

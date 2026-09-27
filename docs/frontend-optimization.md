@@ -1,0 +1,73 @@
+# Dynamic frontend optimization
+
+NPE 2.0 converts the existing DOM, component, CSS, JavaScript, and font analysis
+results into an explicitly enabled runtime. It remains server-agnostic and does
+not require LiteSpeed, Apache directives, Nginx directives, Redis, or a CDN.
+
+## Precomputed pipeline
+
+The existing page-analysis queue fetches and analyzes a bounded public page. After
+DOM/component, CSS, JavaScript, and font analysis completes, the optimization
+manifest builder creates a per-URL record containing a stable page/DOM signature,
+generation time, stored critical CSS, the approved JavaScript manifest, selective
+font preloads, component IDs, conservative asset decisions, and a decision summary.
+No stylesheet parsing or dependency planning runs during an ordinary frontend
+request.
+
+The runtime requires a fresh matching manifest. Missing, malformed, or stale data
+means KEEP. Logged-in, admin, cart, checkout, and account contexts bypass every
+runtime change.
+
+## CSS
+
+Critical CSS is generated from selectors already classified as observed by DOM
+analysis and capped at 50 KB. It is stored in the unified manifest and may be
+inlined when enabled. Dynamic selectors and pseudo states such as hover, focus,
+active, checked, before/after, `is-*`, `has-*`, WooCommerce, Elementor, and
+WoodMart selectors are preserved. An unused candidate is never removed solely
+because one HTML snapshot did not contain it.
+
+Stylesheet decisions support KEEP, DEFER, INLINE_CRITICAL, UNLOAD, and UNKNOWN.
+Safe mode converts uncertain or unload decisions to KEEP. Runtime unloading
+requires an explicit high-confidence precomputed decision.
+
+## JavaScript
+
+Queued analysis requests dependency-safe defer for observed page handles. The
+existing safety policy rejects critical commerce, payment, authentication,
+challenge, consent, navigation, accessibility, inline/localized, external, module,
+or otherwise unsafe scripts. A dependency is not deferred when an enqueued
+non-deferred dependent would violate ordering. Runtime uses WordPress's native
+`strategy=defer` data and only applies decisions from the fresh manifest.
+
+JavaScript delay is experimental, disabled by default, and allowlist-only. The
+planner rejects commerce, payment, authentication, consent, captcha, cart,
+navigation, and accessibility handles. No aggressive event interception is
+enabled automatically.
+
+## Assets and fonts
+
+Unknown asset usage always results in KEEP. Outside safe mode, unloading still
+requires explicit absence evidence, confidence of at least 90, and a dependency
+graph showing no required dependent. Font planning reads the existing font
+manifest, prefers WOFF2, selects only required faces, and caps preloads at two.
+
+## Feature ownership
+
+Ownership is resolved separately for CSS, JavaScript, fonts, and assets. A
+capable LiteSpeed page cache does not imply ownership of any frontend feature.
+LiteSpeed frontend ownership is accepted only through a feature-specific public
+filter signal; known external optimizers can own CSS/JS while NPE retains font
+work. This avoids duplicate processing without globally disabling NPE.
+
+## Invalidation and rollback
+
+Optimization manifests are invalidated on theme switch/update, plugin
+activation/deactivation/update, NPE settings changes, cache purge, Elementor save,
+WoodMart option changes, and relevant post/product updates. Disable
+`optimization.enabled` for immediate rollback; originals remain registered and
+available. Individual critical CSS, defer, unload, delay, and preload switches are
+independent and aggressive controls default to off.
+
+NPE does not rewrite, resize, transcode, preload, lazy-load, or otherwise optimize
+images, video, audio, or other media in this phase.

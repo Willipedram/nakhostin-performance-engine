@@ -1,0 +1,3 @@
+<?php
+namespace Nakhostin\PerformanceEngine\Optimization;
+final class OptimizationOwnershipResolver { private $providers; public function __construct( array $providers = array() ) { $this->providers = array_values( array_filter( $providers, static function ( $provider ): bool { return $provider instanceof OptimizationProviderInterface; } ) ); } public function owners( array $features ): array { $owners = array(); foreach ( $features as $feature ) { $winner = null; foreach ( $this->providers as $provider ) { if ( $provider->owns( $feature ) && ( null === $winner || $provider->priority( $feature ) > $winner->priority( $feature ) ) ) { $winner = $provider; } } $owners[ $feature ] = $winner ? $winner->id() : 'none'; } return $owners; } }

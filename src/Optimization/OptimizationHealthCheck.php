@@ -1,0 +1,3 @@
+<?php
+namespace Nakhostin\PerformanceEngine\Optimization;
+final class OptimizationHealthCheck { private $storage; private $owners; public function __construct( OptimizationManifestStorage $storage, OptimizationOwnershipResolver $owners ) { $this->storage = $storage; $this->owners = $owners; } public function for_url( string $url ): array { $manifest = $this->storage->for_url( $url ); $data = $manifest ? $manifest->to_array() : array(); return array( 'manifest' => $manifest ? ( $manifest->is_stale() ? 'stale' : 'fresh' ) : 'missing', 'providers' => $this->owners->owners( array( 'css', 'javascript', 'fonts', 'assets' ) ), 'decisions' => $data['summary'] ?? array(), 'asset_decisions' => $data['assets']['decisions'] ?? array() ); } }
