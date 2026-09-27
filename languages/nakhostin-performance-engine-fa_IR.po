@@ -1370,3 +1370,45 @@ msgstr "میزان اطمینان"
 
 msgid "Reason"
 msgstr "دلیل"
+
+msgid "Automatic DOM learning is disabled. Enable DOM Intelligence in Settings before starting the queue."
+msgstr "یادگیری خودکار DOM غیرفعال است. پیش از شروع صف، هوشمندی DOM را در تنظیمات فعال کنید."
+
+msgid "WP-Cron is disabled. Configure a real cron runner or use Process queue now."
+msgstr "WP-Cron غیرفعال است. یک کران واقعی تنظیم کنید یا از «پردازش صف در همین حالا» استفاده کنید."
+
+msgid "Start or rescan homepage"
+msgstr "شروع یا اسکن دوباره صفحه اصلی"
+
+msgid "Process queue now"
+msgstr "پردازش صف در همین حالا"
+
+msgid "Next worker run"
+msgstr "اجرای بعدی پردازشگر"
+
+msgid "Not scheduled"
+msgstr "زمان‌بندی نشده"
+
+msgid "Last queue error"
+msgstr "آخرین خطای صف"
+
+msgid "The homepage was added to the automatic learning queue."
+msgstr "صفحه اصلی به صف یادگیری خودکار افزوده شد."
+
+msgid "The automatic learning worker was run."
+msgstr "پردازشگر یادگیری خودکار اجرا شد."
+
+msgid "You are not allowed to manage the DOM learning queue."
+msgstr "اجازه مدیریت صف یادگیری DOM را ندارید."
+
+msgid "Visitor sampling rate (percent)"
+msgstr "نرخ نمونه‌برداری بازدیدکنندگان (درصد)"
+
+msgid "Eligible visits are sampled over time; cooldown and URL deduplication limit database writes and background traffic. Ten percent is recommended for normal production sites."
+msgstr "بازدیدهای واجد شرایط به‌مرور نمونه‌برداری می‌شوند؛ فاصله بازاسکن و تکرارزدایی نشانی‌ها نوشتن پایگاه داده و ترافیک پس‌زمینه را محدود می‌کند. ده درصد برای سایت‌های عادی پیشنهاد می‌شود."
+
+msgid "Could not refresh queue status. Reload the page and verify admin-ajax.php access."
+msgstr "به‌روزرسانی وضعیت صف ممکن نشد. صفحه را دوباره بارگذاری و دسترسی admin-ajax.php را بررسی کنید."
+
+msgid "Automatic learning is disabled."
+msgstr "یادگیری خودکار غیرفعال است."

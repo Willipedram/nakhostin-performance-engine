@@ -118,3 +118,15 @@
 	.npe-settings-actions { align-items: stretch; flex-direction: column; }
 	.npe-settings-actions .button { inline-size: 100%; min-block-size: 40px; }
 }
+
+.npe-admin .npe-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+.npe-admin .npe-inline-form {
+	display: inline-block;
+	margin: 0;
+}

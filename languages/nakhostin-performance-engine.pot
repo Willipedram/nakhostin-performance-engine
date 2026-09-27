@@ -1339,3 +1339,45 @@ msgstr ""
 
 msgid "Reason"
 msgstr ""
+
+msgid "Automatic DOM learning is disabled. Enable DOM Intelligence in Settings before starting the queue."
+msgstr ""
+
+msgid "WP-Cron is disabled. Configure a real cron runner or use Process queue now."
+msgstr ""
+
+msgid "Start or rescan homepage"
+msgstr ""
+
+msgid "Process queue now"
+msgstr ""
+
+msgid "Next worker run"
+msgstr ""
+
+msgid "Not scheduled"
+msgstr ""
+
+msgid "Last queue error"
+msgstr ""
+
+msgid "The homepage was added to the automatic learning queue."
+msgstr ""
+
+msgid "The automatic learning worker was run."
+msgstr ""
+
+msgid "You are not allowed to manage the DOM learning queue."
+msgstr ""
+
+msgid "Visitor sampling rate (percent)"
+msgstr ""
+
+msgid "Eligible visits are sampled over time; cooldown and URL deduplication limit database writes and background traffic. Ten percent is recommended for normal production sites."
+msgstr ""
+
+msgid "Could not refresh queue status. Reload the page and verify admin-ajax.php access."
+msgstr ""
+
+msgid "Automatic learning is disabled."
+msgstr ""

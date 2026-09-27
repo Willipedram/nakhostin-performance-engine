@@ -76,7 +76,9 @@ final class DOMAnalysisQueue {
 
 		if ( $queued ) {
 			set_transient( $cooldown_key, 1, max( HOUR_IN_SECONDS, $cooldown ) );
-			$this->schedule( 3 );
+			// Make the event immediately eligible. DOMAutoLearning dispatches WP-Cron
+			// non-blockingly at shutdown so low-traffic sites do not remain at 0%.
+			$this->schedule( 0 );
 		}
 		return $queued;
 	}
@@ -173,10 +175,14 @@ final class DOMAnalysisQueue {
 	public function report( int $batch_size = 3, int $interval = 10 ): array {
 		$state = $this->state();
 		$counts = array( 'pending' => 0, 'running' => 0, 'failed' => 0 );
+		$last_error = '';
 		foreach ( $this->all() as $job ) {
 			$status = (string) ( $job['status'] ?? '' );
 			if ( isset( $counts[ $status ] ) ) {
 				++$counts[ $status ];
+			}
+			if ( '' !== (string) ( $job['last_error'] ?? '' ) ) {
+				$last_error = (string) $job['last_error'];
 			}
 		}
 		$total = max( 0, (int) ( $state['run_total'] ?? 0 ) );
@@ -187,6 +193,8 @@ final class DOMAnalysisQueue {
 		return array_merge(
 			$counts,
 			array(
+				'wp_cron_disabled'  => defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON,
+				'next_run_at'       => (int) ( wp_next_scheduled( self::CRON_HOOK ) ?: 0 ),
 				'progress'          => $total > 0 ? (int) round( 100 * $processed / $total ) : 0,
 				'run_total'         => $total,
 				'run_completed'     => (int) ( $state['run_completed'] ?? 0 ),
@@ -195,6 +203,7 @@ final class DOMAnalysisQueue {
 				'known_pages'       => count( (array) ( $state['known_urls'] ?? array() ) ),
 				'estimated_seconds' => $eta,
 				'last_completed_at' => (int) ( $state['last_completed_at'] ?? 0 ),
+				'last_error'        => $last_error,
 				'invalidations'     => (int) ( $state['invalidations'] ?? 0 ),
 			)
 		);
@@ -211,7 +220,7 @@ final class DOMAnalysisQueue {
 
 	public function schedule( int $delay = 3 ): void {
 		if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
-			wp_schedule_single_event( time() + max( 1, $delay ), self::CRON_HOOK );
+			wp_schedule_single_event( time() + max( 0, $delay ), self::CRON_HOOK );
 		}
 	}
 

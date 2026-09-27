@@ -1,3 +1,9 @@
+## 2.2.0
+
+- Fixed automatic DOM learning startup by seeding the homepage, immediately scheduling WP-Cron, and dispatching the worker non-blockingly after visitor responses.
+- Changed visit sampling so eligible URLs can be learned over time instead of being excluded for an entire day.
+- Added lost-schedule recovery, WP-Cron health visibility, queue error details, and capability-protected manual start/process controls.
+
 ## 2.1.1
 
 - Added sampled WordPress lifecycle and aggregate database timing diagnostics.

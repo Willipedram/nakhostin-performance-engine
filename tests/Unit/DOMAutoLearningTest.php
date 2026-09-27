@@ -16,6 +16,20 @@ final class DOMAutoLearningTest extends TestCase {
 			Settings::OPTION => array( 'dom' => array( 'enabled' => true ) ),
 		);
 		$GLOBALS['npe_test_transients'] = array();
+		$GLOBALS['npe_test_actions'] = array();
+		unset( $GLOBALS['npe_test_scheduled_event'] );
+	}
+
+	public function test_initial_scan_seeds_homepage_and_schedules_worker(): void {
+		$queue = new DOMAnalysisQueue();
+		$coordinator = ( new ReflectionClass( PageAnalysisCoordinator::class ) )->newInstanceWithoutConstructor();
+		$learning = new DOMAutoLearning( $queue, $coordinator, new Settings() );
+		$learning->seed_initial_scan();
+
+		$this->assertCount( 1, $queue->all() );
+		$this->assertSame( 'initial-scan', $queue->all()[0]['reason'] );
+		$this->assertSame( DOMAnalysisQueue::CRON_HOOK, $GLOBALS['npe_test_scheduled_event']['hook'] );
+		$this->assertArrayHasKey( 'shutdown', $GLOBALS['npe_test_actions'] );
 	}
 
 	public function test_npe_and_litespeed_purges_requeue_known_pages_without_duplicates(): void {

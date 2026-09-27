@@ -21,6 +21,8 @@ final class DOMAdminPage {
 	public const SLUG = 'npe-dom-intelligence';
 	public const ACTION = 'npe_run_dom_analysis';
 	public const STATUS_ACTION = 'npe_dom_queue_status';
+	public const START_QUEUE_ACTION = 'npe_start_dom_learning';
+	public const RUN_QUEUE_ACTION = 'npe_run_dom_learning_queue';
 
 	/** @var DOMAnalyzer */
 	private $analyzer;
@@ -64,6 +66,8 @@ final class DOMAdminPage {
 		add_action( 'admin_post_' . self::ACTION, array( $this, 'handle_analysis' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_progress_script' ) );
 		add_action( 'wp_ajax_' . self::STATUS_ACTION, array( $this, 'queue_status' ) );
+		add_action( 'admin_post_' . self::START_QUEUE_ACTION, array( $this, 'start_queue' ) );
+		add_action( 'admin_post_' . self::RUN_QUEUE_ACTION, array( $this, 'run_queue' ) );
 	}
 
 	public function enqueue_progress_script( string $hook_suffix ): void {
@@ -82,6 +86,10 @@ final class DOMAdminPage {
 				'seconds'   => __( '%d seconds', 'nakhostin-performance-engine' ),
 				'minutes'   => __( 'About %d minutes', 'nakhostin-performance-engine' ),
 				'notRun'    => __( 'Not run', 'nakhostin-performance-engine' ),
+				'notScheduled' => __( 'Not scheduled', 'nakhostin-performance-engine' ),
+				'none'      => __( 'None', 'nakhostin-performance-engine' ),
+				'pollError' => __( 'Could not refresh queue status. Reload the page and verify admin-ajax.php access.', 'nakhostin-performance-engine' ),
+				'disabled'  => __( 'Automatic learning is disabled.', 'nakhostin-performance-engine' ),
 			)
 		);
 	}
@@ -91,12 +99,28 @@ final class DOMAdminPage {
 			wp_send_json_error( array( 'message' => __( 'You are not allowed to view DOM diagnostics.', 'nakhostin-performance-engine' ) ), 403 );
 		}
 		check_ajax_referer( self::STATUS_ACTION, 'nonce' );
-		wp_send_json_success(
-			null === $this->queue ? array() : $this->queue->report(
+		$report = null === $this->queue ? array() : $this->queue->report(
 				(int) ( $this->settings ? $this->settings->get( 'dom.batch_size', 3 ) : 3 ),
 				(int) ( $this->settings ? $this->settings->get( 'dom.scan_interval', 10 ) : 10 )
-			)
-		);
+			);
+		$report['feature_enabled'] = (bool) ( $this->settings && $this->settings->get( 'dom.enabled', false ) );
+		wp_send_json_success( $report );
+	}
+
+	public function start_queue(): void {
+		$this->authorize_queue_action( self::START_QUEUE_ACTION );
+		if ( $this->settings && $this->settings->get( 'dom.enabled', false ) && $this->queue ) {
+			$this->queue->enqueue( home_url( '/' ), 'manual-start', HOUR_IN_SECONDS, true );
+		}
+		$this->redirect( 'queue-started' );
+	}
+
+	public function run_queue(): void {
+		$this->authorize_queue_action( self::RUN_QUEUE_ACTION );
+		if ( $this->settings && $this->settings->get( 'dom.enabled', false ) ) {
+			do_action( DOMAnalysisQueue::CRON_HOOK );
+		}
+		$this->redirect( 'queue-processed' );
 	}
 
 	public function add_menu(): void {
@@ -215,6 +239,7 @@ final class DOMAdminPage {
 			(int) ( $this->settings ? $this->settings->get( 'dom.scan_interval', 10 ) : 10 )
 		);
 		$last_completed = $report['last_completed_at'] > 0 ? gmdate( 'Y-m-d H:i:s', $report['last_completed_at'] ) . ' UTC' : __( 'Not run', 'nakhostin-performance-engine' );
+		$enabled = (bool) ( $this->settings && $this->settings->get( 'dom.enabled', false ) );
 		?>
 		<div class="npe-card">
 			<h2><?php echo esc_html__( 'Automatic learning queue', 'nakhostin-performance-engine' ); ?></h2>
@@ -222,6 +247,7 @@ final class DOMAdminPage {
 			<label for="npe-dom-progress"><?php echo esc_html__( 'Current scan progress', 'nakhostin-performance-engine' ); ?></label>
 			<progress id="npe-dom-progress" class="npe-progress" max="100" value="<?php echo esc_attr( (string) $report['progress'] ); ?>"><?php echo esc_html( (string) $report['progress'] ); ?>%</progress>
 			<p class="npe-progress-value npe-technical" dir="ltr"><?php echo esc_html( (string) $report['progress'] ); ?>%</p>
+			<p id="npe-dom-worker-status" class="description" aria-live="polite"></p>
 			<ul class="npe-progress-details">
 				<li><?php echo esc_html__( 'Pending', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-pending"><?php echo esc_html( (string) $report['pending'] ); ?></strong></li>
 				<li><?php echo esc_html__( 'Running', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-running"><?php echo esc_html( (string) $report['running'] ); ?></strong></li>
@@ -229,8 +255,21 @@ final class DOMAdminPage {
 				<li><?php echo esc_html__( 'Pages analyzed', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-completed"><?php echo esc_html( (string) $report['completed'] ); ?></strong></li>
 				<li><?php echo esc_html__( 'Estimated time remaining', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-eta"><?php echo esc_html( $this->format_duration( (int) $report['estimated_seconds'] ) ); ?></strong></li>
 				<li><?php echo esc_html__( 'Last completed scan', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-last-completed" class="npe-technical" dir="ltr"><?php echo esc_html( $last_completed ); ?></strong></li>
+				<li><?php echo esc_html__( 'Next worker run', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-next-run" class="npe-technical" dir="ltr"><?php echo esc_html( ! empty( $report['next_run_at'] ) ? gmdate( 'Y-m-d H:i:s', $report['next_run_at'] ) . ' UTC' : __( 'Not scheduled', 'nakhostin-performance-engine' ) ); ?></strong></li>
+				<li><?php echo esc_html__( 'Last queue error', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-last-error" class="npe-technical" dir="ltr"><?php echo esc_html( $report['last_error'] ?: __( 'None', 'nakhostin-performance-engine' ) ); ?></strong></li>
 			</ul>
 			<p class="description"><?php echo esc_html__( 'After an NPE or LiteSpeed full cache purge, previously discovered pages are automatically queued for a fresh scan.', 'nakhostin-performance-engine' ); ?></p>
+			<?php if ( ! $enabled ) : ?>
+				<div class="notice notice-warning inline"><p><?php echo esc_html__( 'Automatic DOM learning is disabled. Enable DOM Intelligence in Settings before starting the queue.', 'nakhostin-performance-engine' ); ?></p></div>
+			<?php elseif ( ! empty( $report['wp_cron_disabled'] ) ) : ?>
+				<div class="notice notice-warning inline"><p><?php echo esc_html__( 'WP-Cron is disabled. Configure a real cron runner or use Process queue now.', 'nakhostin-performance-engine' ); ?></p></div>
+			<?php endif; ?>
+			<?php if ( $enabled ) : ?>
+				<div class="npe-actions">
+					<?php $this->queue_action_form( self::START_QUEUE_ACTION, __( 'Start or rescan homepage', 'nakhostin-performance-engine' ) ); ?>
+					<?php $this->queue_action_form( self::RUN_QUEUE_ACTION, __( 'Process queue now', 'nakhostin-performance-engine' ) ); ?>
+				</div>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
@@ -290,6 +329,8 @@ final class DOMAdminPage {
 			'empty-response'  => __( 'The page returned an empty response.', 'nakhostin-performance-engine' ),
 			'dom-unavailable' => __( 'The PHP DOM extension is required for analysis.', 'nakhostin-performance-engine' ),
 			'analysis-failed' => __( 'The page loaded, but one or more asset manifests could not be created safely.', 'nakhostin-performance-engine' ),
+			'queue-started'   => __( 'The homepage was added to the automatic learning queue.', 'nakhostin-performance-engine' ),
+			'queue-processed' => __( 'The automatic learning worker was run.', 'nakhostin-performance-engine' ),
 		);
 
 		if ( ! isset( $notices[ $status ] ) ) {
@@ -351,5 +392,22 @@ final class DOMAdminPage {
 		);
 		wp_safe_redirect( $url );
 		exit;
+	}
+
+	private function authorize_queue_action( string $action ): void {
+		if ( ! $this->capabilities->can_manage() ) {
+			wp_die( esc_html__( 'You are not allowed to manage the DOM learning queue.', 'nakhostin-performance-engine' ) );
+		}
+		check_admin_referer( $action );
+	}
+
+	private function queue_action_form( string $action, string $label ): void {
+		?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="npe-inline-form">
+			<input type="hidden" name="action" value="<?php echo esc_attr( $action ); ?>">
+			<?php wp_nonce_field( $action ); ?>
+			<?php submit_button( $label, 'secondary', 'submit', false ); ?>
+		</form>
+		<?php
 	}
 }

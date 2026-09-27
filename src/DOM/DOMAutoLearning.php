@@ -13,6 +13,7 @@ final class DOMAutoLearning {
 	/** @var DOMAnalysisQueue */ private $queue;
 	/** @var PageAnalysisCoordinator */ private $coordinator;
 	/** @var Settings */ private $settings;
+	/** @var bool */ private $dispatch_registered = false;
 
 	public function __construct( DOMAnalysisQueue $queue, PageAnalysisCoordinator $coordinator, Settings $settings ) {
 		$this->queue = $queue;
@@ -28,6 +29,21 @@ final class DOMAutoLearning {
 		add_action( 'litespeed_purge_url', array( $this, 'litespeed_url_purged' ), 20, 1 );
 		if ( $this->settings->get( 'dom.enabled', false ) ) {
 			add_action( 'template_redirect', array( $this, 'observe_request' ), 1000 );
+			add_action( 'init', array( $this, 'seed_initial_scan' ), 1000 );
+			if ( $this->queue->has_pending() ) {
+				$this->dispatch_worker();
+			}
+		}
+	}
+
+	/** Ensure automatic learning starts even before a sampled cache miss occurs. */
+	public function seed_initial_scan(): void {
+		$state = $this->queue->state();
+		if ( $this->queue->all() || ! empty( $state['known_urls'] ) ) {
+			return;
+		}
+		if ( $this->queue->enqueue( home_url( '/' ), 'initial-scan', HOUR_IN_SECONDS ) ) {
+			$this->dispatch_worker();
 		}
 	}
 
@@ -40,7 +56,9 @@ final class DOMAutoLearning {
 			return;
 		}
 		$hours = (int) $this->settings->get( 'dom.cooldown_hours', 24 );
-		$this->queue->enqueue( $url, 'frontend-request', $hours * HOUR_IN_SECONDS );
+		if ( $this->queue->enqueue( $url, 'frontend-request', $hours * HOUR_IN_SECONDS ) ) {
+			$this->dispatch_worker();
+		}
 	}
 
 	public function process_queue(): void {
@@ -63,6 +81,7 @@ final class DOMAutoLearning {
 		}
 		if ( $this->queue->has_pending() ) {
 			$this->queue->schedule( (int) $this->settings->get( 'dom.scan_interval', 10 ) );
+			$this->dispatch_worker();
 		}
 	}
 
@@ -121,7 +140,25 @@ final class DOMAutoLearning {
 		if ( 100 === $rate ) {
 			return true;
 		}
-		$bucket = (int) sprintf( '%u', crc32( $url . '|' . gmdate( 'Y-m-d' ) ) ) % 100;
-		return $bucket < $rate;
+		// Sample visits rather than permanently excluding 90% of URLs for a day.
+		// Cooldown and queue hashes still deduplicate repeated discoveries.
+		return random_int( 1, 100 ) <= max( 0, $rate );
+	}
+
+	private function dispatch_worker(): void {
+		$this->queue->schedule( 0 );
+		if ( $this->dispatch_registered || ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) ) {
+			return;
+		}
+		$this->dispatch_registered = true;
+		add_action(
+			'shutdown',
+			static function (): void {
+				if ( function_exists( 'spawn_cron' ) ) {
+					spawn_cron( time() );
+				}
+			},
+			PHP_INT_MAX
+		);
 	}
 }

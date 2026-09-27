@@ -117,3 +117,9 @@ untrusted data and escape all displayed values.
   cron to invoke WordPress cron processing.
 - Shadow DOM, iframe documents, CSS pseudo-elements, and browser accessibility
   trees are outside this phase.
+
+## Automatic queue execution and recovery
+
+When automatic DOM learning is enabled, NPE seeds the homepage on the next `init` if no page is known. New jobs are immediately eligible for WP-Cron and NPE requests a non-blocking cron dispatch at shutdown, after the visitor response has completed. Existing pending jobs are rescheduled during plugin boot if their event was lost.
+
+Sampling applies to eligible visits over time; it no longer excludes the same URL for an entire day. The normalized URL cooldown and queue hash continue to deduplicate work. The DOM Intelligence screen reports the next worker time, last queue error, and whether `DISABLE_WP_CRON` prevents automatic execution. Administrators can safely seed the homepage or explicitly process a batch using nonce-protected controls. On installations with `DISABLE_WP_CRON`, configure a real system cron for `wp-cron.php`.

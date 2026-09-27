@@ -37,18 +37,32 @@
 		text( 'npe-dom-completed', data.completed || 0 );
 		text( 'npe-dom-eta', duration( data.estimated_seconds || 0 ) );
 		text( 'npe-dom-last-completed', data.last_completed_at ? new Date( data.last_completed_at * 1000 ).toLocaleString() : config.notRun );
+		text( 'npe-dom-next-run', data.next_run_at ? new Date( data.next_run_at * 1000 ).toLocaleString() : config.notScheduled );
+		text( 'npe-dom-last-error', data.last_error || config.none );
 		var value = document.querySelector( '.npe-progress-value' );
 		if ( value ) {
 			value.textContent = ( data.progress || 0 ) + '%';
 		}
+		text( 'npe-dom-worker-status', data.feature_enabled === false ? config.disabled : '' );
 	}
 
 	function poll() {
 		var body = new URLSearchParams( { action: config.action, nonce: config.nonce } );
 		fetch( config.url, { method: 'POST', credentials: 'same-origin', body: body } )
-			.then( function ( response ) { return response.json(); } )
-			.then( function ( response ) { if ( response.success ) { update( response.data ); } } )
-			.catch( function () {} );
+			.then( function ( response ) {
+				if ( ! response.ok ) {
+					throw new Error( 'HTTP ' + response.status );
+				}
+				return response.json();
+			} )
+			.then( function ( response ) {
+				if ( response.success ) {
+					update( response.data );
+					return;
+				}
+				throw new Error( 'Invalid response' );
+			} )
+			.catch( function () { text( 'npe-dom-worker-status', config.pollError ); } );
 	}
 
 	window.setInterval( poll, 5000 );
