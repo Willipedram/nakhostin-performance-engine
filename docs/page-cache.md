@@ -57,3 +57,9 @@ actually varies to avoid duplicate entries.
 - Early cache uses filesystem, not Redis/Memcached, so its hit path remains deterministic before object-cache bootstrap.
 - Anonymous pages containing application-specific personalization must be excluded or marked personalized by the calling integration.
 - Warmup relies on WordPress cron traffic and loopback HTTP availability.
+
+## Complete-response guarantee
+
+The application cache may receive several output-buffer callbacks when a theme or plugin flushes HTML. NPE accumulates those chunks but writes exactly once, only during `PHP_OUTPUT_HANDLER_FINAL`. A response must contain a recognizable HTML document and a closing `body` or `html` tag before it can enter page cache.
+
+Cache format version 2 invalidates earlier records that may have been created from an intermediate chunk. Both application and early readers reject incomplete or corrupt records and fail open to normal WordPress rendering. Consequently a new page is rendered normally on its first request and cannot be replaced by a cached blank shell.

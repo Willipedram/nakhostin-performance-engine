@@ -1,3 +1,9 @@
+## 2.3.1
+
+- Fixed first-load blank and partial pages by caching only the final, complete output-buffer document.
+- Added complete-HTML validation before writing or serving application and early-cache entries.
+- Invalidated legacy page-cache records that could contain intermediate flushed chunks.
+
 ## 2.3.0
 
 - Rebuilt Settings navigation with reliable server-rendered tabs and progressive JavaScript enhancement.

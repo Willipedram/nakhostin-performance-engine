@@ -9,6 +9,8 @@ final class PageCache {
 		$decision = $this->policy->classify_request( $request ); if ( ! $decision->is_cacheable() ) { $this->metrics->record( 'bypasses' ); do_action( 'npe/cache/lookup', 'bypass' ); return new CacheLookup( 'bypass', $decision->reason() ); }
 		$key = $this->keys->generate( $request ); if ( ! $key['cacheable'] ) { $this->metrics->record( 'bypasses' ); do_action( 'npe/cache/lookup', 'bypass' ); return new CacheLookup( 'bypass', 'query_parameter', null, $key['key'], $key['url'] ); }
 		$entry = $this->store->read( $key['key'] ); if ( ! $entry ) { $this->metrics->record( 'misses' ); do_action( 'npe/cache/lookup', 'miss' ); return new CacheLookup( 'miss', 'not_found', null, $key['key'], $key['url'] ); }
+		$cached_response = $this->policy->classify_response( 200, $entry->headers(), $entry->content() );
+		if ( ! $cached_response->is_cacheable() ) { $this->store->delete( $key['key'] ); $this->metrics->record( 'misses' ); do_action( 'npe/cache/lookup', 'miss' ); return new CacheLookup( 'miss', 'invalid_cached_response', null, $key['key'], $key['url'] ); }
 		if ( $entry->is_fresh( $now ) ) { $this->metrics->record( 'hits' ); do_action( 'npe/cache/lookup', 'hit' ); return new CacheLookup( 'hit', 'fresh', $entry, $key['key'], $key['url'] ); }
 		if ( $entry->is_stale( $now ) ) { $this->metrics->record( 'stale_hits' ); do_action( 'npe/cache/lookup', 'stale' ); do_action( 'npe/cache/warmup_requested', array( $entry->url() ) ); return new CacheLookup( 'stale', 'expired', $entry, $key['key'], $key['url'] ); }
 		$this->store->delete( $key['key'] ); $this->metrics->record( 'misses' ); do_action( 'npe/cache/lookup', 'miss' ); return new CacheLookup( 'miss', 'expired', null, $key['key'], $key['url'] );

@@ -8,7 +8,9 @@
 namespace Nakhostin\PerformanceEngine\Cache;
 
 final class CacheEntry {
-	public const VERSION = 1;
+	// Version 2 guarantees entries were written only after the final output
+	// buffer phase. Version 1 may contain a flushed partial document.
+	public const VERSION = 2;
 	/** @var array */ private $data;
 
 	private function __construct( array $data ) { $this->data = $data; }

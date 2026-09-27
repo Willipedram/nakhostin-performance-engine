@@ -57,6 +57,11 @@ final class CachePolicy {
 		if ( preg_match( '/<input[^>]+type=["\']?password|name=["\'](?:_wpnonce|_ajax_nonce|woocommerce-login-nonce|woocommerce-register-nonce|woocommerce-reset-password-nonce)["\']|id=["\']wpadminbar["\']/i', $content ) ) {
 			return new CacheDecision( false, 'sensitive_markup' );
 		}
+		// Full-page cache entries must look like a completed HTML document. This
+		// rejects empty shells, fatal-error fragments, and partial flushed chunks.
+		if ( ! preg_match( '/<(?:!doctype\s+html|html|body)\b/i', $content ) || ! preg_match( '/<\/(?:body|html)>/i', $content ) ) {
+			return new CacheDecision( false, 'incomplete_html' );
+		}
 		foreach ( $headers as $name => $value ) {
 			$name  = strtolower( (string) $name );
 			$value = strtolower( is_array( $value ) ? implode( ',', $value ) : (string) $value );
