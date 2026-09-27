@@ -11,7 +11,7 @@ final class EarlyCacheReader {
 		if ( ! is_string( $contents ) || 0 !== strpos( $contents, $prefix ) ) { return new EarlyCacheResponse( 'MISS' ); }
 		$data = json_decode( substr( $contents, strlen( $prefix ) ), true );
 		$required = array( 'key', 'created_at', 'expires_at', 'stale_until', 'content_hash', 'content' ); foreach ( $required as $field ) { if ( ! array_key_exists( $field, (array) $data ) ) { return new EarlyCacheResponse( 'MISS' ); } }
-		if ( ! is_array( $data ) || 2 !== (int) ( $data['cache_version'] ?? 0 ) || ! is_string( $data['content'] ?? null ) || ! hash_equals( (string) ( $data['content_hash'] ?? '' ), hash( 'sha256', $data['content'] ) ) || ! hash_equals( $key, (string) ( $data['key'] ?? '' ) ) ) { return new EarlyCacheResponse( 'MISS' ); }
+		if ( ! is_array( $data ) || 3 !== (int) ( $data['cache_version'] ?? 0 ) || ! is_string( $data['content'] ?? null ) || ! hash_equals( (string) ( $data['content_hash'] ?? '' ), hash( 'sha256', $data['content'] ) ) || ! hash_equals( $key, (string) ( $data['key'] ?? '' ) ) ) { return new EarlyCacheResponse( 'MISS' ); }
 		if ( ! preg_match( '/<(?:!doctype\s+html|html|body)\b/i', $data['content'] ) || ! preg_match( '/<\/(?:body|html)>/i', $data['content'] ) ) { @unlink( $path ); return new EarlyCacheResponse( 'MISS' ); } // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Fail-open cache cleanup.
 		$now = $now ?? time(); $status = $now < (int) $data['expires_at'] ? 'HIT' : ( $now <= (int) $data['stale_until'] ? 'STALE' : 'MISS' );
 		if ( 'MISS' === $status ) { return new EarlyCacheResponse( 'MISS' ); }

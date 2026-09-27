@@ -14,7 +14,7 @@ final class FontLoadingOptimizer {
 		add_action( 'npe/cache/purged', array( $this, 'cache_purged' ), 15, 2 );
 		add_action( 'litespeed_purge_all', array( $this, 'litespeed_purge_all' ), 15 );
 		add_action( 'litespeed_purge_url', array( $this, 'litespeed_purge_url' ), 15, 1 );
-		if ( ! $this->settings->get( 'fonts.enabled', false ) ) { return; }
+		if ( ! $this->settings->get( 'fonts.enabled', false ) || $this->settings->get( 'optimization.safe_mode', true ) ) { return; }
 		add_action( 'wp_enqueue_scripts', array( $this, 'optimize' ), PHP_INT_MAX );
 		add_filter( 'wp_preload_resources', array( $this, 'filter_preloads' ), 20 );
 	}
@@ -37,12 +37,16 @@ final class FontLoadingOptimizer {
 		$inline = '';
 		foreach ( (array) ( $data['stylesheets'] ?? array() ) as $stylesheet ) {
 			if ( empty( $stylesheet['font_only'] ) || empty( $stylesheet['url'] ) ) { continue; }
+			$stylesheet_css = '';
+			foreach ( (array) ( $stylesheet['faces'] ?? array() ) as $face ) {
+				if ( ! empty( $face['required'] ) ) { $stylesheet_css .= $this->face_css( $face ); }
+			}
+			// Never remove the source stylesheet unless a valid replacement exists.
+			if ( '' === $stylesheet_css ) { continue; }
 			foreach ( $wp_styles->registered as $handle => $registered ) {
 				if ( $this->normalize_asset_url( (string) ( $registered->src ?? '' ) ) !== $this->normalize_asset_url( (string) $stylesheet['url'] ) ) { continue; }
 				if ( ! empty( $registered->extra['after'] ) || ! empty( $registered->extra['before'] ) || ! empty( $registered->extra['conditional'] ) ) { continue; }
-				foreach ( (array) ( $stylesheet['faces'] ?? array() ) as $face ) {
-					if ( ! empty( $face['required'] ) ) { $inline .= $this->face_css( $face ); }
-				}
+				$inline .= $stylesheet_css;
 				wp_dequeue_style( (string) $handle );
 			}
 		}

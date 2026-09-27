@@ -9,9 +9,9 @@ use Nakhostin\PerformanceEngine\Infrastructure\Settings;
 use PHPUnit\Framework\TestCase;
 
 final class FontLoadingOptimizerTest extends TestCase {
-	protected function setUp(): void { $GLOBALS['npe_test_filters'] = array(); $GLOBALS['npe_test_options'] = array(); $GLOBALS['npe_test_dequeued_styles'] = array(); $GLOBALS['npe_test_inline_styles'] = array(); }
+	protected function setUp(): void { $GLOBALS['npe_test_filters'] = array(); $GLOBALS['npe_test_actions'] = array(); $GLOBALS['npe_test_options'] = array(); $GLOBALS['npe_test_dequeued_styles'] = array(); $GLOBALS['npe_test_inline_styles'] = array(); }
 	public function test_replaces_font_only_stylesheet_with_required_faces(): void {
-		$GLOBALS['npe_test_options'] = array( Settings::OPTION => array( 'fonts' => array( 'enabled' => true ) ) );
+		$GLOBALS['npe_test_options'] = array( Settings::OPTION => array( 'fonts' => array( 'enabled' => true ), 'optimization' => array( 'safe_mode' => false ) ) );
 		$GLOBALS['npe_test_dequeued_styles'] = array(); $GLOBALS['npe_test_inline_styles'] = array();
 		$_SERVER['REQUEST_URI'] = '/refrigerator/';
 		$storage = new FontStorage();
@@ -27,6 +27,15 @@ final class FontLoadingOptimizerTest extends TestCase {
 		$this->assertStringNotContainsString( 'black.woff2', $css );
 	}
 
+	public function test_safe_mode_does_not_register_destructive_font_replacement(): void {
+		$GLOBALS['npe_test_options'] = array( Settings::OPTION => array( 'fonts' => array( 'enabled' => true ), 'optimization' => array( 'safe_mode' => true ) ) );
+		$optimizer = new FontLoadingOptimizer( new FontStorage(), new Settings() );
+
+		$optimizer->register();
+
+		$this->assertArrayNotHasKey( 'wp_enqueue_scripts', $GLOBALS['npe_test_actions'] );
+	}
+
 	public function test_cache_purge_invalidates_stale_font_decision(): void {
 		$GLOBALS['npe_test_options'] = array();
 		$storage = new FontStorage();
@@ -37,7 +46,7 @@ final class FontLoadingOptimizerTest extends TestCase {
 	}
 
 	public function test_litespeed_compatibility_gate_keeps_original_stylesheet(): void {
-		$GLOBALS['npe_test_options'] = array( Settings::OPTION => array( 'fonts' => array( 'enabled' => true ) ) );
+		$GLOBALS['npe_test_options'] = array( Settings::OPTION => array( 'fonts' => array( 'enabled' => true ), 'optimization' => array( 'safe_mode' => false ) ) );
 		add_filter( 'npe/css/optimization_enabled', static function (): bool { return false; } );
 		( new FontLoadingOptimizer( new FontStorage(), new Settings() ) )->optimize();
 		$this->assertSame( array(), $GLOBALS['npe_test_dequeued_styles'] );

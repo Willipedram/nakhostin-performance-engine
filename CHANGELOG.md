@@ -1,3 +1,11 @@
+## 2.3.2
+
+- Removed the fragile `media=print` stylesheet deferral path that could leave first visits unstyled and inflate Speed Index.
+- Made CSS safe mode fully fail open: it now preserves every original stylesheet and skips critical-CSS injection.
+- Restricted stylesheet unloading to repeated, dependency-safe, high-confidence evidence.
+- Prevented safe mode and incomplete font manifests from removing font stylesheets.
+- Invalidated legacy optimization manifests and cached HTML containing old stylesheet delivery decisions.
+
 ## 2.3.1
 
 - Fixed first-load blank and partial pages by caching only the final, complete output-buffer document.

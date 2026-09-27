@@ -8,9 +8,9 @@
 namespace Nakhostin\PerformanceEngine\Cache;
 
 final class CacheEntry {
-	// Version 2 guarantees entries were written only after the final output
-	// buffer phase. Version 1 may contain a flushed partial document.
-	public const VERSION = 2;
+	// Version 3 also invalidates HTML written before the stylesheet fail-open
+	// hardening. Older pages may contain legacy media=print defer markup.
+	public const VERSION = 3;
 	/** @var array */ private $data;
 
 	private function __construct( array $data ) { $this->data = $data; }
