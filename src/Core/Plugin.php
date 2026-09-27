@@ -90,6 +90,7 @@ use Nakhostin\PerformanceEngine\Integrations\LiteSpeed\LiteSpeedCacheBridge;
 use Nakhostin\PerformanceEngine\Integrations\LiteSpeed\LiteSpeedDetector;
 use Nakhostin\PerformanceEngine\Integrations\LiteSpeed\LiteSpeedPurgeBridge;
 use Nakhostin\PerformanceEngine\Integrations\LiteSpeed\LiteSpeedCacheProvider;
+use Nakhostin\PerformanceEngine\Integrations\LiteSpeed\LiteSpeedGuestVaryProbe;
 use Nakhostin\PerformanceEngine\Integrations\WooCommerce\WooCommerceComponentAdapter;
 use Nakhostin\PerformanceEngine\Integrations\WoodMart\WoodMartComponentAdapter;
 use Nakhostin\PerformanceEngine\JavaScript\ConservativeMinifier;
@@ -257,7 +258,7 @@ final class Plugin {
 				return new DashboardPage( $services->get( Settings::class ), $services->get( PageCacheStoreInterface::class ), $services->get( CacheMetrics::class ), $services->get( CacheOperationsState::class ), $services->get( PerformanceStorage::class ), $services->get( PerformanceAggregator::class ), $services->get( JavaScriptStorage::class ), $services->get( Capabilities::class ), $services->get( DOMAnalysisQueue::class ) );
 			}
 		);
-		$this->services->set( DiagnosticsAdminPage::class, static function ( ServiceRegistry $services ): DiagnosticsAdminPage { return new DiagnosticsAdminPage( $services->get( Diagnostics::class ), $services->get( Capabilities::class ) ); } );
+		$this->services->set( DiagnosticsAdminPage::class, static function ( ServiceRegistry $services ): DiagnosticsAdminPage { return new DiagnosticsAdminPage( $services->get( Diagnostics::class ), $services->get( Capabilities::class ), null, $services->get( LiteSpeedGuestVaryProbe::class ) ); } );
 		$this->services->set( LogsAdminPage::class, static function ( ServiceRegistry $services ): LogsAdminPage { return new LogsAdminPage( $services->get( Settings::class ), $services->get( Capabilities::class ) ); } );
 		$this->services->set( CSSAnalyzer::class, new CSSAnalyzer() );
 		$this->services->set( CSSStorage::class, new CSSStorage() );
@@ -466,6 +467,7 @@ final class Plugin {
 		$this->services->set( CacheHeaderManager::class, new CacheHeaderManager() );
 		$this->services->set( ObjectCacheDetector::class, new ObjectCacheDetector() );
 		$this->services->set( LiteSpeedDetector::class, new LiteSpeedDetector() );
+		$this->services->set( LiteSpeedGuestVaryProbe::class, new LiteSpeedGuestVaryProbe() );
 		$this->services->set( DropInDetector::class, new DropInDetector( $content_root ) );
 		$this->services->set( EnvironmentDetector::class, static function ( ServiceRegistry $services ) use ( $content_root ): EnvironmentDetector { return new EnvironmentDetector( $content_root, null, $services->get( DropInDetector::class ) ); } );
 		$this->services->set( EnvironmentReport::class, static function ( ServiceRegistry $services ): EnvironmentReport { return $services->get( EnvironmentDetector::class )->detect(); } );
@@ -482,7 +484,7 @@ final class Plugin {
 		$this->services->set( EarlyCacheManager::class, static function ( ServiceRegistry $services ) use ( $cache_root ): EarlyCacheManager { return new EarlyCacheManager( $services->get( EarlyCacheInstaller::class ), $services->get( Settings::class ), $services->get( CacheRuntimeMode::class ), $cache_root ); } );
 		$this->services->set( EarlyCacheHealthCheck::class, static function ( ServiceRegistry $services ) use ( $cache_root ): EarlyCacheHealthCheck { return new EarlyCacheHealthCheck( $services->get( DropInDetector::class ), $cache_root ); } );
 		$this->services->set( CacheHealthCheck::class, static function ( ServiceRegistry $services ): CacheHealthCheck { return new CacheHealthCheck( $services->get( EnvironmentReport::class ), $services->get( CacheRuntimeMode::class ), $services->get( EarlyCacheHealthCheck::class ) ); } );
-		$this->services->set( Diagnostics::class, static function ( ServiceRegistry $services ): Diagnostics { return new Diagnostics( $services->get( EnvironmentReport::class ), $services->get( CacheHealthCheck::class ) ); } );
+		$this->services->set( Diagnostics::class, static function ( ServiceRegistry $services ): Diagnostics { return new Diagnostics( $services->get( EnvironmentReport::class ), $services->get( CacheHealthCheck::class ), $services->get( LiteSpeedGuestVaryProbe::class ) ); } );
 		$this->services->set( LiteSpeedPurgeBridge::class, new LiteSpeedPurgeBridge() );
 		$this->services->set( CacheDependencyGraph::class, new CacheDependencyGraph() );
 		$this->services->set( CacheDependencyCollector::class, new CacheDependencyCollector() );

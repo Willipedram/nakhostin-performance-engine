@@ -1,8 +1,9 @@
-## 2.1.0
+## 2.1.1
 
 - Added sampled WordPress lifecycle and aggregate database timing diagnostics.
 - Added opt-in debug hook profiling, object-cache, server, PHP, compression, browser-cache, security-header, DOM-complexity, LiteSpeed, and optimization-conflict health checks.
 - Added evidence-based site-health scorecards and sanitized support exports.
+- Added an explicit, same-origin, three-second LiteSpeed Guest Vary latency probe with 403 and invalid-response diagnostics.
 
 # Changelog
 
