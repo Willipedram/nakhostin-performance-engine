@@ -1,3 +1,9 @@
+## 2.4.3
+
+- Fixed diagnostic downloads that advertised PHP, cache, object-cache, performance, optimization, integration, and security sections but exported them as empty arrays.
+- Added explicit measured facts or collection-state explanations to every report section and normalized the external object-cache flag to a JSON boolean.
+- Kept security-header inspection read-only and clearly identifies when headers cannot be observed from the current WordPress admin response.
+
 ## 2.4.2
 
 - Redesigned DOM Intelligence as a responsive operational dashboard with a clear queue state, progress summary, metric cards, and guided actions.

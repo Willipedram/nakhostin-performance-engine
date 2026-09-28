@@ -24,4 +24,18 @@ final class DiagnosticsTest extends TestCase {
 		$this->assertArrayHasKey( 'redis', $result );
 		$this->assertFalse( $result['litespeed_cache'] );
 	}
+
+	public function test_support_report_populates_every_exported_section(): void {
+		$GLOBALS['npe_test_options'] = array();
+		$report = ( new Diagnostics() )->report();
+
+		foreach ( array( 'server', 'php', 'cache', 'object_cache', 'performance', 'optimization', 'integrations', 'security_headers' ) as $section ) {
+			$this->assertNotEmpty( $report[ $section ], $section . ' must contain facts or an explicit collection state.' );
+		}
+
+		$this->assertIsBool( $report['server']['object_cache'] );
+		$this->assertArrayHasKey( 'memory_limit', $report['php'] );
+		$this->assertArrayHasKey( 'backend', $report['object_cache'] );
+		$this->assertArrayHasKey( 'collection', $report['security_headers'] );
+	}
 }
