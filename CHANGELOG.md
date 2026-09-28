@@ -1,3 +1,9 @@
+## 2.4.2
+
+- Redesigned DOM Intelligence as a responsive operational dashboard with a clear queue state, progress summary, metric cards, and guided actions.
+- Made completed scans with failures visually distinct from healthy completion and supplied actionable guidance for legacy failures without recorded reasons.
+- Kept live polling, keyboard focus, RTL layout, WordPress controls, capability checks, and nonce-protected actions intact.
+
 ## 2.4.1
 
 - Added bounded `font-display` rewriting for generated page bundles and analyzed font-only stylesheets.

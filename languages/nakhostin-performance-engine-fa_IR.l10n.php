@@ -454,5 +454,12 @@ return array (
     'Failed scans were queued for another attempt.' => 'اسکن‌های ناموفق برای تلاش دوباره وارد صف شدند.',
     'Build and serve page-specific CSS and JavaScript bundles' => 'ساخت و ارائه بسته‌های اختصاصی CSS و جاوااسکریپت برای هر صفحه',
     'Bundles are generated only by background analysis. Safe mode, unknown sources, inline data, modules, third-party files, protected commerce pages, and jQuery remain on their original handles.' => 'بسته‌ها فقط در تحلیل پس‌زمینه ساخته می‌شوند. حالت امن، منابع ناشناخته، داده‌های درون‌خطی، ماژول‌ها، فایل‌های شخص ثالث، صفحات حساس فروشگاه و jQuery با هندل اصلی خود باقی می‌مانند.',
+    'Page intelligence' => 'هوشمندی صفحه',
+    'Run a safe analysis for any public URL on this site.' => 'برای هر نشانی عمومی این سایت یک تحلیل ایمن اجرا کنید.',
+    'Completed with issues' => 'تکمیل‌شده با موارد نیازمند بررسی',
+    'Processing' => 'در حال پردازش',
+    'Queue is healthy' => 'صف سالم است',
+    'No error detail was recorded for these older failed scans. Retry them to collect a specific reason.' => 'برای این اسکن‌های ناموفق قدیمی جزئیات خطا ثبت نشده است. برای ثبت دلیل دقیق، دوباره تلاش کنید.',
+    'Background worker' => 'پردازشگر پس‌زمینه',
   ),
 );

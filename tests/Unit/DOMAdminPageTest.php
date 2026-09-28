@@ -15,9 +15,11 @@ use Nakhostin\PerformanceEngine\DOM\DOMComponentDetector;
 use Nakhostin\PerformanceEngine\DOM\DOMSignature;
 use Nakhostin\PerformanceEngine\DOM\DOMStateRegistry;
 use Nakhostin\PerformanceEngine\DOM\DOMStorage;
+use Nakhostin\PerformanceEngine\Infrastructure\Settings;
 use PHPUnit\Framework\TestCase;
 
 final class DOMAdminPageTest extends TestCase {
+	protected function setUp(): void { $GLOBALS['npe_test_options'] = array(); $GLOBALS['npe_test_can_manage'] = true; }
 	public function test_run_form_contains_nonce_and_escaped_ltr_output(): void {
 		$GLOBALS['npe_test_can_manage'] = true;
 		$GLOBALS['npe_test_is_rtl']     = false;
@@ -33,7 +35,24 @@ final class DOMAdminPageTest extends TestCase {
 		$this->assertStringContainsString( 'Analyze DOM, CSS, JavaScript, and Components', $output );
 		$this->assertStringContainsString( 'No DOM manifest has been generated yet.', $output );
 		$this->assertStringContainsString( '<progress', $output );
+		$this->assertStringContainsString( 'npe-dom-hero', $output );
+		$this->assertStringContainsString( 'npe-dom-stat-grid', $output );
+		$this->assertStringContainsString( 'Queue is healthy', $output );
 		$this->assertStringContainsString( 'Estimated time remaining', $output );
+	}
+
+
+	public function test_failed_legacy_jobs_have_a_clear_state_and_recovery_guidance(): void {
+		$GLOBALS['npe_test_options'][ Settings::OPTION ] = array( 'dom' => array( 'enabled' => true ) );
+		$GLOBALS['npe_test_options'][ DOMAnalysisQueue::OPTION ] = array( 'job' => array( 'status' => 'failed', 'last_error' => '' ) );
+		ob_start();
+		$this->page()->render();
+		$output = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'has-issues', $output );
+		$this->assertStringContainsString( 'Completed with issues', $output );
+		$this->assertStringContainsString( 'No error detail was recorded', $output );
+		$this->assertStringContainsString( 'Retry failed scans', $output );
 	}
 
 	public function test_unauthorized_user_cannot_view_dom_diagnostics(): void {
@@ -65,7 +84,8 @@ final class DOMAdminPageTest extends TestCase {
 			new Capabilities(),
 			null,
 			null,
-			new DOMAnalysisQueue()
+			new DOMAnalysisQueue(),
+			new Settings()
 		);
 	}
 }

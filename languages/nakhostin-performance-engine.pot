@@ -1402,3 +1402,24 @@ msgstr ""
 
 msgid "Bundles are generated only by background analysis. Safe mode, unknown sources, inline data, modules, third-party files, protected commerce pages, and jQuery remain on their original handles."
 msgstr ""
+
+msgid "Page intelligence"
+msgstr ""
+
+msgid "Run a safe analysis for any public URL on this site."
+msgstr ""
+
+msgid "Completed with issues"
+msgstr ""
+
+msgid "Processing"
+msgstr ""
+
+msgid "Queue is healthy"
+msgstr ""
+
+msgid "No error detail was recorded for these older failed scans. Retry them to collect a specific reason."
+msgstr ""
+
+msgid "Background worker"
+msgstr ""

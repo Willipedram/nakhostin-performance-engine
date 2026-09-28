@@ -29,16 +29,27 @@
 	}
 
 	function update( data ) {
+		var failed = Number( data.failed || 0 );
+		var active = Number( data.pending || 0 ) + Number( data.running || 0 ) > 0;
 		progress.value = data.progress || 0;
 		progress.textContent = ( data.progress || 0 ) + '%';
 		text( 'npe-dom-pending', data.pending || 0 );
 		text( 'npe-dom-running', data.running || 0 );
-		text( 'npe-dom-failed', data.failed || 0 );
+		text( 'npe-dom-failed', failed );
 		text( 'npe-dom-completed', data.completed || 0 );
 		text( 'npe-dom-eta', duration( data.estimated_seconds || 0 ) );
 		text( 'npe-dom-last-completed', data.last_completed_at ? new Date( data.last_completed_at * 1000 ).toLocaleString() : config.notRun );
 		text( 'npe-dom-next-run', data.next_run_at ? new Date( data.next_run_at * 1000 ).toLocaleString() : config.notScheduled );
-		text( 'npe-dom-last-error', data.last_error || config.none );
+		text( 'npe-dom-last-error', data.last_error || ( failed > 0 ? config.unknownError : config.none ) );
+		var queue = document.querySelector( '.npe-dom-queue' );
+		if ( queue ) {
+			queue.classList.remove( 'has-issues', 'is-running', 'is-healthy' );
+			queue.classList.add( failed > 0 ? 'has-issues' : ( active ? 'is-running' : 'is-healthy' ) );
+		}
+		var state = document.querySelector( '#npe-dom-state .npe-dom-state-label' );
+		if ( state ) {
+			state.textContent = failed > 0 ? config.issues : ( active ? config.processing : config.healthy );
+		}
 		var value = document.querySelector( '.npe-progress-value' );
 		if ( value ) {
 			value.textContent = ( data.progress || 0 ) + '%';

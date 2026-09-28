@@ -1433,3 +1433,24 @@ msgstr "ساخت و ارائه بسته‌های اختصاصی CSS و جاوا�
 
 msgid "Bundles are generated only by background analysis. Safe mode, unknown sources, inline data, modules, third-party files, protected commerce pages, and jQuery remain on their original handles."
 msgstr "بسته‌ها فقط در تحلیل پس‌زمینه ساخته می‌شوند. حالت امن، منابع ناشناخته، داده‌های درون‌خطی، ماژول‌ها، فایل‌های شخص ثالث، صفحات حساس فروشگاه و jQuery با هندل اصلی خود باقی می‌مانند."
+
+msgid "Page intelligence"
+msgstr "هوشمندی صفحه"
+
+msgid "Run a safe analysis for any public URL on this site."
+msgstr "برای هر نشانی عمومی این سایت یک تحلیل ایمن اجرا کنید."
+
+msgid "Completed with issues"
+msgstr "تکمیل‌شده با موارد نیازمند بررسی"
+
+msgid "Processing"
+msgstr "در حال پردازش"
+
+msgid "Queue is healthy"
+msgstr "صف سالم است"
+
+msgid "No error detail was recorded for these older failed scans. Retry them to collect a specific reason."
+msgstr "برای این اسکن‌های ناموفق قدیمی جزئیات خطا ثبت نشده است. برای ثبت دلیل دقیق، دوباره تلاش کنید."
+
+msgid "Background worker"
+msgstr "پردازشگر پس‌زمینه"

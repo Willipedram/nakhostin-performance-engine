@@ -92,6 +92,10 @@ final class DOMAdminPage {
 				'none'      => __( 'None', 'nakhostin-performance-engine' ),
 				'pollError' => __( 'Could not refresh queue status. Reload the page and verify admin-ajax.php access.', 'nakhostin-performance-engine' ),
 				'disabled'  => __( 'Automatic learning is disabled.', 'nakhostin-performance-engine' ),
+				'healthy'   => __( 'Queue is healthy', 'nakhostin-performance-engine' ),
+				'processing' => __( 'Processing', 'nakhostin-performance-engine' ),
+				'issues'    => __( 'Completed with issues', 'nakhostin-performance-engine' ),
+				'unknownError' => __( 'No error detail was recorded for these older failed scans. Retry them to collect a specific reason.', 'nakhostin-performance-engine' ),
 			)
 		);
 	}
@@ -213,27 +217,23 @@ final class DOMAdminPage {
 
 		$manifest = $this->storage->latest();
 		?>
-		<div class="wrap npe-admin" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
-			<h1><?php echo esc_html__( 'DOM Intelligence', 'nakhostin-performance-engine' ); ?></h1>
-			<p>
-				<?php
-				echo esc_html__(
-					'One click analyzes the rendered DOM, detected components, same-origin stylesheets, and registered JavaScript dependencies. Full page HTML and submitted source code are not stored.',
-					'nakhostin-performance-engine'
-				);
-				?>
-			</p>
+		<div class="wrap npe-admin npe-dom-page" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
+			<header class="npe-dom-hero">
+				<div>
+					<span class="npe-dom-eyebrow"><span class="dashicons dashicons-networking" aria-hidden="true"></span><?php echo esc_html__( 'Page intelligence', 'nakhostin-performance-engine' ); ?></span>
+					<h1><?php echo esc_html__( 'DOM Intelligence', 'nakhostin-performance-engine' ); ?></h1>
+					<p><?php echo esc_html__( 'One click analyzes the rendered DOM, detected components, same-origin stylesheets, and registered JavaScript dependencies. Full page HTML and submitted source code are not stored.', 'nakhostin-performance-engine' ); ?></p>
+				</div>
+				<span class="npe-version"><?php echo esc_html( 'NPE ' . NPE_VERSION ); ?></span>
+			</header>
 			<?php $this->render_notice(); ?>
 			<?php $this->render_queue(); ?>
-			<div class="npe-card">
-				<h2><?php echo esc_html__( 'Analyze Page Assets', 'nakhostin-performance-engine' ); ?></h2>
+			<div class="npe-card npe-dom-analyze-card">
+				<div class="npe-dom-card-heading"><span class="dashicons dashicons-search" aria-hidden="true"></span><div><h2><?php echo esc_html__( 'Analyze Page Assets', 'nakhostin-performance-engine' ); ?></h2><p><?php echo esc_html__( 'Run a safe analysis for any public URL on this site.', 'nakhostin-performance-engine' ); ?></p></div></div>
 				<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
 					<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>">
 					<?php wp_nonce_field( self::ACTION ); ?>
-					<label for="npe-source-url"><?php echo esc_html__( 'Public page URL', 'nakhostin-performance-engine' ); ?></label>
-					<input class="regular-text code" id="npe-source-url" name="source_url" type="url" required
-						value="<?php echo esc_attr( home_url( '/' ) ); ?>">
-					<?php submit_button( __( 'Analyze DOM, CSS, JavaScript, and Components', 'nakhostin-performance-engine' ) ); ?>
+					<div class="npe-dom-url-field"><label for="npe-source-url"><?php echo esc_html__( 'Public page URL', 'nakhostin-performance-engine' ); ?></label><div><input class="regular-text code" id="npe-source-url" name="source_url" type="url" required value="<?php echo esc_attr( home_url( '/' ) ); ?>"><?php submit_button( __( 'Analyze DOM, CSS, JavaScript, and Components', 'nakhostin-performance-engine' ), 'primary', 'submit', false ); ?></div></div>
 				</form>
 			</div>
 			<?php $this->render_manifest( $manifest ); ?>
@@ -251,23 +251,27 @@ final class DOMAdminPage {
 		);
 		$last_completed = $report['last_completed_at'] > 0 ? gmdate( 'Y-m-d H:i:s', $report['last_completed_at'] ) . ' UTC' : __( 'Not run', 'nakhostin-performance-engine' );
 		$enabled = (bool) ( $this->settings && $this->settings->get( 'dom.enabled', false ) );
+		$has_failures = $report['failed'] > 0;
+		$is_active = $report['pending'] > 0 || $report['running'] > 0;
+		$status_class = $has_failures ? 'has-issues' : ( $is_active ? 'is-running' : 'is-healthy' );
+		$status_text = $has_failures ? __( 'Completed with issues', 'nakhostin-performance-engine' ) : ( $is_active ? __( 'Processing', 'nakhostin-performance-engine' ) : __( 'Queue is healthy', 'nakhostin-performance-engine' ) );
+		$last_error = $report['last_error'] ?: ( $has_failures ? __( 'No error detail was recorded for these older failed scans. Retry them to collect a specific reason.', 'nakhostin-performance-engine' ) : __( 'None', 'nakhostin-performance-engine' ) );
 		?>
-		<div class="npe-card">
-			<h2><?php echo esc_html__( 'Automatic learning queue', 'nakhostin-performance-engine' ); ?></h2>
-			<p><?php echo esc_html__( 'Eligible visitor requests are deduplicated and analyzed asynchronously in small fast batches.', 'nakhostin-performance-engine' ); ?></p>
-			<label for="npe-dom-progress"><?php echo esc_html__( 'Current scan progress', 'nakhostin-performance-engine' ); ?></label>
-			<progress id="npe-dom-progress" class="npe-progress" max="100" value="<?php echo esc_attr( (string) $report['progress'] ); ?>"><?php echo esc_html( (string) $report['progress'] ); ?>%</progress>
-			<p class="npe-progress-value npe-technical" dir="ltr"><?php echo esc_html( (string) $report['progress'] ); ?>%</p>
+		<section class="npe-card npe-dom-queue <?php echo esc_attr( $status_class ); ?>">
+			<div class="npe-dom-queue-header"><div><span class="npe-dom-eyebrow"><span class="dashicons dashicons-update" aria-hidden="true"></span><?php echo esc_html__( 'Background worker', 'nakhostin-performance-engine' ); ?></span><h2><?php echo esc_html__( 'Automatic learning queue', 'nakhostin-performance-engine' ); ?></h2><p><?php echo esc_html__( 'Eligible visitor requests are deduplicated and analyzed asynchronously in small fast batches.', 'nakhostin-performance-engine' ); ?></p></div><span id="npe-dom-state" class="npe-dom-state"><span aria-hidden="true"></span><span class="npe-dom-state-label"><?php echo esc_html( $status_text ); ?></span></span></div>
+			<div class="npe-dom-progress-row"><div><label for="npe-dom-progress"><?php echo esc_html__( 'Current scan progress', 'nakhostin-performance-engine' ); ?></label><progress id="npe-dom-progress" class="npe-progress" max="100" value="<?php echo esc_attr( (string) $report['progress'] ); ?>"><?php echo esc_html( (string) $report['progress'] ); ?>%</progress></div><p class="npe-progress-value npe-technical" dir="ltr"><?php echo esc_html( (string) $report['progress'] ); ?>%</p></div>
 			<p id="npe-dom-worker-status" class="description" aria-live="polite"></p>
+			<ul class="npe-dom-stat-grid">
+				<li><span class="dashicons dashicons-clock" aria-hidden="true"></span><span><?php echo esc_html__( 'Pending', 'nakhostin-performance-engine' ); ?></span><strong id="npe-dom-pending"><?php echo esc_html( (string) $report['pending'] ); ?></strong></li>
+				<li><span class="dashicons dashicons-controls-play" aria-hidden="true"></span><span><?php echo esc_html__( 'Running', 'nakhostin-performance-engine' ); ?></span><strong id="npe-dom-running"><?php echo esc_html( (string) $report['running'] ); ?></strong></li>
+				<li class="npe-dom-stat-failed"><span class="dashicons dashicons-warning" aria-hidden="true"></span><span><?php echo esc_html__( 'Failed', 'nakhostin-performance-engine' ); ?></span><strong id="npe-dom-failed"><?php echo esc_html( (string) $report['failed'] ); ?></strong></li>
+				<li><span class="dashicons dashicons-yes-alt" aria-hidden="true"></span><span><?php echo esc_html__( 'Pages analyzed', 'nakhostin-performance-engine' ); ?></span><strong id="npe-dom-completed"><?php echo esc_html( (string) $report['completed'] ); ?></strong></li>
+			</ul>
 			<ul class="npe-progress-details">
-				<li><?php echo esc_html__( 'Pending', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-pending"><?php echo esc_html( (string) $report['pending'] ); ?></strong></li>
-				<li><?php echo esc_html__( 'Running', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-running"><?php echo esc_html( (string) $report['running'] ); ?></strong></li>
-				<li><?php echo esc_html__( 'Failed', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-failed"><?php echo esc_html( (string) $report['failed'] ); ?></strong></li>
-				<li><?php echo esc_html__( 'Pages analyzed', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-completed"><?php echo esc_html( (string) $report['completed'] ); ?></strong></li>
 				<li><?php echo esc_html__( 'Estimated time remaining', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-eta"><?php echo esc_html( $this->format_duration( (int) $report['estimated_seconds'] ) ); ?></strong></li>
 				<li><?php echo esc_html__( 'Last completed scan', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-last-completed" class="npe-technical" dir="ltr"><?php echo esc_html( $last_completed ); ?></strong></li>
 				<li><?php echo esc_html__( 'Next worker run', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-next-run" class="npe-technical" dir="ltr"><?php echo esc_html( ! empty( $report['next_run_at'] ) ? gmdate( 'Y-m-d H:i:s', $report['next_run_at'] ) . ' UTC' : __( 'Not scheduled', 'nakhostin-performance-engine' ) ); ?></strong></li>
-				<li><?php echo esc_html__( 'Last queue error', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-last-error" class="npe-technical" dir="ltr"><?php echo esc_html( $report['last_error'] ?: __( 'None', 'nakhostin-performance-engine' ) ); ?></strong></li>
+				<li class="npe-dom-error-detail"><?php echo esc_html__( 'Last queue error', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-last-error"><?php echo esc_html( $last_error ); ?></strong></li>
 			</ul>
 			<p class="description"><?php echo esc_html__( 'After an NPE or LiteSpeed full cache purge, previously discovered pages are automatically queued for a fresh scan.', 'nakhostin-performance-engine' ); ?></p>
 			<?php if ( ! $enabled ) : ?>
@@ -282,7 +286,7 @@ final class DOMAdminPage {
 					<?php if ( $report['failed'] > 0 ) { $this->queue_action_form( self::RETRY_QUEUE_ACTION, __( 'Retry failed scans', 'nakhostin-performance-engine' ) ); } ?>
 				</div>
 			<?php endif; ?>
-		</div>
+		</section>
 		<?php
 	}
 
