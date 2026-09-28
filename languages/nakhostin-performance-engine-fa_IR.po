@@ -1427,3 +1427,9 @@ msgstr "تلاش دوباره برای اسکن‌های ناموفق"
 
 msgid "Failed scans were queued for another attempt."
 msgstr "اسکن‌های ناموفق برای تلاش دوباره وارد صف شدند."
+
+msgid "Build and serve page-specific CSS and JavaScript bundles"
+msgstr "ساخت و ارائه بسته‌های اختصاصی CSS و جاوااسکریپت برای هر صفحه"
+
+msgid "Bundles are generated only by background analysis. Safe mode, unknown sources, inline data, modules, third-party files, protected commerce pages, and jQuery remain on their original handles."
+msgstr "بسته‌ها فقط در تحلیل پس‌زمینه ساخته می‌شوند. حالت امن، منابع ناشناخته، داده‌های درون‌خطی، ماژول‌ها، فایل‌های شخص ثالث، صفحات حساس فروشگاه و jQuery با هندل اصلی خود باقی می‌مانند."

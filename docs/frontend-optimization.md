@@ -71,3 +71,13 @@ independent and aggressive controls default to off.
 
 NPE does not rewrite, resize, transcode, preload, lazy-load, or otherwise optimize
 images, video, audio, or other media in this phase.
+
+## Page-specific CSS and JavaScript bundles
+
+When **Build and serve page-specific CSS and JavaScript bundles** is enabled and Safe Mode is disabled, the asynchronous page-analysis worker may write content-addressed bundles under `wp-content/cache/nakhostin-performance-engine/assets/`. Normal frontend requests only read the saved manifest; they never parse source files.
+
+A CSS bundle is published only when every stylesheet observed in the rendered page was fetched from the same origin. Rules classified as required or dynamic are retained in source order, at-rules are preserved, and relative asset URLs are rewritten. If any stylesheet is unknown, external, unavailable, or truncated, NPE keeps the original stylesheets.
+
+A JavaScript bundle contains only local classic scripts with trusted source content and no inline/localized data. Dependency order is retained. jQuery handles (including distinct versions), modules, external scripts, protected WooCommerce scripts, and any handle needed by a retained script remain separate. This boundary is intentional: removing arbitrary functions from a JavaScript library cannot be proven safe from a server-side DOM snapshot.
+
+Runtime replacement is fail-open. Missing/stale manifests, Safe Mode, logged-in users, cart, checkout, account pages, provider conflicts, or incomplete analysis retain the original WordPress handles.

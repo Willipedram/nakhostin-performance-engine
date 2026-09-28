@@ -72,6 +72,7 @@ final class SettingsTest extends TestCase {
 		$this->assertFalse( $defaults['javascript']['defer_enabled'] );
 		$this->assertFalse( $defaults['javascript']['delay_enabled'] );
 		$this->assertFalse( $defaults['assets']['unload_enabled'] );
+		$this->assertFalse( $defaults['assets']['bundle_enabled'] );
 		$this->assertFalse( $defaults['fonts']['preload_enabled'] );
 	}
 

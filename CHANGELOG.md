@@ -1,3 +1,10 @@
+## 2.4.0
+
+- Added background-generated, content-addressed per-page CSS and JavaScript bundles.
+- CSS bundles preserve source order, dynamic/required rules and at-rules, rewrite relative asset URLs, and omit only rules classified unused by the analyzed DOM.
+- JavaScript bundles preserve dependency order and retain jQuery, modules, external scripts, and handles with inline/localized runtime data separately.
+- Added an explicit fail-open bundle setting; safe mode and protected commerce contexts always keep original assets.
+
 ## 2.3.3
 
 - Made automatic DOM learning analyze a bounded 200 response locally when a reverse proxy or page cache bypasses the capture callback.

@@ -452,5 +452,7 @@ return array (
     'Save and verify your public pages' => 'ذخیره کنید و صفحات عمومی را بررسی کنید',
     'Retry failed scans' => 'تلاش دوباره برای اسکن‌های ناموفق',
     'Failed scans were queued for another attempt.' => 'اسکن‌های ناموفق برای تلاش دوباره وارد صف شدند.',
+    'Build and serve page-specific CSS and JavaScript bundles' => 'ساخت و ارائه بسته‌های اختصاصی CSS و جاوااسکریپت برای هر صفحه',
+    'Bundles are generated only by background analysis. Safe mode, unknown sources, inline data, modules, third-party files, protected commerce pages, and jQuery remain on their original handles.' => 'بسته‌ها فقط در تحلیل پس‌زمینه ساخته می‌شوند. حالت امن، منابع ناشناخته، داده‌های درون‌خطی، ماژول‌ها، فایل‌های شخص ثالث، صفحات حساس فروشگاه و jQuery با هندل اصلی خود باقی می‌مانند.',
   ),
 );

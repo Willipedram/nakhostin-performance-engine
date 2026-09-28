@@ -140,6 +140,7 @@ final class PageAnalysisCoordinator {
 			$css_manifest = null;
 			$javascript_manifest = null;
 			$font_manifest = null;
+			$analysis_sources = array( 'css_files' => array(), 'css_complete' => false, 'script_assets' => array(), 'script_contents' => array() );
 
 			try {
 				$components = $this->components->ingest_manifest( $data );
@@ -149,6 +150,8 @@ final class PageAnalysisCoordinator {
 			}
 			try {
 				$css = $this->stylesheets->collect( $data );
+				$analysis_sources['css_files'] = (array) ( $css['files'] ?? array() );
+				$analysis_sources['css_complete'] = ! empty( $css['fetched_files'] ) && empty( $css['skipped_files'] ) && (int) $css['fetched_files'] === count( array_unique( (array) ( $data['stylesheets'] ?? array() ) ) );
 				$css_source = (string) ( $css['css'] ?? '' );
 				$css_manifest = $this->css_analyzer->analyze_stylesheet( $css['css'], $data );
 				$this->css_storage->save( $css_manifest );
@@ -163,6 +166,8 @@ final class PageAnalysisCoordinator {
 			try {
 				$assets  = $this->script_discovery->discover();
 				$sources = $this->script_sources->load( $assets );
+				$analysis_sources['script_assets'] = $assets;
+				$analysis_sources['script_contents'] = (array) ( $sources['contents'] ?? array() );
 				$page_handles = $this->script_resolver->resolve( $assets, $data['scripts'] ?? array() );
 				$options = array( 'page_handles' => $page_handles, 'defer_handles' => $page_handles );
 				$context = array( 'is_admin' => false, 'page_type' => $data['page_type'] ?? 'unknown', 'source_hashes' => $sources['hashes'], 'settings_hash' => hash( 'sha256', (string) wp_json_encode( $this->settings->all() ) ), 'versions' => $this->versions() );
@@ -172,7 +177,7 @@ final class PageAnalysisCoordinator {
 				$complete = false;
 				do_action( 'npe/analysis/error', 'javascript', get_class( $error ) );
 			}
-			do_action( 'npe/analysis/completed', $source_url, $data, $components, $css_source, $css_manifest, $javascript_manifest, $font_manifest );
+			do_action( 'npe/analysis/completed', $source_url, $data, $components, $css_source, $css_manifest, $javascript_manifest, $font_manifest, $analysis_sources );
 			$this->last_success = true;
 			if ( '' !== $token ) { set_transient( self::RESULT_PREFIX . $token, $complete ? 'success' : 'partial', MINUTE_IN_SECONDS ); }
 		} catch ( Throwable $error ) {

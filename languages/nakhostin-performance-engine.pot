@@ -1396,3 +1396,9 @@ msgstr ""
 
 msgid "Failed scans were queued for another attempt."
 msgstr ""
+
+msgid "Build and serve page-specific CSS and JavaScript bundles"
+msgstr ""
+
+msgid "Bundles are generated only by background analysis. Safe mode, unknown sources, inline data, modules, third-party files, protected commerce pages, and jQuery remain on their original handles."
+msgstr ""

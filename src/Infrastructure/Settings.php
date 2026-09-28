@@ -47,7 +47,7 @@ final class Settings {
 			'preload_enabled' => false,
 		);
 		$defaults['optimization'] = array( 'enabled' => false, 'safe_mode' => true );
-		$defaults['assets'] = array( 'unload_enabled' => false );
+		$defaults['assets'] = array( 'unload_enabled' => false, 'bundle_enabled' => false );
 		$defaults['css']['critical_css_enabled'] = false;
 		$defaults['css']['unused_css_enabled'] = false;
 		$defaults['javascript']['defer_enabled'] = false;
@@ -137,6 +137,7 @@ final class Settings {
 		$sanitized['optimization']['safe_mode'] = $this->to_bool( $optimization['safe_mode'] ?? true );
 		$assets = isset( $input['assets'] ) && is_array( $input['assets'] ) ? $input['assets'] : array();
 		$sanitized['assets']['unload_enabled'] = $this->to_bool( $assets['unload_enabled'] ?? false );
+		$sanitized['assets']['bundle_enabled'] = $this->to_bool( $assets['bundle_enabled'] ?? false );
 		$sanitized['css']['critical_css_enabled'] = $this->to_bool( $input['css']['critical_css_enabled'] ?? false );
 		$sanitized['css']['unused_css_enabled'] = $this->to_bool( $input['css']['unused_css_enabled'] ?? false );
 		$sanitized['javascript']['defer_enabled'] = $this->to_bool( $input['javascript']['defer_enabled'] ?? false );

@@ -20,7 +20,7 @@ final class JavaScriptBundleWriter {
 		$this->trusted_directory = rtrim( $trusted_directory, '/\\' );
 	}
 
-	public function build( string $layer, array $ordered_assets, array $source_contents, string $directory ): array {
+	public function build( string $layer, array $ordered_assets, array $source_contents, string $directory = '' ): array {
 		$layer = sanitize_key( $layer );
 		if ( ! in_array( $layer, array( 'core', 'component', 'page' ), true ) ) {
 			throw new RuntimeException( 'Unknown JavaScript bundle layer.' );
@@ -62,7 +62,7 @@ final class JavaScriptBundleWriter {
 		$content  = implode( "\n", $contents );
 		$hash     = substr( hash( 'sha256', $content ), 0, 20 );
 		$filename = $layer . '-' . $hash . '.js';
-		$directory = trailingslashit( $directory );
+		$directory = trailingslashit( '' !== $directory ? $directory : $this->trusted_directory );
 
 		if ( ! wp_mkdir_p( $directory ) ) {
 			throw new RuntimeException( 'Unable to create the JavaScript bundle directory.' );
