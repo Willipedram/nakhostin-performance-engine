@@ -28,17 +28,18 @@ final class JavaScriptPlanner {
 		array $options = array(),
 		array $source_contents = array()
 	): JavaScriptManifest {
-		$graph       = new DependencyGraph( $assets );
-		$diagnostics = $graph->diagnostics();
-		$warnings    = $this->diagnostic_warnings( $diagnostics );
+		$full_graph  = new DependencyGraph( $assets );
 		$enqueued    = $this->enqueued_handles( $assets );
-		$component   = $this->component_handles( $components, $graph );
+		$component   = $this->component_handles( $components, $full_graph );
 		$page_roots  = isset( $options['page_handles'] ) && is_array( $options['page_handles'] )
 			? $options['page_handles']
 			: $enqueued;
 		$core_roots  = isset( $options['core_handles'] ) && is_array( $options['core_handles'] )
 			? $options['core_handles']
 			: array();
+		$graph       = new DependencyGraph( $this->relevant_assets( $assets, array_merge( $enqueued, $component, $page_roots, $core_roots, $this->requested( $options, 'explicitly_absent' ) ) ) );
+		$diagnostics = $graph->diagnostics();
+		$warnings    = $this->diagnostic_warnings( $diagnostics );
 		$has_cycle = ! empty( $diagnostics['cycles'] );
 		$layers    = $has_cycle
 			? array( 'core' => array(), 'component' => array(), 'page' => array() )
@@ -123,6 +124,11 @@ final class JavaScriptPlanner {
 				$required
 			)
 		);
+		$capture_complete = true === ( $options['capture_complete'] ?? false );
+		$explicitly_absent = $capture_complete
+			? $this->requested( $options, 'explicitly_absent' )
+			: array();
+		$protected = array_values( array_intersect( array_keys( $retained ), $required ) );
 
 		return new JavaScriptManifest(
 			array(
@@ -132,7 +138,16 @@ final class JavaScriptPlanner {
 				'page_type'       => sanitize_key( (string) ( $context['page_type'] ?? 'unknown' ) ) ?: 'unknown',
 				'assets'           => $asset_rows,
 				'required'         => $required,
+				'required_by_page' => $this->requested( $options, 'required_handles' ),
+				'observed'         => array_values( array_unique( array_map( 'sanitize_key', $page_roots ) ) ),
+				'enqueued'         => $enqueued,
+				'component_required' => $component,
+				'protected'        => $protected,
+				'explicitly_absent' => $explicitly_absent,
+				'capture'          => array( 'status' => $capture_complete ? 'complete' : 'incomplete', 'complete' => $capture_complete ),
+				'dependency_complete' => empty( $diagnostics['missing'] ) && empty( $diagnostics['cycles'] ),
 				'unused_candidates' => $registered_unused,
+				'registration_diagnostics' => array( 'registered' => count( $asset_rows ), 'global_only' => count( $registered_unused ) ),
 				'file_count'       => count( $asset_rows ),
 				'bundles'          => $bundles,
 				'retained'         => $retained,
@@ -163,6 +178,22 @@ final class JavaScriptPlanner {
 		}
 
 		return array_values( array_unique( $handles ) );
+	}
+
+	/** Keep global registrations out of page graph analysis while preserving dependencies. */
+	private function relevant_assets( array $assets, array $roots ): array {
+		$by_handle = array();
+		foreach ( $assets as $asset ) { if ( $asset instanceof ScriptAsset ) { $by_handle[ $asset->handle() ] = $asset; } }
+		$result = array(); $seen = array(); $queue = array_values( array_unique( array_map( 'sanitize_key', $roots ) ) );
+		while ( $queue ) {
+			$handle = array_shift( $queue );
+			if ( isset( $seen[ $handle ] ) ) { continue; }
+			$seen[ $handle ] = true;
+			if ( ! isset( $by_handle[ $handle ] ) ) { continue; }
+			$result[] = $by_handle[ $handle ];
+			foreach ( $by_handle[ $handle ]->dependencies() as $dependency ) { $queue[] = $dependency; }
+		}
+		return $result;
 	}
 
 	private function bundle( string $layer, string $type, array $handles, DependencyGraph $graph ): array {

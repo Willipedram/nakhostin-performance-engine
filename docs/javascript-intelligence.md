@@ -55,7 +55,10 @@ handle, preserving nonces, AJAX URLs, REST configuration, and execution timing.
 The manifest distinguishes scripts required by the current page (enqueued roots,
 their transitive dependencies, and component-declared handles) from scripts that
 are merely registered but outside that page dependency closure. Registered-only
-handles are reported as unused candidates and are not included in a page bundle.
+handles are reported only as registration diagnostics and are not emitted as
+actionable page decisions or included in a page bundle. A registered-only handle
+is not automatically considered absent. Explicit absence requires a complete,
+trustworthy capture and a known page-specific candidate.
 This is a page-specific dependency decision, not source-code dead-code elimination.
 When a DOM manifest exists, the administration analysis matches its privacy-safe
 script source paths to registered WordPress handles and uses only components
@@ -68,6 +71,8 @@ actual WordPress queue is available. Refreshing JavaScript analysis revisits the
 latest analyzed public URL and refreshes DOM, component, CSS, and JavaScript
 manifests as one consistent snapshot. Heavy analysis never runs inside an ordinary
 visitor response; opt-in DOM learning only enqueues eligible URLs for WP-Cron.
+Incomplete, truncated, failed, or ambiguous captures retain uncertain handles and
+cannot approve absence-based unloading.
 
 `JavaScriptPlanner` produces three narrow layers instead of one global bundle:
 

@@ -140,7 +140,9 @@ final class PageAnalysisCoordinator {
 			$css_manifest = null;
 			$javascript_manifest = null;
 			$font_manifest = null;
-			$analysis_sources = array( 'css_files' => array(), 'css_complete' => false, 'script_assets' => array(), 'script_contents' => array() );
+			$document_complete = strlen( $html ) < DOMSnapshot::MAX_BYTES && 1 === preg_match( '/<\/body\s*>\s*<\/html\s*>\s*$/i', trim( $html ) );
+			if ( ! $document_complete ) { $complete = false; }
+			$analysis_sources = array( 'css_files' => array(), 'css_complete' => false, 'script_assets' => array(), 'script_contents' => array(), 'capture_complete' => false, 'capture_status' => $document_complete ? 'complete' : 'incomplete-document' );
 
 			try {
 				$components = $this->components->ingest_manifest( $data );
@@ -169,7 +171,7 @@ final class PageAnalysisCoordinator {
 				$analysis_sources['script_assets'] = $assets;
 				$analysis_sources['script_contents'] = (array) ( $sources['contents'] ?? array() );
 				$page_handles = $this->script_resolver->resolve( $assets, $data['scripts'] ?? array() );
-				$options = array( 'page_handles' => $page_handles, 'defer_handles' => $page_handles );
+				$options = array( 'page_handles' => $page_handles, 'defer_handles' => $page_handles, 'capture_complete' => $document_complete );
 				$context = array( 'is_admin' => false, 'page_type' => $data['page_type'] ?? 'unknown', 'source_hashes' => $sources['hashes'], 'settings_hash' => hash( 'sha256', (string) wp_json_encode( $this->settings->all() ) ), 'versions' => $this->versions() );
 				$javascript_manifest = $this->javascript_analyzer->analyze_assets( $assets, $components, $context, $options, $sources['contents'] );
 				$this->javascript_storage->save( $javascript_manifest );
@@ -177,6 +179,8 @@ final class PageAnalysisCoordinator {
 				$complete = false;
 				do_action( 'npe/analysis/error', 'javascript', get_class( $error ) );
 			}
+			$analysis_sources['capture_complete'] = $complete && $document_complete && null !== $javascript_manifest;
+			$analysis_sources['capture_status'] = $analysis_sources['capture_complete'] ? 'complete' : ( 'complete' === $analysis_sources['capture_status'] ? 'analysis-incomplete' : $analysis_sources['capture_status'] );
 			do_action( 'npe/analysis/completed', $source_url, $data, $components, $css_source, $css_manifest, $javascript_manifest, $font_manifest, $analysis_sources );
 			$this->last_success = true;
 			if ( '' !== $token ) { set_transient( self::RESULT_PREFIX . $token, $complete ? 'success' : 'partial', MINUTE_IN_SECONDS ); }

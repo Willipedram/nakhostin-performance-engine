@@ -18,6 +18,35 @@ The runtime requires a fresh matching manifest. Missing, malformed, or stale dat
 means KEEP. Logged-in, admin, cart, checkout, and account contexts bypass every
 runtime change.
 
+## Page-specific asset evidence
+
+WordPress's global script registry is not a list of assets used by the current
+page. The analysis worker therefore keeps global registration counts as
+diagnostics and limits actionable decisions to page-relevant handles: assets
+observed in rendered markup, handles actually enqueued for the capture, direct
+page requirements, detected-component requirements, protected handles, explicit
+absence candidates, and the transitive dependencies of retained handles. Merely
+being globally registered never creates an actionable `keep / 0%` row.
+
+Capture completeness is explicit in manifest schema version 3. A capture is
+complete only when the bounded document has a trustworthy end and all required
+analysis stages complete. Failed, partial, truncated, or ambiguous captures may
+record observations but cannot infer absence. Explicit absence is actionable only
+for a known page candidate in a complete capture; it does not mean "registered
+globally but not seen." Unknown and incomplete states always remain KEEP.
+
+Decision reasons describe the evidence rather than an optimistic guess:
+`required-by-page`, `required-by-component`, `required-by-dependency`,
+`observed-on-rendered-page`, `protected-by-safety-policy`, and
+`explicitly-absent-from-complete-capture`. Incomplete or missing dependency
+evidence uses a fail-open reason and zero confidence. Confidence 100 is reserved
+for direct, complete evidence; it is not synthesized from heuristics.
+
+Dependency closure is computed by the worker across every direct and transitive
+edge. Diamond graphs are deduplicated, cycles terminate deterministically, and a
+missing dependency node makes the affected unload decision uncertain. Thus an
+asset cannot unload while any retained page asset depends on it at any depth.
+
 ## CSS
 
 Critical CSS is generated from selectors already classified as observed by DOM
@@ -81,6 +110,13 @@ A CSS bundle is published only when every stylesheet observed in the rendered pa
 A JavaScript bundle contains only local classic scripts with trusted source content and no inline/localized data. Dependency order is retained. jQuery handles (including distinct versions), modules, external scripts, protected WooCommerce scripts, and any handle needed by a retained script remain separate. This boundary is intentional: removing arbitrary functions from a JavaScript library cannot be proven safe from a server-side DOM snapshot.
 
 Runtime replacement is fail-open. Missing/stale manifests, Safe Mode, logged-in users, cart, checkout, account pages, provider conflicts, or incomplete analysis retain the original WordPress handles.
+
+Bundle diagnostics pair `bundle_bytes` with a bounded status: `disabled`,
+`safe-mode`, `incomplete-source-capture`, `no-eligible-assets`,
+`external-or-unsafe-assets`, `source-unavailable`, `writer-failed`, or
+`generated`. Zero bytes is therefore not presented as a silent failure. Source
+fetching, graph traversal, parsing, and bundle writing remain worker-only;
+ordinary requests only validate and apply the precomputed manifest.
 
 
 ## Font rendering

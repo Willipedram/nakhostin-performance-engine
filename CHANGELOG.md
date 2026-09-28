@@ -1,3 +1,9 @@
+## 2.5.0
+
+- Replaced global-registry asset decisions with a page-specific evidence model covering observed, enqueued, direct, component, protected, explicit-absence, and transitive-dependency states.
+- Added explicit capture completeness and manifest schema version 3; legacy, incomplete, malformed, and stale manifests fail open.
+- Added cycle-safe dependency closure and meaningful zero-byte bundle statuses without adding frontend analysis work.
+
 ## 2.4.3
 
 - Fixed diagnostic downloads that advertised PHP, cache, object-cache, performance, optimization, integration, and security sections but exported them as empty arrays.
