@@ -18,5 +18,6 @@ final class FontAnalyzerTest extends TestCase {
 		$this->assertFalse( $data['families'][0]['faces'][1]['required'] );
 		$this->assertSame( 'https://example.test/fonts/iransansx/Regular.woff2', $data['required_sources'][0] );
 		$this->assertTrue( $data['stylesheets'][0]['font_only'] );
+		$this->assertSame( 'swap', $data['families'][0]['faces'][0]['display'] );
 	}
 }

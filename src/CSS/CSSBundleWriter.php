@@ -7,7 +7,8 @@ use RuntimeException;
 final class CSSBundleWriter {
 	/** @var string */ private $directory;
 	/** @var string */ private $base_url;
-	public function __construct( string $directory, string $base_url ) { $this->directory = rtrim( $directory, '/\\' ); $this->base_url = trailingslashit( $base_url ); }
+	/** @var FontDisplayOptimizer */ private $font_display;
+	public function __construct( string $directory, string $base_url, ?FontDisplayOptimizer $font_display = null ) { $this->directory = rtrim( $directory, '/\\' ); $this->base_url = trailingslashit( $base_url ); $this->font_display = $font_display ?: new FontDisplayOptimizer(); }
 
 	public function build( array $files, CSSManifest $usage ): array {
 		$data = $usage->to_array();
@@ -20,7 +21,7 @@ final class CSSBundleWriter {
 			if ( '' !== trim( $filtered ) ) { $parts[] = '/* NPE source */' . "\n" . $filtered; $urls[] = esc_url_raw( (string) $file['url'] ); }
 		}
 		if ( ! $parts ) { throw new RuntimeException( 'No safe CSS source was available for bundling.' ); }
-		$content = implode( "\n", $parts ); $hash = substr( hash( 'sha256', $content ), 0, 20 ); $filename = 'page-' . $hash . '.css';
+		$content = $this->font_display->rewrite( implode( "\n", $parts ) ); $hash = substr( hash( 'sha256', $content ), 0, 20 ); $filename = 'page-' . $hash . '.css';
 		$this->publish( $filename, $content );
 		return array( 'url' => $this->base_url . $filename, 'filename' => $filename, 'content_hash' => $hash, 'source_urls' => $urls, 'original_size' => $original, 'optimized_size' => strlen( $content ) );
 	}

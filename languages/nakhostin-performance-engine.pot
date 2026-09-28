@@ -1077,7 +1077,7 @@ msgid "Required on page"
 msgstr ""
 
 
-msgid "Effect: on a previously analyzed public page, NPE can dequeue a stylesheet containing only @font-face rules and recreate only the required variants. Mixed stylesheets, unknown pages, logged-in users, uncertain fonts, and LiteSpeed-compatible CSS optimization remain unchanged."
+msgid "Effect: on a previously analyzed public page, NPE can dequeue a stylesheet containing only @font-face rules, recreate only required variants, and enforce font-display: swap when the source uses auto, block, or no strategy. Mixed stylesheets, unknown pages, logged-in users, uncertain fonts, and LiteSpeed-compatible CSS optimization remain unchanged."
 msgstr ""
 
 

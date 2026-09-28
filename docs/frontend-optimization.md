@@ -81,3 +81,8 @@ A CSS bundle is published only when every stylesheet observed in the rendered pa
 A JavaScript bundle contains only local classic scripts with trusted source content and no inline/localized data. Dependency order is retained. jQuery handles (including distinct versions), modules, external scripts, protected WooCommerce scripts, and any handle needed by a retained script remain separate. This boundary is intentional: removing arbitrary functions from a JavaScript library cannot be proven safe from a server-side DOM snapshot.
 
 Runtime replacement is fail-open. Missing/stale manifests, Safe Mode, logged-in users, cart, checkout, account pages, provider conflicts, or incomplete analysis retain the original WordPress handles.
+
+
+## Font rendering
+
+Generated CSS bundles normalize missing, `auto`, and `block` `font-display` declarations to `swap`, preventing invisible text while first-party fonts download. Existing `fallback` and `optional` declarations are respected. When page-aware font replacement is explicitly enabled outside Safe Mode, its reconstructed `@font-face` rules use the same policy and only required faces are emitted. NPE does not guess font metric overrides because incorrect ascent, descent, or size-adjust values can introduce layout shift.

@@ -13,6 +13,6 @@ final class CSSBundleWriterTest extends TestCase {
 		$writer = new CSSBundleWriter( $this->directory, 'https://example.test/cache/css/' );
 		$result = $writer->build( array( array( 'url' => 'https://example.test/theme/css/site.css', 'css' => '.hero{background:url(../img/a.png)}.unused{display:none}.menu:hover{color:red}@font-face{font-family:x;src:url(font.woff2)}' ) ), $manifest );
 		$content = file_get_contents( $this->directory . '/' . $result['filename'] );
-		self::assertStringContainsString( '.hero{', $content ); self::assertStringContainsString( '.menu:hover{', $content ); self::assertStringContainsString( '@font-face{', $content ); self::assertStringNotContainsString( '.unused{', $content ); self::assertStringContainsString( 'https://example.test/theme/img/a.png', $content );
+		self::assertStringContainsString( '.hero{', $content ); self::assertStringContainsString( '.menu:hover{', $content ); self::assertStringContainsString( '@font-face{', $content ); self::assertStringContainsString( 'font-display:swap', $content ); self::assertStringNotContainsString( '.unused{', $content ); self::assertStringContainsString( 'https://example.test/theme/img/a.png', $content );
 	}
 }

@@ -87,7 +87,7 @@ final class FontLoadingOptimizer {
 		if ( ! $sources ) { return ''; }
 		$weight = preg_replace( '/[^0-9 ]/', '', (string) ( $face['weight'] ?? '400' ) ) ?: '400';
 		$style = in_array( $face['style'] ?? '', array( 'normal', 'italic', 'oblique' ), true ) ? $face['style'] : 'normal';
-		$display = in_array( $face['display'] ?? '', array( 'auto', 'block', 'swap', 'fallback', 'optional' ), true ) ? $face['display'] : 'swap';
+		$display = in_array( $face['display'] ?? '', array( 'swap', 'fallback', 'optional' ), true ) ? $face['display'] : 'swap';
 		$unicode_range = preg_replace( '/[^uU+0-9a-fA-F?\-, ]/', '', (string) ( $face['unicode_range'] ?? '' ) ) ?? '';
 		return '@font-face{font-family:"' . $family . '";font-style:' . $style . ';font-weight:' . $weight . ';font-display:' . $display . ';src:' . implode( ',', $sources ) . ';' . ( '' !== $unicode_range ? 'unicode-range:' . $unicode_range . ';' : '' ) . '}';
 	}

@@ -1,3 +1,9 @@
+## 2.4.1
+
+- Added bounded `font-display` rewriting for generated page bundles and analyzed font-only stylesheets.
+- Missing, `auto`, and `block` declarations now become `swap`; explicit `fallback` and `optional` choices remain intact.
+- Added regression coverage for font-display rewriting and bundled font faces.
+
 ## 2.4.0
 
 - Added background-generated, content-addressed per-page CSS and JavaScript bundles.

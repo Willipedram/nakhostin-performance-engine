@@ -367,7 +367,7 @@ return array (
     'Format' => 'قالب',
     'Source URL' => 'نشانی منبع',
     'Required on page' => 'موردنیاز در صفحه',
-    'Effect: on a previously analyzed public page, NPE can dequeue a stylesheet containing only @font-face rules and recreate only the required variants. Mixed stylesheets, unknown pages, logged-in users, uncertain fonts, and LiteSpeed-compatible CSS optimization remain unchanged.' => 'اثر: در صفحه عمومی که قبلاً تحلیل شده است، NPE می‌تواند فایل CSS شامل صرفاً قوانین @font-face را از صف خارج کند و فقط گونه‌های موردنیاز را بازسازی کند. فایل‌های ترکیبی، صفحه‌های ناشناخته، کاربران واردشده، فونت‌های نامطمئن و بهینه‌سازی CSS سازگار با LiteSpeed بدون تغییر می‌مانند.',
+    'Effect: on a previously analyzed public page, NPE can dequeue a stylesheet containing only @font-face rules, recreate only required variants, and enforce font-display: swap when the source uses auto, block, or no strategy. Mixed stylesheets, unknown pages, logged-in users, uncertain fonts, and LiteSpeed-compatible CSS optimization remain unchanged.' => 'اثر: در صفحه عمومی تحلیل‌شده، NPE می‌تواند فایل CSS صرفاً شامل @font-face را جایگزین کند، فقط گونه‌های موردنیاز را بازسازی کند و برای منابع دارای auto، block یا بدون راهبرد، font-display: swap اعمال کند. فایل‌های ترکیبی، صفحه‌های ناشناخته، کاربران واردشده، فونت‌های نامطمئن و بهینه‌سازی CSS متعلق به LiteSpeed بدون تغییر می‌مانند.',
     'NPE Settings' => 'تنظیمات NPE',
     'Configure performance features with safe defaults. Every option explains its effect before you enable it.' => 'قابلیت‌های بهینه‌سازی را با پیش‌فرض‌های ایمن تنظیم کنید. اثر هر گزینه پیش از فعال‌سازی آن توضیح داده شده است.',
     'Settings sections' => 'بخش‌های تنظیمات',

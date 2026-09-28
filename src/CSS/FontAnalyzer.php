@@ -106,6 +106,7 @@ final class FontAnalyzer {
 		$weight = preg_match( '/font-weight\s*:\s*([^;!}]+)/i', $block, $match ) ? sanitize_text_field( trim( $match[1] ) ) : '400';
 		$style = preg_match( '/font-style\s*:\s*([^;!}]+)/i', $block, $match ) ? sanitize_key( trim( $match[1] ) ) : 'normal';
 		$display = preg_match( '/font-display\s*:\s*([^;!}]+)/i', $block, $match ) ? sanitize_key( trim( $match[1] ) ) : 'swap';
+		if ( in_array( $display, array( 'auto', 'block' ), true ) ) { $display = 'swap'; }
 		$unicode_range = preg_match( '/unicode-range\s*:\s*([^;!}]+)/i', $block, $match ) ? preg_replace( '/[^uU+0-9a-fA-F?\-, ]/', '', trim( $match[1] ) ) : '';
 		return array( 'family' => $family, 'weight' => $weight, 'style' => in_array( $style, array( 'normal', 'italic', 'oblique' ), true ) ? $style : 'normal', 'display' => in_array( $display, array( 'auto', 'block', 'swap', 'fallback', 'optional' ), true ) ? $display : 'swap', 'unicode_range' => $unicode_range, 'sources' => $sources );
 	}
