@@ -19,7 +19,13 @@ final class EarlyCacheManager {
 				$owner
 			);
 			$guidance = __( 'If that cache is active, no action is required. To switch to NPE Early Cache, first disable the owning cache through its own settings and cleanup tool, confirm that it removed advanced-cache.php, and then save the NPE cache settings again. Never delete the file while its owner is active.', 'nakhostin-performance-engine' );
-			echo '<div class="notice notice-info"><p><strong>' . esc_html( $message ) . '</strong></p><p>' . esc_html( $guidance ) . '</p></div>';
+			$fingerprint = sanitize_key( (string) ( $state['fingerprint'] ?? '' ) );
+			$diagnostic = '' === $fingerprint ? '' : sprintf(
+				/* translators: %s: non-sensitive short SHA-256 fingerprint. */
+				__( 'Drop-in diagnostic ID: %s', 'nakhostin-performance-engine' ),
+				$fingerprint
+			);
+			echo '<div class="notice notice-info"><p><strong>' . esc_html( $message ) . '</strong></p><p>' . esc_html( $guidance ) . '</p>' . ( '' !== $diagnostic ? '<p><code>' . esc_html( $diagnostic ) . '</code></p>' : '' ) . '</div>';
 			return;
 		}
 		echo '<div class="notice notice-warning"><p>' . esc_html__( 'NPE Early Cache is unavailable. Confirm that WP_CACHE is enabled and wp-content is writable; NPE is using the safe application-cache fallback.', 'nakhostin-performance-engine' ) . '</p></div>';

@@ -466,5 +466,9 @@ return array (
     'an unreadable cache drop-in' => 'یک drop-in کش غیرقابل‌خواندن',
     'an unrecognized cache system' => 'یک سامانه کش شناسایی‌نشده',
     'advanced-cache.php ownership evidence' => 'شواهد مالکیت advanced-cache.php',
+    'Drop-in diagnostic ID: %s' => 'شناسه تشخیصی drop-in: %s',
+    'advanced-cache.php safely replaceable' => 'قابلیت جایگزینی امن advanced-cache.php',
+    'advanced-cache.php diagnostic ID' => 'شناسه تشخیصی advanced-cache.php',
+    'advanced-cache.php inspected bytes' => 'بایت‌های بررسی‌شده advanced-cache.php',
   ),
 );

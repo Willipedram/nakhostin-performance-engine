@@ -9,7 +9,7 @@ final class EarlyCacheInstaller {
 	public function state(): array { return $this->detector->detect(); }
 	public function install(): array {
 		$state = $this->detector->detect();
-		if ( $state['exists'] && ! $state['npe_owned'] ) { return array( 'success' => false, 'status' => 'external_dropin', 'owner' => $state['owner'] ); }
+		if ( $state['exists'] && ! $state['npe_owned'] && empty( $state['replaceable'] ) ) { return array( 'success' => false, 'status' => 'external_dropin', 'owner' => $state['owner'] ); }
 		if ( ! is_readable( $this->template ) || ! is_dir( dirname( $state['path'] ) ) || ! is_writable( dirname( $state['path'] ) ) ) { return array( 'success' => false, 'status' => 'unwritable', 'owner' => $state['owner'] ); }
 		$contents = file_get_contents( $this->template ); if ( ! is_string( $contents ) ) { return array( 'success' => false, 'status' => 'template_unreadable', 'owner' => 'none' ); }
 		$contents = str_replace( '__NPE_PLUGIN_PATH__', var_export( $this->plugin_path, true ), $contents );

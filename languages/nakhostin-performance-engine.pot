@@ -1439,3 +1439,16 @@ msgstr ""
 
 msgid "advanced-cache.php ownership evidence"
 msgstr ""
+
+#. translators: %s: non-sensitive short SHA-256 fingerprint.
+msgid "Drop-in diagnostic ID: %s"
+msgstr ""
+
+msgid "advanced-cache.php safely replaceable"
+msgstr ""
+
+msgid "advanced-cache.php diagnostic ID"
+msgstr ""
+
+msgid "advanced-cache.php inspected bytes"
+msgstr ""

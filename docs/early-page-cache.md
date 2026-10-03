@@ -37,6 +37,12 @@ deliberately manual: disable the other cache through its own controls, let its
 cleanup tool remove `advanced-cache.php`, then save NPE settings again. NPE never
 deletes or chains a foreign drop-in.
 
+An empty or comment-only `advanced-cache.php` has no executable behavior and is
+classified as an inert placeholder. NPE may replace only that provably inert file;
+an unrecognized file containing executable PHP remains protected. Diagnostics
+report a short SHA-256 identifier and inspected byte count so support can compare
+the file without exposing its contents or filesystem path.
+
 NPE does not modify `wp-config.php`; `WP_CACHE` must be enabled by the operator or
 hosting platform. NPE also requires a writable `wp-content` directory to install
 the drop-in. If either requirement is missing, application caching remains the

@@ -14,7 +14,7 @@ final class EnvironmentDetector {
 		$compression = ( new CompressionDetector() )->detect( $server );
 		$proxy = ( new ReverseProxyDetector() )->detect( $server );
 		$type = $this->servers->detect( $server );
-		$owner = $dropin['exists'] ? ( $dropin['npe_owned'] ? 'npe_early' : $dropin['owner'] ) : 'none';
+		$owner = $dropin['npe_owned'] ? 'npe_early' : ( $dropin['exists'] && empty( $dropin['replaceable'] ) ? $dropin['owner'] : 'none' );
 		$installable = $this->dropins->can_install() || $dropin['npe_owned'];
 		return new EnvironmentReport( array_merge( $cache, $compression, array( 'server' => $type, 'reverse_proxy' => $proxy, 'dropin' => $dropin, 'early_cache_installable' => $installable, 'supports_early_cache' => ! empty( $cache['wp_cache'] ) && $installable, 'page_cache_owner' => $owner ) ) );
 	}

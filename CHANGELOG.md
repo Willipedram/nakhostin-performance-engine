@@ -1,3 +1,9 @@
+## 2.5.2
+
+- Treat only empty or comment-only `advanced-cache.php` files as safely replaceable inert placeholders, allowing NPE Early Cache to recover from stale files without weakening foreign-file ownership protection.
+- Broaden legacy NPE recognition to cover older markerless loaders that reference the NPE runtime classes and plugin path.
+- Add a non-sensitive short fingerprint, inspected byte count, and replaceability state to drop-in diagnostics; executable unknown files remain untouched.
+
 ## 2.5.1
 
 - Recognize markerless legacy NPE early-cache drop-ins using two NPE-specific runtime signatures so they can be upgraded safely instead of being misclassified as foreign.

@@ -1470,3 +1470,16 @@ msgstr "یک سامانه کش شناسایی‌نشده"
 
 msgid "advanced-cache.php ownership evidence"
 msgstr "شواهد مالکیت advanced-cache.php"
+
+#. translators: %s: non-sensitive short SHA-256 fingerprint.
+msgid "Drop-in diagnostic ID: %s"
+msgstr "شناسه تشخیصی drop-in: %s"
+
+msgid "advanced-cache.php safely replaceable"
+msgstr "قابلیت جایگزینی امن advanced-cache.php"
+
+msgid "advanced-cache.php diagnostic ID"
+msgstr "شناسه تشخیصی advanced-cache.php"
+
+msgid "advanced-cache.php inspected bytes"
+msgstr "بایت‌های بررسی‌شده advanced-cache.php"
