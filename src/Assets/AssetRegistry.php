@@ -1,0 +1,3 @@
+<?php
+namespace Nakhostin\PerformanceEngine\Assets;
+final class AssetRegistry { private $assets = array(); public function register( string $handle, string $type, array $dependencies = array(), array $metadata = array() ): void { $handle = sanitize_key( $handle ); if ( '' !== $handle ) { $this->assets[ $handle ] = array( 'handle' => $handle, 'type' => in_array( $type, array( 'style', 'script' ), true ) ? $type : 'unknown', 'dependencies' => array_values( array_filter( array_map( 'sanitize_key', $dependencies ) ) ), 'metadata' => $metadata ); } } public function all(): array { return $this->assets; } }

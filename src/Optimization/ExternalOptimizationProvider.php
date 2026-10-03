@@ -1,0 +1,3 @@
+<?php
+namespace Nakhostin\PerformanceEngine\Optimization;
+final class ExternalOptimizationProvider implements OptimizationProviderInterface { private $active; public function __construct( array $active_plugins ) { $this->active = $active_plugins; } public function id(): string { return 'external'; } public function owns( string $feature ): bool { $patterns = array( 'autoptimize/autoptimize.php', 'wp-rocket/wp-rocket.php', 'w3-total-cache/w3-total-cache.php' ); return in_array( $feature, array( 'css', 'javascript', 'assets' ), true ) && (bool) array_intersect( $patterns, $this->active ); } public function priority( string $feature ): int { return 100; } }

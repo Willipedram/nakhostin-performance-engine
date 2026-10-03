@@ -1,0 +1,6 @@
+<?php
+/** Diagnostic-only security-header audit. No policy is emitted or modified. @package NakhostinPerformanceEngine */
+namespace Nakhostin\PerformanceEngine\Security;
+final class SecurityHeaderAnalyzer {
+	public function analyze( array $headers, bool $https = true ): SecurityHeaderReport { $normalized = array(); foreach ( $headers as $name => $value ) { $normalized[ strtolower( $name ) ] = trim( is_array( $value ) ? implode( ', ', $value ) : (string) $value ); } $csp = $normalized['content-security-policy'] ?? ''; $report = $normalized['content-security-policy-report-only'] ?? ''; return new SecurityHeaderReport( array( 'hsts' => array( 'present' => $https && isset( $normalized['strict-transport-security'] ), 'status' => ! $https ? 'not_applicable' : ( isset( $normalized['strict-transport-security'] ) ? 'present' : 'absent' ) ), 'csp' => array( 'status' => '' !== $csp ? 'enforce' : ( '' !== $report ? 'report_only' : 'absent' ) ), 'x_content_type_options' => isset( $normalized['x-content-type-options'] ), 'referrer_policy' => isset( $normalized['referrer-policy'] ), 'frame_protection' => isset( $normalized['x-frame-options'] ) || false !== stripos( $csp, 'frame-ancestors' ), 'coop' => isset( $normalized['cross-origin-opener-policy'] ), 'management' => 'diagnostic_only' ) ); }
+}

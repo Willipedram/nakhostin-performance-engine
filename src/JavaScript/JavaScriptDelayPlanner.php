@@ -1,0 +1,3 @@
+<?php
+namespace Nakhostin\PerformanceEngine\JavaScript;
+final class JavaScriptDelayPlanner { private const PROTECTED = array( 'checkout', 'payment', 'auth', 'consent', 'captcha', 'cart', 'navigation', 'accessibility' ); public function plan( array $allowlist, array $context = array() ): array { if ( in_array( $context['page_type'] ?? '', array( 'cart', 'checkout', 'account' ), true ) ) { return array(); } return array_values( array_filter( array_map( 'sanitize_key', $allowlist ), static function ( string $handle ): bool { foreach ( self::PROTECTED as $protected ) { if ( false !== strpos( $handle, $protected ) ) { return false; } } return '' !== $handle; } ) ); } }

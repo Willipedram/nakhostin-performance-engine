@@ -1,0 +1,3 @@
+<?php
+namespace Nakhostin\PerformanceEngine\CSS;
+final class UnusedCSSAnalyzer { private $policy; public function __construct( ?UnusedCSSPolicy $policy = null ) { $this->policy = $policy ?: new UnusedCSSPolicy(); } public function analyze( array $selectors, array $used, array $javascript_references = array(), array $explicit_safe = array() ): array { $result = array(); foreach ( $selectors as $selector ) { $classification = $this->policy->classify( (string) $selector, $used, $javascript_references ); if ( UnusedCSSPolicy::POSSIBLY_UNUSED === $classification && in_array( $selector, $explicit_safe, true ) ) { $classification = UnusedCSSPolicy::SAFE_TO_REMOVE; } $result[ (string) $selector ] = $classification; } return $result; } }

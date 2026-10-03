@@ -1,0 +1,430 @@
+<?php
+/**
+ * Explicit DOM Intelligence diagnostic screen.
+ *
+ * @package NakhostinPerformanceEngine
+ */
+
+namespace Nakhostin\PerformanceEngine\Admin;
+
+use Nakhostin\PerformanceEngine\Core\Capabilities;
+use Nakhostin\PerformanceEngine\Components\ComponentRegistry;
+use Nakhostin\PerformanceEngine\DOM\DOMAnalyzer;
+use Nakhostin\PerformanceEngine\DOM\DOMAnalysisQueue;
+use Nakhostin\PerformanceEngine\DOM\DOMManifest;
+use Nakhostin\PerformanceEngine\DOM\DOMSnapshot;
+use Nakhostin\PerformanceEngine\DOM\DOMStorageInterface;
+use Nakhostin\PerformanceEngine\DOM\PageAnalysisCoordinator;
+use Nakhostin\PerformanceEngine\Infrastructure\Settings;
+
+final class DOMAdminPage {
+	public const SLUG = 'npe-dom-intelligence';
+	public const ACTION = 'npe_run_dom_analysis';
+	public const STATUS_ACTION = 'npe_dom_queue_status';
+	public const START_QUEUE_ACTION = 'npe_start_dom_learning';
+	public const RUN_QUEUE_ACTION = 'npe_run_dom_learning_queue';
+	public const RETRY_QUEUE_ACTION = 'npe_retry_failed_dom_learning';
+
+	/** @var DOMAnalyzer */
+	private $analyzer;
+
+	/** @var DOMStorageInterface */
+	private $storage;
+
+	/** @var Capabilities */
+	private $capabilities;
+
+	/** @var ComponentRegistry|null */
+	private $components;
+
+	/** @var PageAnalysisCoordinator|null */
+	private $coordinator;
+	/** @var DOMAnalysisQueue|null */
+	private $queue;
+	/** @var Settings|null */
+	private $settings;
+
+	public function __construct(
+		DOMAnalyzer $analyzer,
+		DOMStorageInterface $storage,
+		Capabilities $capabilities,
+		?ComponentRegistry $components = null,
+		?PageAnalysisCoordinator $coordinator = null,
+		?DOMAnalysisQueue $queue = null,
+		?Settings $settings = null
+	) {
+		$this->analyzer     = $analyzer;
+		$this->storage      = $storage;
+		$this->capabilities = $capabilities;
+		$this->components   = $components;
+		$this->coordinator  = $coordinator;
+		$this->queue        = $queue;
+		$this->settings     = $settings;
+	}
+
+	public function register(): void {
+		add_action( 'admin_menu', array( $this, 'add_menu' ) );
+		add_action( 'admin_post_' . self::ACTION, array( $this, 'handle_analysis' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_progress_script' ) );
+		add_action( 'wp_ajax_' . self::STATUS_ACTION, array( $this, 'queue_status' ) );
+		add_action( 'admin_post_' . self::START_QUEUE_ACTION, array( $this, 'start_queue' ) );
+		add_action( 'admin_post_' . self::RUN_QUEUE_ACTION, array( $this, 'run_queue' ) );
+		add_action( 'admin_post_' . self::RETRY_QUEUE_ACTION, array( $this, 'retry_queue' ) );
+	}
+
+	public function enqueue_progress_script( string $hook_suffix ): void {
+		if ( false === strpos( $hook_suffix, '_page_' . self::SLUG ) ) {
+			return;
+		}
+		wp_enqueue_script( 'npe-dom-progress', NPE_URL . 'assets/admin/dom-progress.js', array(), NPE_VERSION, true );
+		wp_localize_script(
+			'npe-dom-progress',
+			'npeDomProgress',
+			array(
+				'url'       => admin_url( 'admin-ajax.php' ),
+				'action'    => self::STATUS_ACTION,
+				'nonce'     => wp_create_nonce( self::STATUS_ACTION ),
+				'completed' => __( 'Completed', 'nakhostin-performance-engine' ),
+				'seconds'   => __( '%d seconds', 'nakhostin-performance-engine' ),
+				'minutes'   => __( 'About %d minutes', 'nakhostin-performance-engine' ),
+				'notRun'    => __( 'Not run', 'nakhostin-performance-engine' ),
+				'notScheduled' => __( 'Not scheduled', 'nakhostin-performance-engine' ),
+				'none'      => __( 'None', 'nakhostin-performance-engine' ),
+				'pollError' => __( 'Could not refresh queue status. Reload the page and verify admin-ajax.php access.', 'nakhostin-performance-engine' ),
+				'disabled'  => __( 'Automatic learning is disabled.', 'nakhostin-performance-engine' ),
+				'healthy'   => __( 'Queue is healthy', 'nakhostin-performance-engine' ),
+				'processing' => __( 'Processing', 'nakhostin-performance-engine' ),
+				'issues'    => __( 'Completed with issues', 'nakhostin-performance-engine' ),
+				'unknownError' => __( 'No error detail was recorded for these older failed scans. Retry them to collect a specific reason.', 'nakhostin-performance-engine' ),
+			)
+		);
+	}
+
+	public function queue_status(): void {
+		if ( ! $this->capabilities->can_manage() ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to view DOM diagnostics.', 'nakhostin-performance-engine' ) ), 403 );
+		}
+		check_ajax_referer( self::STATUS_ACTION, 'nonce' );
+		$report = null === $this->queue ? array() : $this->queue->report(
+				(int) ( $this->settings ? $this->settings->get( 'dom.batch_size', 3 ) : 3 ),
+				(int) ( $this->settings ? $this->settings->get( 'dom.scan_interval', 10 ) : 10 )
+			);
+		$report['feature_enabled'] = (bool) ( $this->settings && $this->settings->get( 'dom.enabled', false ) );
+		wp_send_json_success( $report );
+	}
+
+	public function start_queue(): void {
+		$this->authorize_queue_action( self::START_QUEUE_ACTION );
+		if ( $this->settings && $this->settings->get( 'dom.enabled', false ) && $this->queue ) {
+			$this->queue->enqueue( home_url( '/' ), 'manual-start', HOUR_IN_SECONDS, true );
+		}
+		$this->redirect( 'queue-started' );
+	}
+
+	public function run_queue(): void {
+		$this->authorize_queue_action( self::RUN_QUEUE_ACTION );
+		if ( $this->settings && $this->settings->get( 'dom.enabled', false ) ) {
+			do_action( DOMAnalysisQueue::CRON_HOOK );
+		}
+		$this->redirect( 'queue-processed' );
+	}
+
+	public function retry_queue(): void {
+		$this->authorize_queue_action( self::RETRY_QUEUE_ACTION );
+		if ( $this->settings && $this->settings->get( 'dom.enabled', false ) && $this->queue ) {
+			$this->queue->retry_failed();
+			do_action( DOMAnalysisQueue::CRON_HOOK );
+		}
+		$this->redirect( 'queue-retried' );
+	}
+
+	public function add_menu(): void {
+		add_submenu_page(
+			AdminPage::SLUG,
+			__( 'DOM Intelligence', 'nakhostin-performance-engine' ),
+			__( 'DOM Intelligence', 'nakhostin-performance-engine' ),
+			Capabilities::MANAGE,
+			self::SLUG,
+			array( $this, 'render' )
+		);
+	}
+
+	public function handle_analysis(): void {
+		if ( ! $this->capabilities->can_manage() ) {
+			wp_die( esc_html__( 'You are not allowed to run DOM analysis.', 'nakhostin-performance-engine' ) );
+		}
+
+		check_admin_referer( self::ACTION );
+		if ( ! class_exists( 'DOMDocument' ) ) {
+			$this->redirect( 'dom-unavailable' );
+		}
+
+		$submitted_url = isset( $_POST['source_url'] )
+			? esc_url_raw( wp_unslash( $_POST['source_url'] ) )
+			: '';
+
+		if ( ! $this->is_allowed_url( $submitted_url ) ) {
+			$this->redirect( 'invalid-url' );
+		}
+
+		if ( null !== $this->coordinator && $this->coordinator->request( $submitted_url ) ) {
+			$this->redirect( 'success' );
+		}
+
+		$response = wp_safe_remote_get(
+			$submitted_url,
+			array(
+				'timeout'             => 10,
+				'redirection'         => 3,
+				'limit_response_size' => DOMSnapshot::MAX_BYTES,
+				'user-agent'          => 'NPE DOM Intelligence/' . NPE_VERSION,
+			)
+		);
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			$this->redirect( 'fetch-failed' );
+		}
+
+		$html = wp_remote_retrieve_body( $response );
+		if ( '' === trim( $html ) ) {
+			$this->redirect( 'empty-response' );
+		}
+		if ( null !== $this->coordinator ) {
+			$this->coordinator->capture( $html, '', $submitted_url );
+			$this->redirect( $this->coordinator->succeeded() ? 'success' : 'analysis-failed' );
+		}
+
+		$manifest = $this->analyzer->create_manifest(
+			new DOMSnapshot(
+				$html,
+				array(
+					'source_url' => $submitted_url,
+					'versions'   => $this->environment_versions(),
+				)
+			)
+		);
+		$this->storage->save( $manifest );
+		if ( null !== $this->components ) {
+			$this->components->ingest_manifest( $manifest->to_array() );
+		}
+		$this->redirect( 'success' );
+	}
+
+	public function render(): void {
+		if ( ! $this->capabilities->can_manage() ) {
+			wp_die( esc_html__( 'You are not allowed to view DOM diagnostics.', 'nakhostin-performance-engine' ) );
+		}
+
+		$manifest = $this->storage->latest();
+		?>
+		<div class="wrap npe-admin npe-dom-page" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
+			<header class="npe-dom-hero">
+				<div>
+					<span class="npe-dom-eyebrow"><span class="dashicons dashicons-networking" aria-hidden="true"></span><?php echo esc_html__( 'Page intelligence', 'nakhostin-performance-engine' ); ?></span>
+					<h1><?php echo esc_html__( 'DOM Intelligence', 'nakhostin-performance-engine' ); ?></h1>
+					<p><?php echo esc_html__( 'One click analyzes the rendered DOM, detected components, same-origin stylesheets, and registered JavaScript dependencies. Full page HTML and submitted source code are not stored.', 'nakhostin-performance-engine' ); ?></p>
+				</div>
+				<span class="npe-version"><?php echo esc_html( 'NPE ' . NPE_VERSION ); ?></span>
+			</header>
+			<?php $this->render_notice(); ?>
+			<?php $this->render_queue(); ?>
+			<div class="npe-card npe-dom-analyze-card">
+				<div class="npe-dom-card-heading"><span class="dashicons dashicons-search" aria-hidden="true"></span><div><h2><?php echo esc_html__( 'Analyze Page Assets', 'nakhostin-performance-engine' ); ?></h2><p><?php echo esc_html__( 'Run a safe analysis for any public URL on this site.', 'nakhostin-performance-engine' ); ?></p></div></div>
+				<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
+					<input type="hidden" name="action" value="<?php echo esc_attr( self::ACTION ); ?>">
+					<?php wp_nonce_field( self::ACTION ); ?>
+					<div class="npe-dom-url-field"><label for="npe-source-url"><?php echo esc_html__( 'Public page URL', 'nakhostin-performance-engine' ); ?></label><div><input class="regular-text code" id="npe-source-url" name="source_url" type="url" required value="<?php echo esc_attr( home_url( '/' ) ); ?>"><?php submit_button( __( 'Analyze DOM, CSS, JavaScript, and Components', 'nakhostin-performance-engine' ), 'primary', 'submit', false ); ?></div></div>
+				</form>
+			</div>
+			<?php $this->render_manifest( $manifest ); ?>
+		</div>
+		<?php
+	}
+
+	private function render_queue(): void {
+		if ( null === $this->queue ) {
+			return;
+		}
+		$report = $this->queue->report(
+			(int) ( $this->settings ? $this->settings->get( 'dom.batch_size', 3 ) : 3 ),
+			(int) ( $this->settings ? $this->settings->get( 'dom.scan_interval', 10 ) : 10 )
+		);
+		$last_completed = $report['last_completed_at'] > 0 ? gmdate( 'Y-m-d H:i:s', $report['last_completed_at'] ) . ' UTC' : __( 'Not run', 'nakhostin-performance-engine' );
+		$enabled = (bool) ( $this->settings && $this->settings->get( 'dom.enabled', false ) );
+		$has_failures = $report['failed'] > 0;
+		$is_active = $report['pending'] > 0 || $report['running'] > 0;
+		$status_class = $has_failures ? 'has-issues' : ( $is_active ? 'is-running' : 'is-healthy' );
+		$status_text = $has_failures ? __( 'Completed with issues', 'nakhostin-performance-engine' ) : ( $is_active ? __( 'Processing', 'nakhostin-performance-engine' ) : __( 'Queue is healthy', 'nakhostin-performance-engine' ) );
+		$last_error = $report['last_error'] ?: ( $has_failures ? __( 'No error detail was recorded for these older failed scans. Retry them to collect a specific reason.', 'nakhostin-performance-engine' ) : __( 'None', 'nakhostin-performance-engine' ) );
+		?>
+		<section class="npe-card npe-dom-queue <?php echo esc_attr( $status_class ); ?>">
+			<div class="npe-dom-queue-header"><div><span class="npe-dom-eyebrow"><span class="dashicons dashicons-update" aria-hidden="true"></span><?php echo esc_html__( 'Background worker', 'nakhostin-performance-engine' ); ?></span><h2><?php echo esc_html__( 'Automatic learning queue', 'nakhostin-performance-engine' ); ?></h2><p><?php echo esc_html__( 'Eligible visitor requests are deduplicated and analyzed asynchronously in small fast batches.', 'nakhostin-performance-engine' ); ?></p></div><span id="npe-dom-state" class="npe-dom-state"><span aria-hidden="true"></span><span class="npe-dom-state-label"><?php echo esc_html( $status_text ); ?></span></span></div>
+			<div class="npe-dom-progress-row"><div><label for="npe-dom-progress"><?php echo esc_html__( 'Current scan progress', 'nakhostin-performance-engine' ); ?></label><progress id="npe-dom-progress" class="npe-progress" max="100" value="<?php echo esc_attr( (string) $report['progress'] ); ?>"><?php echo esc_html( (string) $report['progress'] ); ?>%</progress></div><p class="npe-progress-value npe-technical" dir="ltr"><?php echo esc_html( (string) $report['progress'] ); ?>%</p></div>
+			<p id="npe-dom-worker-status" class="description" aria-live="polite"></p>
+			<ul class="npe-dom-stat-grid">
+				<li><span class="dashicons dashicons-clock" aria-hidden="true"></span><span><?php echo esc_html__( 'Pending', 'nakhostin-performance-engine' ); ?></span><strong id="npe-dom-pending"><?php echo esc_html( (string) $report['pending'] ); ?></strong></li>
+				<li><span class="dashicons dashicons-controls-play" aria-hidden="true"></span><span><?php echo esc_html__( 'Running', 'nakhostin-performance-engine' ); ?></span><strong id="npe-dom-running"><?php echo esc_html( (string) $report['running'] ); ?></strong></li>
+				<li class="npe-dom-stat-failed"><span class="dashicons dashicons-warning" aria-hidden="true"></span><span><?php echo esc_html__( 'Failed', 'nakhostin-performance-engine' ); ?></span><strong id="npe-dom-failed"><?php echo esc_html( (string) $report['failed'] ); ?></strong></li>
+				<li><span class="dashicons dashicons-yes-alt" aria-hidden="true"></span><span><?php echo esc_html__( 'Pages analyzed', 'nakhostin-performance-engine' ); ?></span><strong id="npe-dom-completed"><?php echo esc_html( (string) $report['completed'] ); ?></strong></li>
+			</ul>
+			<ul class="npe-progress-details">
+				<li><?php echo esc_html__( 'Estimated time remaining', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-eta"><?php echo esc_html( $this->format_duration( (int) $report['estimated_seconds'] ) ); ?></strong></li>
+				<li><?php echo esc_html__( 'Last completed scan', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-last-completed" class="npe-technical" dir="ltr"><?php echo esc_html( $last_completed ); ?></strong></li>
+				<li><?php echo esc_html__( 'Next worker run', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-next-run" class="npe-technical" dir="ltr"><?php echo esc_html( ! empty( $report['next_run_at'] ) ? gmdate( 'Y-m-d H:i:s', $report['next_run_at'] ) . ' UTC' : __( 'Not scheduled', 'nakhostin-performance-engine' ) ); ?></strong></li>
+				<li class="npe-dom-error-detail"><?php echo esc_html__( 'Last queue error', 'nakhostin-performance-engine' ); ?>: <strong id="npe-dom-last-error"><?php echo esc_html( $last_error ); ?></strong></li>
+			</ul>
+			<p class="description"><?php echo esc_html__( 'After an NPE or LiteSpeed full cache purge, previously discovered pages are automatically queued for a fresh scan.', 'nakhostin-performance-engine' ); ?></p>
+			<?php if ( ! $enabled ) : ?>
+				<div class="notice notice-warning inline"><p><?php echo esc_html__( 'Automatic DOM learning is disabled. Enable DOM Intelligence in Settings before starting the queue.', 'nakhostin-performance-engine' ); ?></p></div>
+			<?php elseif ( ! empty( $report['wp_cron_disabled'] ) ) : ?>
+				<div class="notice notice-warning inline"><p><?php echo esc_html__( 'WP-Cron is disabled. Configure a real cron runner or use Process queue now.', 'nakhostin-performance-engine' ); ?></p></div>
+			<?php endif; ?>
+			<?php if ( $enabled ) : ?>
+				<div class="npe-actions">
+					<?php $this->queue_action_form( self::START_QUEUE_ACTION, __( 'Start or rescan homepage', 'nakhostin-performance-engine' ) ); ?>
+					<?php $this->queue_action_form( self::RUN_QUEUE_ACTION, __( 'Process queue now', 'nakhostin-performance-engine' ) ); ?>
+					<?php if ( $report['failed'] > 0 ) { $this->queue_action_form( self::RETRY_QUEUE_ACTION, __( 'Retry failed scans', 'nakhostin-performance-engine' ) ); } ?>
+				</div>
+			<?php endif; ?>
+		</section>
+		<?php
+	}
+
+	private function format_duration( int $seconds ): string {
+		if ( $seconds <= 0 ) {
+			return __( 'Completed', 'nakhostin-performance-engine' );
+		}
+		if ( $seconds < MINUTE_IN_SECONDS ) {
+			return sprintf( __( '%d seconds', 'nakhostin-performance-engine' ), $seconds );
+		}
+		return sprintf( __( 'About %d minutes', 'nakhostin-performance-engine' ), (int) ceil( $seconds / MINUTE_IN_SECONDS ) );
+	}
+
+	private function render_manifest( ?DOMManifest $manifest ): void {
+		if ( null === $manifest ) {
+			echo '<div class="npe-card"><p>';
+			echo esc_html__( 'No DOM manifest has been generated yet.', 'nakhostin-performance-engine' );
+			echo '</p></div>';
+			return;
+		}
+
+		$data = $manifest->to_array();
+		$rows = array(
+			__( 'Page type', 'nakhostin-performance-engine' )             => $data['page_type'],
+			__( 'DOM signature', 'nakhostin-performance-engine' )         => $data['dom_signature'],
+			__( 'Classes', 'nakhostin-performance-engine' )               => count( $data['classes'] ),
+			__( 'IDs', 'nakhostin-performance-engine' )                   => count( $data['ids'] ),
+			__( 'Attributes', 'nakhostin-performance-engine' )            => count( $data['attributes'] ),
+			__( 'Components', 'nakhostin-performance-engine' )            => implode( ', ', $data['components'] ),
+			__( 'WooCommerce structures', 'nakhostin-performance-engine' ) => $this->yes_no(
+				in_array( 'woocommerce', $data['integrations'], true )
+			),
+			__( 'Elementor structures', 'nakhostin-performance-engine' )   => $this->yes_no(
+				in_array( 'elementor', $data['integrations'], true )
+			),
+		);
+		?>
+		<div class="npe-card">
+			<h2><?php echo esc_html__( 'Latest Manifest', 'nakhostin-performance-engine' ); ?></h2>
+			<table class="widefat striped"><tbody>
+			<?php foreach ( $rows as $label => $value ) : ?>
+				<tr><th scope="row"><?php echo esc_html( $label ); ?></th><td><?php echo esc_html( (string) $value ); ?></td></tr>
+			<?php endforeach; ?>
+			</tbody></table>
+		</div>
+		<?php
+	}
+
+	private function render_notice(): void {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only allowlisted notice status.
+		$status = isset( $_GET['npe_dom_status'] ) ? sanitize_key( wp_unslash( $_GET['npe_dom_status'] ) ) : '';
+		$notices = array(
+			'success'         => __( 'Page asset analysis completed.', 'nakhostin-performance-engine' ),
+			'invalid-url'     => __( 'Enter a valid URL on this WordPress site.', 'nakhostin-performance-engine' ),
+			'fetch-failed'    => __( 'The page could not be fetched safely.', 'nakhostin-performance-engine' ),
+			'empty-response'  => __( 'The page returned an empty response.', 'nakhostin-performance-engine' ),
+			'dom-unavailable' => __( 'The PHP DOM extension is required for analysis.', 'nakhostin-performance-engine' ),
+			'analysis-failed' => __( 'The page loaded, but one or more asset manifests could not be created safely.', 'nakhostin-performance-engine' ),
+			'queue-started'   => __( 'The homepage was added to the automatic learning queue.', 'nakhostin-performance-engine' ),
+			'queue-processed' => __( 'The automatic learning worker was run.', 'nakhostin-performance-engine' ),
+			'queue-retried'   => __( 'Failed scans were queued for another attempt.', 'nakhostin-performance-engine' ),
+		);
+
+		if ( ! isset( $notices[ $status ] ) ) {
+			return;
+		}
+
+		$class = 'success' === $status ? 'notice-success' : 'notice-error';
+		printf(
+			'<div class="notice %1$s"><p>%2$s</p></div>',
+			esc_attr( $class ),
+			esc_html( $notices[ $status ] )
+		);
+	}
+
+	private function is_allowed_url( string $url ): bool {
+		if ( '' === $url || ! wp_http_validate_url( $url ) ) {
+			return false;
+		}
+
+		$requested_host   = wp_parse_url( $url, PHP_URL_HOST );
+		$site_host        = wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+		$requested_port   = wp_parse_url( $url, PHP_URL_PORT );
+		$site_port        = wp_parse_url( home_url( '/' ), PHP_URL_PORT );
+		$requested_scheme = wp_parse_url( $url, PHP_URL_SCHEME );
+		$site_scheme      = wp_parse_url( home_url( '/' ), PHP_URL_SCHEME );
+
+		return is_string( $requested_host )
+			&& is_string( $site_host )
+			&& strtolower( $requested_host ) === strtolower( $site_host )
+			&& $requested_port === $site_port
+			&& $requested_scheme === $site_scheme;
+	}
+
+	private function environment_versions(): array {
+		$theme = wp_get_theme();
+
+		return array(
+			'wordpress'   => get_bloginfo( 'version' ),
+			'theme'       => $theme->get( 'Version' ),
+			'woocommerce' => defined( 'WC_VERSION' ) ? WC_VERSION : '',
+			'elementor'   => defined( 'ELEMENTOR_VERSION' ) ? ELEMENTOR_VERSION : '',
+			'npe'         => NPE_VERSION,
+		);
+	}
+
+	private function yes_no( bool $value ): string {
+		return $value
+			? __( 'Yes', 'nakhostin-performance-engine' )
+			: __( 'No', 'nakhostin-performance-engine' );
+	}
+
+	private function redirect( string $status ): void {
+		$url = add_query_arg(
+			array(
+				'page'           => self::SLUG,
+				'npe_dom_status' => $status,
+			),
+			admin_url( 'admin.php' )
+		);
+		wp_safe_redirect( $url );
+		exit;
+	}
+
+	private function authorize_queue_action( string $action ): void {
+		if ( ! $this->capabilities->can_manage() ) {
+			wp_die( esc_html__( 'You are not allowed to manage the DOM learning queue.', 'nakhostin-performance-engine' ) );
+		}
+		check_admin_referer( $action );
+	}
+
+	private function queue_action_form( string $action, string $label ): void {
+		?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="npe-inline-form">
+			<input type="hidden" name="action" value="<?php echo esc_attr( $action ); ?>">
+			<?php wp_nonce_field( $action ); ?>
+			<?php submit_button( $label, 'secondary', 'submit', false ); ?>
+		</form>
+		<?php
+	}
+}
