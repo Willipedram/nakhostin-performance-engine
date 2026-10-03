@@ -1454,3 +1454,19 @@ msgstr "برای این اسکن‌های ناموفق قدیمی جزئیات �
 
 msgid "Background worker"
 msgstr "پردازشگر پس‌زمینه"
+
+#. translators: %s: detected owner of advanced-cache.php.
+msgid "NPE did not install its Early Cache because advanced-cache.php is already owned by %s. The existing file remains unchanged."
+msgstr "کش زودهنگام NPE نصب نشد، زیرا فایل advanced-cache.php در اختیار %s است. فایل موجود بدون تغییر باقی ماند."
+
+msgid "If that cache is active, no action is required. To switch to NPE Early Cache, first disable the owning cache through its own settings and cleanup tool, confirm that it removed advanced-cache.php, and then save the NPE cache settings again. Never delete the file while its owner is active."
+msgstr "اگر آن سامانه کش فعال است، نیازی به اقدام نیست. برای استفاده از کش زودهنگام NPE، ابتدا سامانه مالک را از تنظیمات و ابزار پاک‌سازی خودش غیرفعال کنید، مطمئن شوید advanced-cache.php را حذف کرده است و سپس تنظیمات کش NPE را دوباره ذخیره کنید. تا زمانی که سامانه مالک فعال است، این فایل را حذف نکنید."
+
+msgid "an unreadable cache drop-in"
+msgstr "یک drop-in کش غیرقابل‌خواندن"
+
+msgid "an unrecognized cache system"
+msgstr "یک سامانه کش شناسایی‌نشده"
+
+msgid "advanced-cache.php ownership evidence"
+msgstr "شواهد مالکیت advanced-cache.php"

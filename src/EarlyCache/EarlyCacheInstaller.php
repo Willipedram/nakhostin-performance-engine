@@ -6,6 +6,7 @@ use Nakhostin\PerformanceEngine\Environment\DropInDetector;
 final class EarlyCacheInstaller {
 	private $detector; private $template; private $plugin_path;
 	public function __construct( DropInDetector $detector, string $template, string $plugin_path ) { $this->detector = $detector; $this->template = $template; $this->plugin_path = rtrim( $plugin_path, '/\\' ) . '/'; }
+	public function state(): array { return $this->detector->detect(); }
 	public function install(): array {
 		$state = $this->detector->detect();
 		if ( $state['exists'] && ! $state['npe_owned'] ) { return array( 'success' => false, 'status' => 'external_dropin', 'owner' => $state['owner'] ); }

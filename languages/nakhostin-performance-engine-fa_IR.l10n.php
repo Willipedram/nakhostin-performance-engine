@@ -461,5 +461,10 @@ return array (
     'Queue is healthy' => 'صف سالم است',
     'No error detail was recorded for these older failed scans. Retry them to collect a specific reason.' => 'برای این اسکن‌های ناموفق قدیمی جزئیات خطا ثبت نشده است. برای ثبت دلیل دقیق، دوباره تلاش کنید.',
     'Background worker' => 'پردازشگر پس‌زمینه',
+    'NPE did not install its Early Cache because advanced-cache.php is already owned by %s. The existing file remains unchanged.' => 'کش زودهنگام NPE نصب نشد، زیرا فایل advanced-cache.php در اختیار %s است. فایل موجود بدون تغییر باقی ماند.',
+    'If that cache is active, no action is required. To switch to NPE Early Cache, first disable the owning cache through its own settings and cleanup tool, confirm that it removed advanced-cache.php, and then save the NPE cache settings again. Never delete the file while its owner is active.' => 'اگر آن سامانه کش فعال است، نیازی به اقدام نیست. برای استفاده از کش زودهنگام NPE، ابتدا سامانه مالک را از تنظیمات و ابزار پاک‌سازی خودش غیرفعال کنید، مطمئن شوید advanced-cache.php را حذف کرده است و سپس تنظیمات کش NPE را دوباره ذخیره کنید. تا زمانی که سامانه مالک فعال است، این فایل را حذف نکنید.',
+    'an unreadable cache drop-in' => 'یک drop-in کش غیرقابل‌خواندن',
+    'an unrecognized cache system' => 'یک سامانه کش شناسایی‌نشده',
+    'advanced-cache.php ownership evidence' => 'شواهد مالکیت advanced-cache.php',
   ),
 );

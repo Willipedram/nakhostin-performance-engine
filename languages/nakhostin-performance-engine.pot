@@ -1423,3 +1423,19 @@ msgstr ""
 
 msgid "Background worker"
 msgstr ""
+
+#. translators: %s: detected owner of advanced-cache.php.
+msgid "NPE did not install its Early Cache because advanced-cache.php is already owned by %s. The existing file remains unchanged."
+msgstr ""
+
+msgid "If that cache is active, no action is required. To switch to NPE Early Cache, first disable the owning cache through its own settings and cleanup tool, confirm that it removed advanced-cache.php, and then save the NPE cache settings again. Never delete the file while its owner is active."
+msgstr ""
+
+msgid "an unreadable cache drop-in"
+msgstr ""
+
+msgid "an unrecognized cache system"
+msgstr ""
+
+msgid "advanced-cache.php ownership evidence"
+msgstr ""

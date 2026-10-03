@@ -1,3 +1,9 @@
+## 2.5.1
+
+- Recognize markerless legacy NPE early-cache drop-ins using two NPE-specific runtime signatures so they can be upgraded safely instead of being misclassified as foreign.
+- Identify Cache Enabler alongside existing known drop-in owners and include a bounded ownership reason in diagnostics.
+- Replace the alarming foreign-drop-in warning with an owner-aware informational notice and safe handoff instructions; foreign files remain untouched.
+
 ## 2.5.0
 
 - Replaced global-registry asset decisions with a page-specific evidence model covering observed, enqueued, direct, component, protected, explicit-absence, and transitive-dependency states.
