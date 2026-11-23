@@ -8,10 +8,12 @@
 namespace Nakhostin\PerformanceEngine\Admin;
 
 use Nakhostin\PerformanceEngine\Core\Capabilities;
+use Nakhostin\PerformanceEngine\CSS\ApprovedCSSRules;
 use Nakhostin\PerformanceEngine\CSS\CSSAnalyzer;
 use Nakhostin\PerformanceEngine\CSS\CSSManifest;
 use Nakhostin\PerformanceEngine\CSS\CSSStorage;
 use Nakhostin\PerformanceEngine\CSS\FontStorage;
+use Nakhostin\PerformanceEngine\Optimization\OptimizationManifestStorage;
 use Nakhostin\PerformanceEngine\DOM\DOMStorageInterface;
 
 final class CSSAdminPage {
@@ -74,11 +76,39 @@ final class CSSAdminPage {
 		if ( ! $this->capabilities->can_manage() ) {
 			wp_die( esc_html__( 'You are not allowed to view CSS diagnostics.', 'nakhostin-performance-engine' ) );
 		}
+		$page = isset( $_GET['npe_css_page'] ) && is_string( $_GET['npe_css_page'] ) ? esc_url_raw( wp_unslash( $_GET['npe_css_page'] ) ) : home_url( '/' ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only local manifest lookup.
+		$queued = isset( $_GET['npe_css_queued'] ) && '1' === $_GET['npe_css_queued']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Display feedback only.
+		$plan = ( new OptimizationManifestStorage() )->for_url( $page );
+		$summary = $plan ? $plan->section( 'summary' ) : array();
 		?>
 		<div class="wrap npe-admin" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
-			<div class="notice notice-info inline"><p><?php echo esc_html__( 'NPE compares selectors with the latest DOM manifest. It only reports review candidates and never removes or rewrites CSS automatically.', 'nakhostin-performance-engine' ); ?></p></div>
-			<div class="npe-card npe-explainer"><p><?php echo esc_html__( 'For automatic collection, run Analyze Page Assets under DOM Intelligence. The form below is an advanced fallback for a stylesheet you want to inspect manually.', 'nakhostin-performance-engine' ); ?></p><p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=' . DOMAdminPage::SLUG ) ); ?>"><?php echo esc_html__( 'Open automatic page analysis', 'nakhostin-performance-engine' ); ?></a></p></div>
-			<div class="npe-card">
+			<section class="npe-card">
+				<h2><?php echo esc_html__( 'Optimize a public page', 'nakhostin-performance-engine' ); ?></h2>
+				<p><?php echo esc_html__( 'Combine compatible stylesheets in the background. Stylesheet order and dynamic rules are preserved.', 'nakhostin-performance-engine' ); ?></p>
+				<?php if ( $summary ) : ?>
+					<p><?php echo esc_html( sprintf( __( 'Last CSS plan: %1$s · %2$d source files in the bundle', 'nakhostin-performance-engine' ), $summary['css']['bundle_status'] ?? 'unknown', (int) ( $summary['css']['bundled_files'] ?? 0 ) ) ); ?></p>
+					<p><?php echo esc_html( sprintf( __( 'Stylesheet collection: %d ms', 'nakhostin-performance-engine' ), (int) ( $summary['css']['collection_ms'] ?? 0 ) ) ); ?>
+					<?php if ( ! empty( $summary['css']['skipped'] ) ) : ?><code dir="ltr"><?php echo esc_html( wp_json_encode( $summary['css']['skipped'] ) ); ?></code><?php endif; ?></p>
+				<?php elseif ( $queued ) : ?>
+					<div class="notice notice-info inline"><p><?php echo esc_html__( 'The page is queued. Refresh this screen after WordPress finishes the background scan.', 'nakhostin-performance-engine' ); ?></p></div>
+				<?php endif; ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+					<input type="hidden" name="action" value="<?php echo esc_attr( DOMAdminPage::ACTION ); ?>">
+					<input type="hidden" name="npe_css_quick" value="1">
+					<?php wp_nonce_field( DOMAdminPage::ACTION ); ?>
+					<p><label for="npe-css-page-url"><?php echo esc_html__( 'Public page URL', 'nakhostin-performance-engine' ); ?></label>
+					<input class="regular-text" dir="ltr" type="url" id="npe-css-page-url" name="source_url" value="<?php echo esc_attr( $page ); ?>" required></p>
+					<p><label><input type="checkbox" name="npe_lazy" value="1"> <?php echo esc_html__( 'Also enable native image and iframe lazy loading', 'nakhostin-performance-engine' ); ?></label></p>
+					<details class="npe-advanced"><summary><?php echo esc_html__( 'Approve unused CSS for this page', 'nakhostin-performance-engine' ); ?></summary>
+						<p><label><input type="checkbox" name="npe_css_update_approvals" value="1"> <?php echo esc_html__( 'Update the approved list for the URL above', 'nakhostin-performance-engine' ); ?></label></p>
+						<p><label for="npe-css-approved"><?php echo esc_html__( 'Confirmed unused class selectors', 'nakhostin-performance-engine' ); ?></label>
+						<input type="text" id="npe-css-approved" name="npe_css_approved" dir="ltr" maxlength="1300" size="36" value="<?php echo esc_attr( implode( ', ', ApprovedCSSRules::for_page( $page ) ) ); ?>"></p>
+						<p class="description"><?php echo esc_html__( 'Enter up to 20 simple classes, such as .old-banner. Approve only after checking mobile, desktop, and interactive states. Nested and grouped rules are kept.', 'nakhostin-performance-engine' ); ?></p>
+					</details>
+					<?php submit_button( __( 'Queue page optimization', 'nakhostin-performance-engine' ), 'primary', 'submit', false ); ?>
+				</form>
+			</section>
+			<details class="npe-card npe-advanced"><summary><?php echo esc_html__( 'Advanced settings', 'nakhostin-performance-engine' ); ?></summary>
 				<h2><?php echo esc_html__( 'Manual stylesheet analysis (advanced)', 'nakhostin-performance-engine' ); ?></h2>
 				<p><?php echo esc_html__( 'First analyze the target page under DOM Intelligence, then paste the corresponding stylesheet below. Dynamic selectors and uncertain rules are preserved.', 'nakhostin-performance-engine' ); ?></p>
 				<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post">
@@ -89,7 +119,7 @@ final class CSSAdminPage {
 					<p class="description"><?php echo esc_html__( 'The submitted CSS is processed in memory and is not stored. Only selector counts and the compact analysis manifest are saved.', 'nakhostin-performance-engine' ); ?></p>
 					<?php submit_button( __( 'Analyze CSS usage', 'nakhostin-performance-engine' ) ); ?>
 				</form>
-			</div>
+			</details>
 			<?php $this->render_manifest( $this->storage->latest() ); ?>
 			<?php $this->render_fonts(); ?>
 		</div>

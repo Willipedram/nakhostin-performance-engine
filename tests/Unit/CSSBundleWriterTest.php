@@ -14,6 +14,18 @@ final class CSSBundleWriterTest extends TestCase {
 		self::assertStringContainsString( '.hero{', $content ); self::assertStringContainsString( '.menu:hover{', $content ); self::assertStringContainsString( '@font-face{', $content ); self::assertStringNotContainsString( 'font-display:swap', $content ); self::assertStringContainsString( '.unused{', $content ); self::assertStringContainsString( 'https://example.test/theme/img/a.png', $content );
 	}
 
+	public function test_group_selection_preserves_gaps_and_requirements(): void {
+		$writer = new CSSBundleWriter( $this->directory, 'https://example.test/cache/css/' );
+		$files = array(
+			array( 'url' => 'a', 'css' => '.a{color:red}' ),
+			array( 'url' => 'b', 'css' => '@charset "utf-8";.b{color:red}' ),
+			array( 'url' => 'c', 'css' => '.c{color:red}' ),
+			array( 'url' => 'd', 'css' => '.d{color:red}' ),
+		);
+		self::assertSame( array( 'c', 'd' ), array_column( $writer->best_run( array( 'a', 'b', 'c', 'd' ), $files ), 'url' ) );
+		self::assertSame( array(), $writer->best_run( array( 'a', 'b', 'c', 'missing', 'd' ), $files ) );
+	}
+
 	public function test_root_relative_url_preserves_origin_port_and_suffix(): void {
 		$writer = new CSSBundleWriter( $this->directory, 'https://example.test:8443/cache/css/' );
 		$result = $writer->build(

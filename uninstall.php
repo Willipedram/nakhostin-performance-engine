@@ -27,6 +27,7 @@ $npe_remove_site_data = static function () {
 	delete_option( 'npe_component_bundle_index' );
 	delete_option( 'npe_javascript_manifest' );
 	delete_option( 'npe_css_manifest' );
+	delete_option( 'npe_approved_css_rules' );
 	delete_option( 'npe_font_manifests' );
 	delete_option( 'npe_optimization_manifests' );
 	delete_option( 'npe_critical_css' );

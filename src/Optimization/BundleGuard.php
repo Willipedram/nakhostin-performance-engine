@@ -21,8 +21,8 @@ final class BundleGuard {
 	}
 
 	/**
-	 * Replacing a block appends a handle to the WordPress queue. Require it to
-	 * be a suffix so the asset keeps its relative order against unbundled files.
+	 * Replacement must keep the original queue order. CSS is spliced at the
+	 * original position; JavaScript still appends and therefore needs a suffix.
 	 *
 	 * @param object $manager WordPress script or stylesheet dependency manager.
 	 * @param string[] $handles Ordered source handles.
@@ -36,7 +36,8 @@ final class BundleGuard {
 			return false;
 		}
 		$queue = array_values( array_diff( $manager->queue, $manager->done ) );
-		if ( array_slice( $queue, -count( $handles ) ) !== $handles || count( array_unique( $handles ) ) !== count( $handles ) ) {
+		$start = array_search( $handles[0], $queue, true );
+		if ( false === $start || array_slice( $queue, $start, count( $handles ) ) !== $handles || ( 'css' !== $type && $start + count( $handles ) !== count( $queue ) ) || count( array_unique( $handles ) ) !== count( $handles ) ) {
 			return false;
 		}
 

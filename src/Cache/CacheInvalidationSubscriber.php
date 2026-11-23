@@ -119,7 +119,9 @@ final class CacheInvalidationSubscriber {
 	public function settings_changed( $old_value, $new_value ): void {
 		$old_cache = is_array( $old_value ) ? (array) ( $old_value['cache'] ?? array() ) : array();
 		$new_cache = is_array( $new_value ) ? (array) ( $new_value['cache'] ?? array() ) : array();
-		if ( $old_cache !== $new_cache ) {
+		$old_media = is_array( $old_value ) ? (bool) ( $old_value['media']['lazy_load'] ?? false ) : false;
+		$new_media = is_array( $new_value ) ? (bool) ( $new_value['media']['lazy_load'] ?? false ) : false;
+		if ( $old_cache !== $new_cache || $old_media !== $new_media ) {
 			$this->purges->request( PurgeRequest::create( 'full', 'all', 'cache_settings_changed' ) );
 		}
 	}

@@ -142,7 +142,7 @@ final class PageAnalysisCoordinator {
 			$font_manifest = null;
 			$document_complete = strlen( $html ) < DOMSnapshot::MAX_BYTES && 1 === preg_match( '/<\/body\s*>\s*<\/html\s*>\s*$/i', trim( $html ) );
 			if ( ! $document_complete ) { $complete = false; }
-			$analysis_sources = array( 'css_files' => array(), 'css_complete' => false, 'script_assets' => array(), 'script_contents' => array(), 'capture_complete' => false, 'capture_status' => $document_complete ? 'complete' : 'incomplete-document' );
+			$analysis_sources = array( 'document_complete' => $document_complete, 'css_files' => array(), 'css_complete' => false, 'script_assets' => array(), 'script_contents' => array(), 'capture_complete' => false, 'capture_status' => $document_complete ? 'complete' : 'incomplete-document' );
 
 			try {
 				$components = $this->components->ingest_manifest( $data );
@@ -151,8 +151,17 @@ final class PageAnalysisCoordinator {
 				do_action( 'npe/analysis/error', 'components', get_class( $error ) );
 			}
 			try {
+				$css_started = microtime( true );
 				$css = $this->stylesheets->collect( $data );
+				$analysis_sources['css_collection_ms'] = (int) round( ( microtime( true ) - $css_started ) * 1000 );
 				$analysis_sources['css_files'] = (array) ( $css['files'] ?? array() );
+				$analysis_sources['css_order'] = array_map(
+					function ( string $source ) use ( $source_url ): string {
+						return $this->stylesheets->absolute_url( $source, $source_url );
+					},
+					array_slice( (array) ( $data['stylesheets'] ?? array() ), 0, 50 )
+				);
+				$analysis_sources['css_skip_reasons'] = $css['skip_reasons'] ?? array();
 				$analysis_sources['css_complete'] = ! empty( $css['fetched_files'] ) && empty( $css['skipped_files'] ) && (int) $css['fetched_files'] === count( array_unique( (array) ( $data['stylesheets'] ?? array() ) ) );
 				$css_source = (string) ( $css['css'] ?? '' );
 				$css_manifest = $this->css_analyzer->analyze_stylesheet( $css['css'], $data );

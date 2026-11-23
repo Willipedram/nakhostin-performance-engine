@@ -122,3 +122,13 @@ ordinary requests only validate and apply the precomputed manifest.
 ## Font rendering
 
 Generated CSS bundles preserve existing `font-display` declarations. When page-aware font replacement is explicitly enabled outside Safe Mode, its reconstructed `@font-face` rules use the same policy and only required faces are emitted. NPE does not guess font metric overrides because incorrect ascent, descent, or size-adjust values can introduce layout shift.
+
+### Quick CSS optimization
+
+Use **NPE → CSS → Optimize a public page** to enqueue analysis of one public URL. This enables the CSS-only combination mode without enabling JavaScript optimization or disabling Safe Mode. An optional checkbox enables WordPress-native lazy loading for supported public content images and iframes. WordPress still controls the eager loading window and high-priority image handling. Theme and builder markup that bypasses WordPress media processing is outside this option.
+
+The CSS worker considers up to 50 observed stylesheet URLs with an eight-second collection budget. It selects a compatible adjacent group and retains originals when its live queue, version, ownership or HTTP checks fail. A successful plan invalidates the page's NPE cache entry. HTML that uses a replacement bundle is still excluded from NPE page caching while the runtime rechecks the generated file.
+
+The advanced approval field accepts simple class selectors for an exact public URL. Approve only after checking browser coverage in mobile, desktop and interactive states. NPE removes an approved class rule only if analysis also classifies it as unused and the rule is standalone at the top level. Grouped selectors, nested rules and pseudo-states remain. Clear the approval list and queue the page again to restore those rules.
+
+The CSS screen shows worker status, number of sources, collection time and skipped-source counts. With redacted debugging and WP_DEBUG enabled, the worker writes the same summary to the configured WordPress log and the page source shows an NPE CSS runtime status comment.

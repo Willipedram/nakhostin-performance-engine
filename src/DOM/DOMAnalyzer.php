@@ -163,7 +163,7 @@ final class DOMAnalyzer implements DOMAnalyzerInterface {
 				}
 
 				if ( 'link' === strtolower( $node->tagName ) && false !== stripos( $node->getAttribute( 'rel' ), 'stylesheet' ) ) {
-					$stylesheets[] = $this->privacy_safe_url( $node->getAttribute( 'href' ) );
+					$stylesheets[] = $this->stylesheet_url( $node->getAttribute( 'href' ) );
 				}
 			}
 		}
@@ -178,7 +178,7 @@ final class DOMAnalyzer implements DOMAnalyzerInterface {
 			'buttons'         => $this->count( $xpath, '//button | //input[@type="button" or @type="submit" or @type="reset"]' ),
 			'links'           => $this->count( $xpath, '//a[@href]' ),
 			'scripts'         => $scripts,
-			'stylesheets'     => array_values( array_filter( $this->unique( $stylesheets ) ) ),
+			'stylesheets'     => array_values( array_unique( array_filter( $stylesheets ) ) ),
 			'body_classes'    => $this->unique_safe_identifiers( $body_classes ),
 			'state_values'    => $state_values,
 		);
@@ -260,6 +260,17 @@ final class DOMAnalyzer implements DOMAnalyzerInterface {
 		return $result;
 	}
 
+	private function stylesheet_url( string $url ): string {
+		$safe = $this->privacy_safe_url( $url );
+		$query = wp_parse_url( $url, PHP_URL_QUERY );
+		// Keep only WordPress's public asset version. Other query parameters
+		// may carry private values and must not become manifest identities.
+		if ( '' !== $safe && is_string( $query ) && preg_match( '/^ver=[a-z0-9][a-z0-9._-]{0,47}$/iD', $query ) ) {
+			return $safe . '?' . $query;
+		}
+		return $safe;
+	}
+
 	private function privacy_safe_url( string $url ): string {
 		if ( '' === $url ) {
 			return '';
@@ -278,7 +289,7 @@ final class DOMAnalyzer implements DOMAnalyzerInterface {
 		$host = isset( $parts['host'] ) ? strtolower( $parts['host'] ) : '';
 		$path = isset( $parts['path'] ) ? $this->privacy_safe_path( $parts['path'] ) : '';
 
-		return ( '' !== $host ? ( '' !== $scheme ? $scheme . ':' : '' ) . '//' . $host : '' ) . $path;
+		return ( '' !== $host ? ( '' !== $scheme ? $scheme . ':' : '' ) . '//' . $host . ( isset( $parts['port'] ) ? ':' . $parts['port'] : '' ) : '' ) . $path;
 	}
 
 	private function privacy_safe_path( string $path ): string {

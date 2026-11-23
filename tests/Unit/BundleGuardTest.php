@@ -44,6 +44,9 @@ final class BundleGuardTest extends TestCase {
 		self::assertTrue( $guard->can_replace( $manager, array( 'second', 'third' ), 'css' ) );
 		self::assertFalse( $guard->can_replace( $manager, array( 'base', 'second' ), 'css' ) );
 		self::assertFalse( $guard->can_replace( $manager, array( 'third', 'second' ), 'css' ) );
+		$manager->queue[] = 'last';
+		$manager->registered['last'] = $this->asset();
+		self::assertTrue( $guard->can_replace( $manager, array( 'second', 'third' ), 'css' ) );
 		$manager->registered['remaining'] = $this->asset( array( 'third' ) );
 		self::assertFalse( $guard->can_replace( $manager, array( 'second', 'third' ), 'css' ) );
 		unset( $manager->registered['remaining'] );

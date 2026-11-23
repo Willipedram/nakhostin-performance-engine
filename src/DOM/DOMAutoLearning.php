@@ -62,7 +62,7 @@ final class DOMAutoLearning {
 	}
 
 	public function process_queue(): void {
-		if ( ! $this->settings->get( 'dom.enabled', false ) ) {
+		if ( ! $this->settings->get( 'dom.enabled', false ) && ! $this->settings->get( 'css.combine_enabled', false ) ) {
 			return;
 		}
 		$batch_size = (int) $this->settings->get( 'dom.batch_size', 3 );
@@ -87,7 +87,7 @@ final class DOMAutoLearning {
 	}
 
 	public function cache_purged( string $scope, array $values ): void {
-		if ( ! $this->settings->get( 'dom.enabled', false ) ) {
+		if ( ! $this->settings->get( 'dom.enabled', false ) && ! $this->settings->get( 'css.combine_enabled', false ) ) {
 			return;
 		}
 		if ( 'all' === $scope ) {

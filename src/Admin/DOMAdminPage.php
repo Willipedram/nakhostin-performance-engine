@@ -7,6 +7,9 @@
 
 namespace Nakhostin\PerformanceEngine\Admin;
 
+use Nakhostin\PerformanceEngine\CSS\ApprovedCSSRules;
+use Nakhostin\PerformanceEngine\Optimization\OptimizationManifestStorage;
+
 use Nakhostin\PerformanceEngine\Core\Capabilities;
 use Nakhostin\PerformanceEngine\Components\ComponentRegistry;
 use Nakhostin\PerformanceEngine\DOM\DOMAnalyzer;
@@ -165,6 +168,29 @@ final class DOMAdminPage {
 
 		if ( ! $this->is_allowed_url( $submitted_url ) ) {
 			$this->redirect( 'invalid-url' );
+		}
+
+		if ( isset( $_POST['npe_css_quick'] ) && '1' === $_POST['npe_css_quick'] && $this->queue && $this->settings ) {
+			if ( null !== wp_parse_url( $submitted_url, PHP_URL_QUERY ) || null !== wp_parse_url( $submitted_url, PHP_URL_FRAGMENT ) ) {
+				$this->redirect( 'invalid-url' );
+			}
+			$approvals = isset( $_POST['npe_css_approved'] ) && is_string( $_POST['npe_css_approved'] ) ? sanitize_text_field( wp_unslash( $_POST['npe_css_approved'] ) ) : '';
+			if ( isset( $_POST['npe_css_update_approvals'] ) && '1' === $_POST['npe_css_update_approvals'] && ( strlen( $approvals ) > 1300 || ! ApprovedCSSRules::save( $submitted_url, $approvals ) ) ) {
+				$this->redirect( 'invalid-css-approvals' );
+			}
+			$options = $this->settings->all();
+			$options['css']['combine_enabled'] = true;
+			if ( isset( $_POST['npe_lazy'] ) && '1' === $_POST['npe_lazy'] ) {
+				$options['media']['lazy_load'] = true;
+			}
+			update_option( Settings::OPTION, $options );
+			if ( ! $this->settings->get( 'css.combine_enabled', false ) ) {
+				$this->redirect( 'analysis-failed' );
+			}
+			( new OptimizationManifestStorage() )->invalidate_url( $submitted_url );
+			$queued = $this->queue->enqueue( $submitted_url, 'manual-css', HOUR_IN_SECONDS, true );
+			wp_safe_redirect( add_query_arg( array( 'page' => CSSAdminPage::SLUG, 'npe_css_page' => $submitted_url, 'npe_css_queued' => $queued ? '1' : '0' ), admin_url( 'admin.php' ) ) );
+			exit;
 		}
 
 		if ( null !== $this->coordinator && $this->coordinator->request( $submitted_url ) ) {
@@ -333,6 +359,7 @@ final class DOMAdminPage {
 		$status = isset( $_GET['npe_dom_status'] ) ? sanitize_key( wp_unslash( $_GET['npe_dom_status'] ) ) : '';
 		$notices = array(
 			'success'         => __( 'Page asset analysis completed.', 'nakhostin-performance-engine' ),
+			'invalid-css-approvals' => __( 'Enter up to 20 simple CSS classes, for example .old-banner.', 'nakhostin-performance-engine' ),
 			'invalid-url'     => __( 'Enter a valid URL on this WordPress site.', 'nakhostin-performance-engine' ),
 			'fetch-failed'    => __( 'The page could not be fetched safely.', 'nakhostin-performance-engine' ),
 			'empty-response'  => __( 'The page returned an empty response.', 'nakhostin-performance-engine' ),

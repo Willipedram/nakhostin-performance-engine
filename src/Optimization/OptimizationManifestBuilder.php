@@ -4,6 +4,7 @@ namespace Nakhostin\PerformanceEngine\Optimization;
 
 use Nakhostin\PerformanceEngine\Assets\AssetRegistry;
 use Nakhostin\PerformanceEngine\Assets\AssetUsagePlanner;
+use Nakhostin\PerformanceEngine\CSS\ApprovedCSSRules;
 use Nakhostin\PerformanceEngine\CSS\CSSBundleWriter;
 use Nakhostin\PerformanceEngine\CSS\CriticalCSSGenerator;
 use Nakhostin\PerformanceEngine\CSS\CSSManifest;
@@ -21,12 +22,13 @@ final class OptimizationManifestBuilder {
 	public function register(): void { add_action( 'npe/analysis/completed', array( $this, 'build' ), 10, 8 ); }
 
 	public function build( string $url, array $dom, array $components, string $css_source, ?CSSManifest $css, ?JavaScriptManifest $javascript, ?FontManifest $font, array $sources = array() ): bool {
-		if ( ! $this->settings->get( 'optimization.enabled', false ) || '' === $url || ! $css || ! $javascript ) { return false; }
+		if ( ( ! $this->settings->get( 'optimization.enabled', false ) && ! $this->settings->get( 'css.combine_enabled', false ) ) || '' === $url || ! $css || ! $javascript ) { return false; }
 		$signature = sanitize_key( (string) ( $dom['dom_signature'] ?? hash( 'sha256', $url ) ) );
 		$critical = $this->critical->generate( $css_source, $css, $signature, $this->component_ids( $components ) );
 		$registry = new AssetRegistry(); $js = $javascript->to_array();
 		foreach ( (array) ( $js['assets'] ?? array() ) as $handle => $asset ) { $registry->register( (string) $handle, 'script', (array) ( $asset['dependencies'] ?? array() ) ); }
 		$safe_mode = (bool) $this->settings->get( 'optimization.safe_mode', true );
+		$document_complete = true === ( $sources['document_complete'] ?? $sources['capture_complete'] ?? false );
 		$capture_complete = true === ( $sources['capture_complete'] ?? false ) && true === ( $js['capture']['complete'] ?? false );
 		$decisions = $this->assets->plan(
 			$registry,
@@ -44,16 +46,38 @@ final class OptimizationManifestBuilder {
 		);
 		foreach ( $decisions as $handle => &$decision ) { $decision['type'] = 'script'; } unset( $decision );
 		$preloads = $font ? $this->fonts->plan( $font, 2 ) : array();
-		$bundles = $this->bundle_plan( $javascript, $sources, $safe_mode, $capture_complete );
-		$summary = array( 'css' => array( 'observed' => (int) ( $css->to_array()['selector_count'] ?? 0 ), 'critical_bytes' => strlen( (string) ( $critical->to_array()['css'] ?? '' ) ), 'bundle_bytes' => (int) ( $bundles['css']['optimized_size'] ?? 0 ), 'bundle_status' => (string) $bundles['css']['status'] ), 'javascript' => array( 'observed' => count( (array) ( $js['observed'] ?? array() ) ), 'deferred' => count( (array) ( $js['deferred'] ?? array() ) ), 'bundle_bytes' => (int) ( $bundles['javascript']['optimized_size'] ?? 0 ), 'bundle_status' => (string) $bundles['javascript']['status'] ), 'fonts' => array( 'preloaded' => count( $preloads ) ) );
-		return $this->storage->save( new OptimizationManifest( array( 'page_signature' => $signature, 'generated_at' => time(), 'source_url' => esc_url_raw( $url ), 'dom_signature' => (string) ( $dom['dom_signature'] ?? '' ), 'capture' => array( 'status' => $capture_complete ? 'complete' : (string) ( $sources['capture_status'] ?? 'incomplete' ), 'complete' => $capture_complete ), 'css' => array( 'critical' => $critical->to_array()['css'], 'stylesheets' => array(), 'bundle' => $bundles['css'] ), 'javascript' => array( 'manifest' => $js, 'bundle' => $bundles['javascript'] ), 'fonts' => array( 'preloads' => $preloads ), 'assets' => array( 'decisions' => array_values( $decisions ), 'scope' => 'page-relevant-only', 'global_registration_count' => (int) ( $js['registration_diagnostics']['registered'] ?? 0 ) ), 'components' => $this->component_ids( $components ), 'summary' => $summary ) ) );
+		$approved = $this->settings->get( 'css.combine_enabled', false )
+			? array_intersect( ApprovedCSSRules::for_page( $url ), $css->to_array()['unused_candidates'] ?? array() ) : array();
+		$bundles = $this->bundle_plan( $javascript, $sources, $safe_mode, $capture_complete, $document_complete, $approved );
+		do_action( 'npe/optimization/css_plan', $bundles['css']['status'], count( $bundles['css']['source_urls'] ?? array() ), $sources['css_skip_reasons'] ?? array(), (int) ( $sources['css_collection_ms'] ?? 0 ) );
+		$summary = array( 'css' => array( 'observed' => (int) ( $css->to_array()['selector_count'] ?? 0 ), 'critical_bytes' => strlen( (string) ( $critical->to_array()['css'] ?? '' ) ), 'bundle_bytes' => (int) ( $bundles['css']['optimized_size'] ?? 0 ), 'bundle_status' => (string) $bundles['css']['status'], 'bundled_files' => count( $bundles['css']['source_urls'] ?? array() ), 'skipped' => $sources['css_skip_reasons'] ?? array(), 'collection_ms' => (int) ( $sources['css_collection_ms'] ?? 0 ) ), 'javascript' => array( 'observed' => count( (array) ( $js['observed'] ?? array() ) ), 'deferred' => count( (array) ( $js['deferred'] ?? array() ) ), 'bundle_bytes' => (int) ( $bundles['javascript']['optimized_size'] ?? 0 ), 'bundle_status' => (string) $bundles['javascript']['status'] ), 'fonts' => array( 'preloaded' => count( $preloads ) ) );
+		$saved = $this->storage->save( new OptimizationManifest( array( 'page_signature' => $signature, 'generated_at' => time(), 'source_url' => esc_url_raw( $url ), 'dom_signature' => (string) ( $dom['dom_signature'] ?? '' ), 'capture' => array( 'status' => $capture_complete ? 'complete' : (string) ( $sources['capture_status'] ?? 'incomplete' ), 'complete' => $capture_complete, 'document_complete' => $document_complete ), 'css' => array( 'critical' => $critical->to_array()['css'], 'stylesheets' => array(), 'bundle' => $bundles['css'] ), 'javascript' => array( 'manifest' => $js, 'bundle' => $bundles['javascript'] ), 'fonts' => array( 'preloads' => $preloads ), 'assets' => array( 'decisions' => array_values( $decisions ), 'scope' => 'page-relevant-only', 'global_registration_count' => (int) ( $js['registration_diagnostics']['registered'] ?? 0 ) ), 'components' => $this->component_ids( $components ), 'summary' => $summary ) ) );
+		if ( $saved && 'generated' === $bundles['css']['status'] ) {
+			do_action( 'npe/optimization/css_ready', $url );
+		}
+		return $saved;
 	}
 
-	private function bundle_plan( JavaScriptManifest $javascript, array $sources, bool $safe_mode, bool $capture_complete ): array {
-		$status = ! $this->settings->get( 'assets.bundle_enabled', false ) ? 'disabled' : ( $safe_mode ? 'safe-mode' : ( ! $capture_complete ? 'incomplete-source-capture' : 'no-eligible-assets' ) );
+	private function bundle_plan( JavaScriptManifest $javascript, array $sources, bool $safe_mode, bool $capture_complete, bool $document_complete, array $approved ): array {
+		$status = ! $this->settings->get( 'optimization.enabled', false ) || ! $this->settings->get( 'assets.bundle_enabled', false ) ? 'disabled' : ( $safe_mode ? 'safe-mode' : ( ! $capture_complete ? 'incomplete-source-capture' : 'no-eligible-assets' ) );
 		$result = array( 'css' => array( 'status' => $status ), 'javascript' => array( 'status' => $status ) );
-		if ( 'no-eligible-assets' !== $status ) { return $result; }
-		$built = $this->build_bundles( $javascript, $sources );
+		$built = 'no-eligible-assets' === $status ? $this->build_bundles( $javascript, $sources ) : array();
+		if ( $this->settings->get( 'css.combine_enabled', false ) ) {
+			$result['css']['status'] = $document_complete ? 'no-eligible-assets' : 'incomplete-source-capture';
+			unset( $built['css'] );
+			if ( $document_complete && $this->css_writer ) {
+				try {
+					$run = $this->css_writer->best_run( $sources['css_order'] ?? array(), $sources['css_files'] ?? array() );
+					if ( $run ) {
+						$built['css'] = $this->css_writer->build( $run, $approved );
+					}
+				} catch ( Throwable $error ) {
+					$built['css'] = array( 'status' => 'writer-failed' );
+					do_action( 'npe/analysis/error', 'css-bundle', get_class( $error ) );
+				}
+			}
+		}
+
 		foreach ( array( 'css', 'javascript' ) as $type ) {
 			if ( ! empty( $built[ $type ] ) ) {
 				$result[ $type ] = $built[ $type ];
@@ -61,9 +85,9 @@ final class OptimizationManifestBuilder {
 					$result[ $type ]['status'] = $this->verify_delivery( $type, $built[ $type ] ) ? 'generated' : 'delivery-unverified';
 				}
 			}
-			elseif ( 'css' === $type && empty( $sources['css_complete'] ) ) { $result[ $type ]['status'] = 'incomplete-source-capture'; }
-			elseif ( 'javascript' === $type && empty( $sources['script_contents'] ) ) { $result[ $type ]['status'] = 'source-unavailable'; }
-			elseif ( 'javascript' === $type && ( ! empty( $javascript->to_array()['observed'] ) || ! empty( $javascript->to_array()['retained'] ) ) ) { $result[ $type ]['status'] = 'external-or-unsafe-assets'; }
+			elseif ( 'css' === $type && 'no-eligible-assets' === $result['css']['status'] && empty( $sources['css_files'] ) ) { $result[ $type ]['status'] = 'incomplete-source-capture'; }
+			elseif ( 'javascript' === $type && 'no-eligible-assets' === $status && empty( $sources['script_contents'] ) ) { $result[ $type ]['status'] = 'source-unavailable'; }
+			elseif ( 'javascript' === $type && 'no-eligible-assets' === $status && ( ! empty( $javascript->to_array()['observed'] ) || ! empty( $javascript->to_array()['retained'] ) ) ) { $result[ $type ]['status'] = 'external-or-unsafe-assets'; }
 		}
 		return $result;
 	}

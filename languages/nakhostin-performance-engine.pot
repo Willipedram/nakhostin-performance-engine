@@ -1605,3 +1605,51 @@ msgstr ""
 
 msgid "Advanced settings"
 msgstr ""
+
+msgid "Optimize a public page"
+msgstr ""
+
+msgid "Combine compatible stylesheets in the background. Stylesheet order and dynamic rules are preserved."
+msgstr ""
+
+msgid "Last CSS plan: %1$s · %2$d source files in the bundle"
+msgstr ""
+
+msgid "Stylesheet collection: %d ms"
+msgstr ""
+
+msgid "The page is queued. Refresh this screen after WordPress finishes the background scan."
+msgstr ""
+
+msgid "Also enable native image and iframe lazy loading"
+msgstr ""
+
+msgid "Approve unused CSS for this page"
+msgstr ""
+
+msgid "Update the approved list for the URL above"
+msgstr ""
+
+msgid "Confirmed unused class selectors"
+msgstr ""
+
+msgid "Enter up to 20 simple classes, such as .old-banner. Approve only after checking mobile, desktop, and interactive states. Nested and grouped rules are kept."
+msgstr ""
+
+msgid "Queue page optimization"
+msgstr ""
+
+msgid "Enter up to 20 simple CSS classes, for example .old-banner."
+msgstr ""
+
+msgid "Combine compatible stylesheets"
+msgstr ""
+
+msgid "Merge a verified group of adjacent stylesheets for an analyzed page. Safe Mode can remain on."
+msgstr ""
+
+msgid "Native media lazy loading"
+msgstr ""
+
+msgid "Use WordPress loading rules for supported images and iframes. Explicit eager loading and high priority are preserved."
+msgstr ""

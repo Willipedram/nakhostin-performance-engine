@@ -1,3 +1,8 @@
+## 2.6.2
+
+- Add a single background CSS optimization action, optional native media lazy loading, and page-scoped confirmed CSS pruning.
+- Preserve stylesheet versions for runtime matching, merge compatible adjacent styles, and report collection time and fallback reasons.
+
 ## 2.6.1
 
 - Unify NPE administration screens under a shared, scoped WordPress admin shell with grouped navigation and an indigo theme.

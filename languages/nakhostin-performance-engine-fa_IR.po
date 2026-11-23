@@ -1636,3 +1636,51 @@ msgstr "مستندات"
 
 msgid "Advanced settings"
 msgstr "تنظیمات پیشرفته"
+
+msgid "Optimize a public page"
+msgstr "بهینه‌سازی یک صفحهٔ عمومی"
+
+msgid "Combine compatible stylesheets in the background. Stylesheet order and dynamic rules are preserved."
+msgstr "فایل‌های CSS سازگار در پس‌زمینه ادغام می‌شوند. ترتیب فایل‌ها و قواعد پویا حفظ می‌شوند."
+
+msgid "Last CSS plan: %1$s · %2$d source files in the bundle"
+msgstr "آخرین وضعیت CSS: %1$s · %2$d فایل در بسته"
+
+msgid "Stylesheet collection: %d ms"
+msgstr "جمع‌آوری فایل‌های CSS: %d میلی‌ثانیه"
+
+msgid "The page is queued. Refresh this screen after WordPress finishes the background scan."
+msgstr "صفحه در صف است. پس از پایان بررسی پس‌زمینه در وردپرس، این صفحه را تازه کنید."
+
+msgid "Also enable native image and iframe lazy loading"
+msgstr "بارگذاری تنبل بومی تصاویر و iframe را هم فعال کن"
+
+msgid "Approve unused CSS for this page"
+msgstr "تأیید CSS استفاده‌نشده برای این صفحه"
+
+msgid "Update the approved list for the URL above"
+msgstr "فهرست تأییدشدهٔ نشانی بالا را به‌روز کن"
+
+msgid "Confirmed unused class selectors"
+msgstr "انتخابگرهای کلاسی تأییدشده برای حذف"
+
+msgid "Enter up to 20 simple classes, such as .old-banner. Approve only after checking mobile, desktop, and interactive states. Nested and grouped rules are kept."
+msgstr "حداکثر ۲۰ کلاس ساده مثل ‎.old-banner‎ وارد کنید. فقط پس از بررسی موبایل، دسکتاپ و حالت‌های تعاملی تأیید کنید. قواعد تودرتو و گروهی حفظ می‌شوند."
+
+msgid "Queue page optimization"
+msgstr "افزودن صفحه به صف بهینه‌سازی"
+
+msgid "Enter up to 20 simple CSS classes, for example .old-banner."
+msgstr "حداکثر ۲۰ کلاس سادهٔ CSS مثل ‎.old-banner‎ وارد کنید."
+
+msgid "Combine compatible stylesheets"
+msgstr "ادغام فایل‌های CSS سازگار"
+
+msgid "Merge a verified group of adjacent stylesheets for an analyzed page. Safe Mode can remain on."
+msgstr "گروهی از فایل‌های CSS کنار هم و تأییدشده را برای صفحهٔ بررسی‌شده ادغام می‌کند. حالت ایمن می‌تواند روشن بماند."
+
+msgid "Native media lazy loading"
+msgstr "بارگذاری تنبل بومی رسانه"
+
+msgid "Use WordPress loading rules for supported images and iframes. Explicit eager loading and high priority are preserved."
+msgstr "از قواعد وردپرس برای بارگذاری تصاویر و iframeهای پشتیبانی‌شده استفاده می‌کند. بارگذاری فوری و اولویت بالا حفظ می‌شوند."

@@ -27,7 +27,7 @@ final class CSSAdminPageTest extends TestCase {
 
 		$this->assertStringContainsString( 'name="_wpnonce"', $output );
 		$this->assertStringContainsString( 'name="npe_css_source"', $output );
-		$this->assertStringContainsString( 'never removes or rewrites CSS automatically', $output );
+		$this->assertStringContainsString( 'Stylesheet order and dynamic rules are preserved', $output );
 		$this->assertStringContainsString( 'processed in memory and is not stored', $output );
 	}
 

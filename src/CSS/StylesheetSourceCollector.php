@@ -19,7 +19,13 @@ final class StylesheetSourceCollector {
 		$skipped  = array();
 		$total    = 0;
 
+		$deadline = microtime( true ) + 8;
 		foreach ( array_slice( (array) ( $manifest['stylesheets'] ?? array() ), 0, 50 ) as $source ) {
+			$remaining = $deadline - microtime( true );
+			if ( $remaining < 0.25 ) {
+				$skipped[] = 'time-limit';
+				break;
+			}
 			$url = $this->absolute_url( (string) $source, $page_url );
 			if ( '' === $url || '' === $page_origin || $page_origin !== $this->origin( $url ) ) {
 				$skipped[] = 'cross-origin-or-invalid';
@@ -30,7 +36,7 @@ final class StylesheetSourceCollector {
 			$response = wp_safe_remote_get(
 				$url,
 				array(
-					'timeout'             => 8,
+					'timeout'             => min( 2, $remaining ),
 					'redirection'         => 2,
 					'limit_response_size' => $budget + 1,
 					'user-agent'          => 'NPE CSS Intelligence/' . ( defined( 'NPE_VERSION' ) ? NPE_VERSION : 'development' ),
@@ -63,10 +69,11 @@ final class StylesheetSourceCollector {
 			'fetched_files' => count( $contents ),
 			'skipped_files' => count( $skipped ),
 			'bytes'         => $total,
+			'skip_reasons'  => array_count_values( $skipped ),
 		);
 	}
 
-	private function absolute_url( string $source, string $page_url ): string {
+	public function absolute_url( string $source, string $page_url ): string {
 		$source = esc_url_raw( $source, array( 'http', 'https' ) );
 		if ( '' === $source ) {
 			return '';

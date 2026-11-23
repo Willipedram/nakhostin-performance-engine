@@ -112,6 +112,7 @@ use Nakhostin\PerformanceEngine\Performance\PerformanceStorage;
 use Nakhostin\PerformanceEngine\Performance\HookProfiler;
 use Nakhostin\PerformanceEngine\Performance\HookProfileStorage;
 use Nakhostin\PerformanceEngine\Optimization\BundleLocation;
+use Nakhostin\PerformanceEngine\Optimization\NativeLazyLoading;
 use Nakhostin\PerformanceEngine\Optimization\OptimizationCoordinator;
 use Nakhostin\PerformanceEngine\Optimization\OptimizationPolicy;
 use Nakhostin\PerformanceEngine\Optimization\OptimizationManifestStorage;
@@ -162,26 +163,12 @@ final class Plugin {
 	}
 
 	public function boot(): void {
-		$this->load_textdomain();
+		add_action( 'init', array( $this, 'load_textdomain' ), 0 );
 
 		$this->services->get( VersionManager::class )->maybe_upgrade();
 
 		if ( is_admin() ) {
-			AdminShell::register();
-			$this->services->get( DashboardPage::class )->register();
-			$this->services->get( CacheAdminPage::class )->register();
-			$this->services->get( DOMAdminPage::class )->register();
-			$this->services->get( CSSAdminPage::class )->register();
-			$this->services->get( JavaScriptAdminPage::class )->register();
-			$this->services->get( ComponentsAdminPage::class )->register();
-			$this->services->get( 'npe.admin.woocommerce' )->register();
-			$this->services->get( 'npe.admin.elementor' )->register();
-			$this->services->get( 'npe.admin.litespeed' )->register();
-			$this->services->get( PerformanceAdminPage::class )->register();
-			$this->services->get( DiagnosticsAdminPage::class )->register();
-			$this->services->get( AdminPage::class )->register();
-			$this->services->get( LogsAdminPage::class )->register();
-			$this->services->get( OptimizationAdminPage::class )->register();
+			add_action( 'init', array( $this, 'register_admin_pages' ), 1 );
 		}
 		$this->services->get( PerformanceMonitor::class )->register();
 		$this->services->get( HookProfiler::class )->register();
@@ -190,7 +177,16 @@ final class Plugin {
 		$this->services->get( FontLoadingOptimizer::class )->register();
 		$this->services->get( OptimizationManifestBuilder::class )->register();
 		$this->services->get( OptimizationInvalidationSubscriber::class )->register();
+		add_action( 'npe/optimization/css_ready', function ( string $url ): void {
+			$this->services->get( PageCacheStoreInterface::class )->purge_urls( array( $url ) );
+		} );
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && $this->services->get( Settings::class )->get( 'debugging.enabled', false ) ) {
+			add_action( 'npe/optimization/css_plan', function ( string $status, int $files, array $skipped, int $elapsed ): void {
+				$this->services->get( LoggerInterface::class )->debug( 'CSS plan', array( 'status' => $status, 'files' => $files, 'skipped' => wp_json_encode( $skipped ), 'collection_ms' => $elapsed ) );
+			}, 10, 4 );
+		}
 		$this->services->get( OptimizationCoordinator::class )->register();
+		NativeLazyLoading::register( $this->services->get( Settings::class ) );
 
 		$this->services->get( CacheWarmer::class )->register();
 		$this->services->get( CacheWarmupManager::class )->register();
@@ -209,6 +205,24 @@ final class Plugin {
 		 * @param ServiceRegistry $services The plugin service registry.
 		 */
 		do_action( 'npe/loaded', $this->services );
+	}
+
+	public function register_admin_pages(): void {
+		AdminShell::register();
+		$this->services->get( DashboardPage::class )->register();
+		$this->services->get( CacheAdminPage::class )->register();
+		$this->services->get( DOMAdminPage::class )->register();
+		$this->services->get( CSSAdminPage::class )->register();
+		$this->services->get( JavaScriptAdminPage::class )->register();
+		$this->services->get( ComponentsAdminPage::class )->register();
+		$this->services->get( 'npe.admin.woocommerce' )->register();
+		$this->services->get( 'npe.admin.elementor' )->register();
+		$this->services->get( 'npe.admin.litespeed' )->register();
+		$this->services->get( PerformanceAdminPage::class )->register();
+		$this->services->get( DiagnosticsAdminPage::class )->register();
+		$this->services->get( AdminPage::class )->register();
+		$this->services->get( LogsAdminPage::class )->register();
+		$this->services->get( OptimizationAdminPage::class )->register();
 	}
 
 	public function load_textdomain(): void {

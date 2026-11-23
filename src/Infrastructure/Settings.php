@@ -22,6 +22,9 @@ final class Settings {
 		'performance',
 	);
 
+	private $cached_input;
+	private $cached_settings;
+
 	public function defaults(): array {
 		$defaults = array(
 			'general'   => array(
@@ -48,6 +51,8 @@ final class Settings {
 		);
 		$defaults['optimization'] = array( 'enabled' => false, 'safe_mode' => true );
 		$defaults['assets'] = array( 'unload_enabled' => false, 'bundle_enabled' => false );
+		$defaults['css']['combine_enabled'] = false;
+		$defaults['media'] = array( 'lazy_load' => false );
 		$defaults['css']['critical_css_enabled'] = false;
 		$defaults['css']['unused_css_enabled'] = false;
 		$defaults['javascript']['defer_enabled'] = false;
@@ -85,7 +90,11 @@ final class Settings {
 	public function all(): array {
 		$stored = get_option( self::OPTION, array() );
 
-		return $this->sanitize( is_array( $stored ) ? $stored : array() );
+		if ( null === $this->cached_settings || $this->cached_input !== $stored ) {
+			$this->cached_input = $stored;
+			$this->cached_settings = $this->sanitize( $stored );
+		}
+		return $this->cached_settings;
 	}
 
 	public function get( string $path, $default = null ) {
@@ -138,6 +147,8 @@ final class Settings {
 		$assets = isset( $input['assets'] ) && is_array( $input['assets'] ) ? $input['assets'] : array();
 		$sanitized['assets']['unload_enabled'] = $this->to_bool( $assets['unload_enabled'] ?? false );
 		$sanitized['assets']['bundle_enabled'] = $this->to_bool( $assets['bundle_enabled'] ?? false );
+		$sanitized['css']['combine_enabled'] = $this->to_bool( $input['css']['combine_enabled'] ?? false );
+		$sanitized['media']['lazy_load'] = $this->to_bool( $input['media']['lazy_load'] ?? false );
 		$sanitized['css']['critical_css_enabled'] = $this->to_bool( $input['css']['critical_css_enabled'] ?? false );
 		$sanitized['css']['unused_css_enabled'] = $this->to_bool( $input['css']['unused_css_enabled'] ?? false );
 		$sanitized['javascript']['defer_enabled'] = $this->to_bool( $input['javascript']['defer_enabled'] ?? false );

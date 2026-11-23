@@ -60,6 +60,14 @@ final class DOMAnalyzerTest extends TestCase {
 		$this->assertArrayNotHasKey( 'unknown', $manifest['versions'] );
 	}
 
+	public function test_only_the_public_stylesheet_version_is_retained(): void {
+		$manifest = $this->analyzer->analyze(
+			'<html><head><link rel="stylesheet" href="https://example.test:8443/a.css?ver=2.3"><link rel="stylesheet" href="/b.css?ver=1&amp;token=private"></head><body></body></html>',
+			array()
+		);
+		$this->assertSame( array( 'https://example.test:8443/a.css?ver=2.3', '/b.css' ), $manifest['stylesheets'] );
+	}
+
 	public function test_signature_is_stable_across_dynamic_page_instances(): void {
 		$first = '<body class="single-product postid-123 elementor-page elementor-element-a1b2c3d">'
 			. '<main><div id="product-123" class="product type-product"><h1>First product</h1></div></main></body>';

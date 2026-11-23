@@ -9,22 +9,47 @@ final class CSSBundleWriter {
 	/** @var string */ private $base_url;
 	public function __construct( string $directory, string $base_url ) { $this->directory = rtrim( $directory, '/\\' ); $this->base_url = trailingslashit( $base_url ); }
 
-	public function build( array $files ): array {
+	public function build( array $files, array $approved = array() ): array {
 		$parts = array(); $urls = array(); $original = 0;
 		foreach ( $files as $file ) {
 			if ( ! is_array( $file ) || empty( $file['url'] ) || ! isset( $file['css'] ) ) { continue; }
 			$css = (string) $file['css']; $original += strlen( $css );
 			// These directives depend on the original stylesheet boundary or URL.
-			if ( preg_match( '/@(?:charset|import|namespace)\b|(?:image-set|src)\s*\(/i', $css ) || false !== strpos( $css, '\\' ) ) {
+			if ( ! $this->supports( $css ) ) {
 				throw new RuntimeException( 'Stylesheet uses syntax that requires its original URL or document boundary.' );
 			}
-			$parts[] = $this->rewrite_urls( $css, (string) $file['url'] );
+			$parts[] = $this->rewrite_urls( ApprovedCSSRules::prune( $css, $approved ), (string) $file['url'] );
 			$urls[] = esc_url_raw( (string) $file['url'] );
 		}
-		if ( ! $parts ) { throw new RuntimeException( 'No safe CSS source was available for bundling.' ); }
+		if ( ! $parts || '' === trim( implode( '', $parts ) ) ) { throw new RuntimeException( 'No safe CSS source was available for bundling.' ); }
 		$content = implode( "\n", $parts ); $hash = substr( hash( 'sha256', $content ), 0, 20 ); $filename = 'page-' . $hash . '.css';
 		$this->publish( $filename, $content );
 		return array( 'url' => $this->base_url . $filename, 'filename' => $filename, 'content_hash' => $hash, 'source_urls' => $urls, 'original_size' => $original, 'optimized_size' => strlen( $content ) );
+	}
+
+	/** Choose one compatible contiguous block without moving CSS across other files. */
+	public function best_run( array $ordered_urls, array $files ): array {
+		$by_url = array_column( $files, null, 'url' );
+		$best = array();
+		$run = array();
+		foreach ( $ordered_urls as $url ) {
+			$file = $by_url[ $url ] ?? null;
+			if ( ! $file || ! $this->supports( $file['css'] ) ) {
+				$run = array();
+				continue;
+			}
+			$run[] = $file;
+			if ( count( $run ) > count( $best ) ) {
+				$best = $run;
+			}
+		}
+		return count( $best ) >= 2 ? $best : array();
+	}
+
+	private function supports( string $css ): bool {
+		return '' !== trim( $css )
+			&& ! preg_match( '/@(?:charset|import|namespace)\b|(?:image-set|src)\s*\(/i', $css )
+			&& false === strpos( $css, '\\' );
 	}
 
 	private function rewrite_urls( string $css, string $source_url ): string {
