@@ -18,7 +18,7 @@ final class PerformanceAdminPage {
 
 	public function __construct( PerformanceStorage $storage, PerformanceAggregator $aggregator, Capabilities $capabilities ) { $this->storage = $storage; $this->aggregator = $aggregator; $this->capabilities = $capabilities; }
 	public function register(): void { add_action( 'admin_menu', array( $this, 'add_menu' ) ); add_action( 'admin_post_' . self::CLEAR_ACTION, array( $this, 'handle_clear' ) ); add_action( 'admin_post_' . self::IMPORT_ACTION, array( $this, 'import_lighthouse' ) ); }
-	public function add_menu(): void { add_submenu_page( AdminPage::SLUG, __( 'Performance Overview', 'nakhostin-performance-engine' ), __( 'Performance', 'nakhostin-performance-engine' ), Capabilities::MANAGE, self::SLUG, array( $this, 'render' ) ); }
+	public function add_menu(): void { AdminShell::submenu( AdminPage::SLUG, __( 'Performance Overview', 'nakhostin-performance-engine' ), __( 'Performance', 'nakhostin-performance-engine' ), Capabilities::MANAGE, self::SLUG, array( $this, 'render' ) ); }
 	public function handle_clear(): void { $this->authorize(); $this->storage->clear(); wp_safe_redirect( admin_url( 'admin.php?page=' . self::SLUG ) ); exit; }
 
 	public function import_lighthouse(): void {
@@ -43,7 +43,6 @@ final class PerformanceAdminPage {
 		$summary = $this->aggregator->summarize( $this->storage->all() );
 		?>
 		<div class="wrap npe-admin" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
-		<h1><?php echo esc_html__( 'Performance Overview', 'nakhostin-performance-engine' ); ?></h1>
 		<?php $this->render_lighthouse(); ?>
 		<p><?php echo esc_html__( 'These are backend PHP generation measurements, not browser-observed TTFB or network latency.', 'nakhostin-performance-engine' ); ?></p>
 		<table class="widefat striped"><thead><tr><th><?php echo esc_html__( 'Metric', 'nakhostin-performance-engine' ); ?></th><th><?php echo esc_html__( 'Average', 'nakhostin-performance-engine' ); ?></th><th><?php echo esc_html__( 'Median', 'nakhostin-performance-engine' ); ?></th><th><?php echo esc_html__( 'Minimum', 'nakhostin-performance-engine' ); ?></th><th><?php echo esc_html__( 'Maximum', 'nakhostin-performance-engine' ); ?></th></tr></thead><tbody>

@@ -77,7 +77,7 @@ final class JavaScriptAdminPage {
 	}
 
 	public function add_menu(): void {
-		add_submenu_page(
+		AdminShell::submenu(
 			AdminPage::SLUG,
 			__( 'JavaScript Intelligence', 'nakhostin-performance-engine' ),
 			__( 'JavaScript', 'nakhostin-performance-engine' ),
@@ -142,7 +142,6 @@ final class JavaScriptAdminPage {
 		$manifest = $this->storage->latest();
 		?>
 		<div class="wrap npe-admin" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
-			<h1><?php echo esc_html__( 'JavaScript Intelligence', 'nakhostin-performance-engine' ); ?></h1>
 			<p>
 				<?php
 				echo esc_html__(

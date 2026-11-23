@@ -1,3 +1,9 @@
+## 2.6.1
+
+- Unify NPE administration screens under a shared, scoped WordPress admin shell with grouped navigation and an indigo theme.
+- Add RTL and dark appearance tokens, responsive scrollable tables, and native advanced settings disclosures.
+- Document the repository design standard and add administration route, asset isolation, and browser smoke checks.
+
 ## 2.6.0
 
 - Verify file availability, size, source identity, queue order, dependencies, and manifest freshness before replacing original assets with an opt-in bundle.

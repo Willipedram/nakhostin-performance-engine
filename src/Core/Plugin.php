@@ -8,6 +8,7 @@
 namespace Nakhostin\PerformanceEngine\Core;
 
 use Nakhostin\PerformanceEngine\Admin\AdminPage;
+use Nakhostin\PerformanceEngine\Admin\AdminShell;
 use Nakhostin\PerformanceEngine\Admin\ComponentsAdminPage;
 use Nakhostin\PerformanceEngine\Admin\CSSAdminPage;
 use Nakhostin\PerformanceEngine\Admin\DOMAdminPage;
@@ -166,6 +167,7 @@ final class Plugin {
 		$this->services->get( VersionManager::class )->maybe_upgrade();
 
 		if ( is_admin() ) {
+			AdminShell::register();
 			$this->services->get( DashboardPage::class )->register();
 			$this->services->get( CacheAdminPage::class )->register();
 			$this->services->get( DOMAdminPage::class )->register();

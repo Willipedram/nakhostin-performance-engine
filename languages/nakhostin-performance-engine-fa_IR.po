@@ -1615,3 +1615,24 @@ msgstr "میانهٔ نسخهٔ پایه و نسخهٔ پیشنهادی"
 
 msgid "Each median uses the three most recently imported runs per phase for the same URL, profile, Lighthouse version, and configuration."
 msgstr "هر میانه از سه اجرای آخر واردشده در هر مرحله، با نشانی، نمایه، نسخه و پیکربندی یکسان محاسبه می‌شود."
+
+msgid "Skip to NPE content"
+msgstr "رفتن به محتوای NPE"
+
+msgid "Breadcrumb"
+msgstr "مسیر صفحه"
+
+msgid "NPE navigation"
+msgstr "ناوبری NPE"
+
+msgid "Scrollable table"
+msgstr "جدول قابل پیمایش"
+
+msgid "More"
+msgstr "بیشتر"
+
+msgid "Documentation"
+msgstr "مستندات"
+
+msgid "Advanced settings"
+msgstr "تنظیمات پیشرفته"

@@ -514,5 +514,12 @@ return array (
     'Speed Index (ms)' => 'شاخص سرعت (میلی‌ثانیه)',
     'Baseline and candidate medians' => 'میانهٔ نسخهٔ پایه و نسخهٔ پیشنهادی',
     'Each median uses the three most recently imported runs per phase for the same URL, profile, Lighthouse version, and configuration.' => 'هر میانه از سه اجرای آخر واردشده در هر مرحله، با نشانی، نمایه، نسخه و پیکربندی یکسان محاسبه می‌شود.',
+    'Skip to NPE content' => 'رفتن به محتوای NPE',
+    'Breadcrumb' => 'مسیر صفحه',
+    'NPE navigation' => 'ناوبری NPE',
+    'Scrollable table' => 'جدول قابل پیمایش',
+    'More' => 'بیشتر',
+    'Documentation' => 'مستندات',
+    'Advanced settings' => 'تنظیمات پیشرفته',
   ),
 );

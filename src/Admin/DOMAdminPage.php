@@ -73,7 +73,7 @@ final class DOMAdminPage {
 	}
 
 	public function enqueue_progress_script( string $hook_suffix ): void {
-		if ( false === strpos( $hook_suffix, '_page_' . self::SLUG ) ) {
+		if ( ! AdminShell::is_page( $hook_suffix, self::SLUG ) ) {
 			return;
 		}
 		wp_enqueue_script( 'npe-dom-progress', NPE_URL . 'assets/admin/dom-progress.js', array(), NPE_VERSION, true );
@@ -139,7 +139,7 @@ final class DOMAdminPage {
 	}
 
 	public function add_menu(): void {
-		add_submenu_page(
+		AdminShell::submenu(
 			AdminPage::SLUG,
 			__( 'DOM Intelligence', 'nakhostin-performance-engine' ),
 			__( 'DOM Intelligence', 'nakhostin-performance-engine' ),
@@ -218,14 +218,7 @@ final class DOMAdminPage {
 		$manifest = $this->storage->latest();
 		?>
 		<div class="wrap npe-admin npe-dom-page" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
-			<header class="npe-dom-hero">
-				<div>
-					<span class="npe-dom-eyebrow"><span class="dashicons dashicons-networking" aria-hidden="true"></span><?php echo esc_html__( 'Page intelligence', 'nakhostin-performance-engine' ); ?></span>
-					<h1><?php echo esc_html__( 'DOM Intelligence', 'nakhostin-performance-engine' ); ?></h1>
-					<p><?php echo esc_html__( 'One click analyzes the rendered DOM, detected components, same-origin stylesheets, and registered JavaScript dependencies. Full page HTML and submitted source code are not stored.', 'nakhostin-performance-engine' ); ?></p>
-				</div>
-				<span class="npe-version"><?php echo esc_html( 'NPE ' . NPE_VERSION ); ?></span>
-			</header>
+			<p class="npe-page-intro"><?php echo esc_html__( 'One click analyzes the rendered DOM, detected components, same-origin stylesheets, and registered JavaScript dependencies. Full page HTML and submitted source code are not stored.', 'nakhostin-performance-engine' ); ?></p>
 			<?php $this->render_notice(); ?>
 			<?php $this->render_queue(); ?>
 			<div class="npe-card npe-dom-analyze-card">

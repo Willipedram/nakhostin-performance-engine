@@ -35,7 +35,7 @@ final class DOMAdminPageTest extends TestCase {
 		$this->assertStringContainsString( 'Analyze DOM, CSS, JavaScript, and Components', $output );
 		$this->assertStringContainsString( 'No DOM manifest has been generated yet.', $output );
 		$this->assertStringContainsString( '<progress', $output );
-		$this->assertStringContainsString( 'npe-dom-hero', $output );
+		$this->assertStringContainsString( 'npe-page-intro', $output );
 		$this->assertStringContainsString( 'npe-dom-stat-grid', $output );
 		$this->assertStringContainsString( 'Queue is healthy', $output );
 		$this->assertStringContainsString( 'Estimated time remaining', $output );
@@ -65,6 +65,7 @@ final class DOMAdminPageTest extends TestCase {
 	public function test_progress_script_only_loads_on_dom_screen(): void {
 		$GLOBALS['npe_test_scripts'] = array();
 		$page = $this->page();
+		$page->add_menu();
 		$page->enqueue_progress_script( 'nakhostin-performance-engine_page_npe-dom-intelligence' );
 		$this->assertArrayHasKey( 'npe-dom-progress', $GLOBALS['npe_test_scripts'] );
 		$this->assertArrayHasKey( 'npe-dom-progress', $GLOBALS['npe_test_localized_scripts'] );

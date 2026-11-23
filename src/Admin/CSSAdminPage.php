@@ -43,7 +43,7 @@ final class CSSAdminPage {
 	}
 
 	public function add_menu(): void {
-		add_submenu_page(
+		AdminShell::submenu(
 			AdminPage::SLUG,
 			__( 'CSS Intelligence', 'nakhostin-performance-engine' ),
 			__( 'CSS', 'nakhostin-performance-engine' ),
@@ -76,7 +76,6 @@ final class CSSAdminPage {
 		}
 		?>
 		<div class="wrap npe-admin" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
-			<h1><?php echo esc_html__( 'CSS Intelligence', 'nakhostin-performance-engine' ); ?></h1>
 			<div class="notice notice-info inline"><p><?php echo esc_html__( 'NPE compares selectors with the latest DOM manifest. It only reports review candidates and never removes or rewrites CSS automatically.', 'nakhostin-performance-engine' ); ?></p></div>
 			<div class="npe-card npe-explainer"><p><?php echo esc_html__( 'For automatic collection, run Analyze Page Assets under DOM Intelligence. The form below is an advanced fallback for a stylesheet you want to inspect manually.', 'nakhostin-performance-engine' ); ?></p><p><a class="button" href="<?php echo esc_url( admin_url( 'admin.php?page=' . DOMAdminPage::SLUG ) ); ?>"><?php echo esc_html__( 'Open automatic page analysis', 'nakhostin-performance-engine' ); ?></a></p></div>
 			<div class="npe-card">

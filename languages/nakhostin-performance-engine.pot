@@ -1584,3 +1584,24 @@ msgstr ""
 
 msgid "Each median uses the three most recently imported runs per phase for the same URL, profile, Lighthouse version, and configuration."
 msgstr ""
+
+msgid "Skip to NPE content"
+msgstr ""
+
+msgid "Breadcrumb"
+msgstr ""
+
+msgid "NPE navigation"
+msgstr ""
+
+msgid "Scrollable table"
+msgstr ""
+
+msgid "More"
+msgstr ""
+
+msgid "Documentation"
+msgstr ""
+
+msgid "Advanced settings"
+msgstr ""

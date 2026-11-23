@@ -33,7 +33,7 @@ final class ComponentsAdminPage {
 	}
 
 	public function add_menu(): void {
-		add_submenu_page(
+		AdminShell::submenu(
 			AdminPage::SLUG,
 			__( 'Components', 'nakhostin-performance-engine' ),
 			__( 'Components', 'nakhostin-performance-engine' ),
@@ -84,7 +84,6 @@ final class ComponentsAdminPage {
 		$usage      = $this->registry->usage();
 		?>
 		<div class="wrap npe-admin" dir="<?php echo esc_attr( is_rtl() ? 'rtl' : 'ltr' ); ?>">
-			<h1><?php echo esc_html__( 'Component Intelligence', 'nakhostin-performance-engine' ); ?></h1>
 			<?php $this->render_notice(); ?>
 			<div class="npe-card">
 				<h2><?php echo esc_html__( 'Register Custom Component', 'nakhostin-performance-engine' ); ?></h2>
