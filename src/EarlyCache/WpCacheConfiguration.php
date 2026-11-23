@@ -8,8 +8,20 @@
 namespace Nakhostin\PerformanceEngine\EarlyCache;
 
 final class WpCacheConfiguration {
+	/** @var string|null */ private $failure;
+
+	public function failure(): ?string {
+		return $this->failure;
+	}
+
 	public function enable( string $path ): bool {
-		if ( ! is_file( $path ) || is_link( $path ) || ! is_writable( $path ) || ! is_writable( dirname( $path ) ) ) {
+		$this->failure = 'config-write';
+		if ( is_link( $path ) || ! is_file( $path ) ) {
+			$this->failure = 'config-location';
+			return false;
+		}
+		if ( ! is_writable( $path ) || ! is_writable( dirname( $path ) ) ) {
+			$this->failure = 'config-permissions';
 			return false;
 		}
 
@@ -26,10 +38,15 @@ final class WpCacheConfiguration {
 			$original = stream_get_contents( $file );
 			$stat = fstat( $file );
 			$updated = is_string( $original ) ? $this->enable_in_source( $original ) : null;
+			if ( is_string( $original ) && null === $updated ) {
+				$this->failure = 'config-format';
+				return false;
+			}
 			if ( null === $updated || false === $stat || 1 !== $stat['nlink'] ) {
 				return false;
 			}
 			if ( $original === $updated ) {
+				$this->failure = null;
 				return true;
 			}
 
@@ -63,6 +80,7 @@ final class WpCacheConfiguration {
 			if ( function_exists( 'opcache_invalidate' ) ) {
 				@opcache_invalidate( $path, true );
 			}
+			$this->failure = null;
 			return true;
 		} catch ( \Exception $error ) {
 			return false;

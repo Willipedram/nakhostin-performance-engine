@@ -37,6 +37,7 @@ final class WpCacheConfigurationTest extends TestCase {
 			chmod( $path, 0640 );
 			$editor = new WpCacheConfiguration();
 			self::assertSame( null !== $expected, $editor->enable( $path ) );
+			self::assertSame( null === $expected ? 'config-format' : null, $editor->failure() );
 			self::assertSame( $expected ?? $source, file_get_contents( $path ) );
 			self::assertSame( 0640, fileperms( $path ) & 0777 );
 			if ( null !== $expected ) {

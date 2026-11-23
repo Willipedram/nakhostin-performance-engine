@@ -486,5 +486,11 @@ return array (
     'Extends compatibility by sharing supported cache tags, lifetimes, and purge events with LiteSpeed.' => 'علاوه بر محافظ‌های سازگاری، برچسب‌ها، زمان اعتبار و رویدادهای پاک‌سازی قابل پشتیبانی را با LiteSpeed به اشتراک می‌گذارد.',
     'Help for %s' => 'راهنمای %s',
     'You have unsaved changes.' => 'تغییرات هنوز ذخیره نشده‌اند.',
+    'This is a WordPress multisite installation. Ask the network administrator to enable WP_CACHE in the shared configuration.' => 'این وردپرس چندسایته است. از مدیر شبکه بخواهید WP_CACHE را در پیکربندی مشترک فعال کند.',
+    'WordPress or your host blocks automatic file changes. Enable WP_CACHE in the hosting configuration.' => 'وردپرس یا میزبان تغییر خودکار فایل‌ها را مسدود کرده است. WP_CACHE را در تنظیمات میزبانی فعال کنید.',
+    'NPE could not locate a regular wp-config.php file in the standard locations. Ask your host to enable WP_CACHE.' => 'NPE در مسیرهای استاندارد فایل معمولی wp-config.php پیدا نکرد. از میزبان بخواهید WP_CACHE را فعال کند.',
+    'PHP cannot write to wp-config.php or its parent directory. Ask your host to enable WP_CACHE.' => 'PHP اجازهٔ نوشتن در wp-config.php یا پوشهٔ آن را ندارد. از میزبان بخواهید WP_CACHE را فعال کند.',
+    'NPE found a custom or ambiguous wp-config.php and left it untouched. Ask your host to enable WP_CACHE in the existing configuration.' => 'NPE پیکربندی wp-config.php را سفارشی یا مبهم تشخیص داد و آن را تغییر نداد. از میزبان بخواهید WP_CACHE را در پیکربندی فعلی فعال کند.',
+    'NPE could not safely replace wp-config.php while preserving its ownership and permissions. Ask your host to enable WP_CACHE.' => 'NPE نتوانست wp-config.php را با حفظ مالکیت و مجوزهای فعلی جایگزین کند. از میزبان بخواهید WP_CACHE را فعال کند.',
   ),
 );

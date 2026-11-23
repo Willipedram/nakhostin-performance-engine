@@ -36,9 +36,15 @@ final class EarlyCacheManager {
 		if ( $this->mode->is( CacheRuntimeMode::NPE_EARLY ) && null === $this->setup_status ) {
 			return;
 		}
-		$message = 'config' === $this->setup_status
-			? __( 'NPE could not enable WP_CACHE in wp-config.php. Enable it in the hosting configuration to use Early Cache.', 'nakhostin-performance-engine' )
-			: __( 'NPE could not prepare Early Cache. Check that PHP can write to wp-content and the NPE cache directory. Application cache is available as a fallback.', 'nakhostin-performance-engine' );
+		$messages = array(
+			'config-multisite'   => __( 'This is a WordPress multisite installation. Ask the network administrator to enable WP_CACHE in the shared configuration.', 'nakhostin-performance-engine' ),
+			'config-policy'      => __( 'WordPress or your host blocks automatic file changes. Enable WP_CACHE in the hosting configuration.', 'nakhostin-performance-engine' ),
+			'config-location'    => __( 'NPE could not locate a regular wp-config.php file in the standard locations. Ask your host to enable WP_CACHE.', 'nakhostin-performance-engine' ),
+			'config-permissions' => __( 'PHP cannot write to wp-config.php or its parent directory. Ask your host to enable WP_CACHE.', 'nakhostin-performance-engine' ),
+			'config-format'      => __( 'NPE found a custom or ambiguous wp-config.php and left it untouched. Ask your host to enable WP_CACHE in the existing configuration.', 'nakhostin-performance-engine' ),
+			'config-write'       => __( 'NPE could not safely replace wp-config.php while preserving its ownership and permissions. Ask your host to enable WP_CACHE.', 'nakhostin-performance-engine' ),
+		);
+		$message = $messages[ $this->setup_status ] ?? __( 'NPE could not prepare Early Cache. Check that PHP can write to wp-content and the NPE cache directory. Application cache is available as a fallback.', 'nakhostin-performance-engine' );
 		echo '<div class="notice notice-warning"><p>' . esc_html( $message ) . '</p></div>';
 	}
 	public function synchronize(): void {
@@ -59,7 +65,7 @@ final class EarlyCacheManager {
 				$this->setup_status = 'filesystem';
 				return;
 			}
-			$this->setup_status = $this->enable_wp_cache() ? 'restart' : 'config';
+			$this->setup_status = $this->enable_wp_cache();
 			return;
 		}
 		$this->disable_config();
@@ -68,9 +74,12 @@ final class EarlyCacheManager {
 	private function requested(): bool {
 		return $this->settings->get( 'cache.enabled', false ) && $this->settings->get( 'cache.early_cache', false );
 	}
-	private function enable_wp_cache(): bool {
-		if ( is_multisite() || ( function_exists( 'wp_is_file_mod_allowed' ) && ! wp_is_file_mod_allowed( 'npe_early_cache' ) ) ) {
-			return false;
+	private function enable_wp_cache(): string {
+		if ( is_multisite() ) {
+			return 'config-multisite';
+		}
+		if ( function_exists( 'wp_is_file_mod_allowed' ) && ! wp_is_file_mod_allowed( 'npe_early_cache' ) ) {
+			return 'config-policy';
 		}
 		$root = rtrim( ABSPATH, '/\\' );
 		$path = $root . '/wp-config.php';
@@ -78,7 +87,8 @@ final class EarlyCacheManager {
 		if ( ! file_exists( $path ) && ! is_file( $parent . '/wp-settings.php' ) ) {
 			$path = $parent . '/wp-config.php';
 		}
-		return ( new WpCacheConfiguration() )->enable( $path );
+		$configuration = new WpCacheConfiguration();
+		return $configuration->enable( $path ) ? 'restart' : $configuration->failure();
 	}
 	private function write_config(): bool {
 		if ( ! is_dir( $this->cache_directory ) && ! wp_mkdir_p( $this->cache_directory ) ) { return false; }
