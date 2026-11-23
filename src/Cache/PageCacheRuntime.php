@@ -2,6 +2,7 @@
 /** Explicitly enabled application-level WordPress cache runtime. @package NakhostinPerformanceEngine */
 namespace Nakhostin\PerformanceEngine\Cache;
 final class PageCacheRuntime {
+	private const MAX_CAPTURE_BYTES = 2097152;
 	/** @var PageCache */ private $cache; /** @var CacheRequestFactory */ private $requests; /** @var CacheHeaderManager */ private $headers; /** @var CacheRequest|null */ private $request; /** @var CacheDependencyCollector|null */ private $dependencies; /** @var string */ private $capture_buffer = ''; /** @var bool */ private $capture_finished = false;
 	public function __construct( PageCache $cache, CacheRequestFactory $requests, CacheHeaderManager $headers, ?CacheDependencyCollector $dependencies = null ) { $this->cache = $cache; $this->requests = $requests; $this->headers = $headers; $this->dependencies = $dependencies; }
 	public function register(): void { add_action( 'template_redirect', array( $this, 'maybe_serve' ), -999 ); }
@@ -9,9 +10,14 @@ final class PageCacheRuntime {
 		try { $this->request = $this->requests->from_globals(); $lookup = $this->cache->lookup( $this->request ); } catch ( \Throwable $error ) { do_action( 'npe/cache/runtime_error', 'lookup' ); return; }
 		if ( $lookup->is_hit() && $lookup->entry() ) { foreach ( $this->headers->for_lookup( $lookup ) as $name => $value ) { if ( ! headers_sent() ) { header( $name . ': ' . $value, true ); } } if ( 'HEAD' !== $this->request->method() ) { echo $lookup->entry()->content(); } exit; }
 		foreach ( $this->headers->for_lookup( $lookup ) as $name => $value ) { if ( ! headers_sent() ) { header( $name . ': ' . $value, true ); } }
-		if ( 'miss' === $lookup->status() ) { ob_start( array( $this, 'capture' ) ); }
+		if ( 'miss' === $lookup->status() && 'GET' === $this->request->method() ) {
+			ob_start( array( $this, 'capture' ) );
+		}
 	}
 	public function capture( string $content, int $phase = 0 ): string {
+		if ( $this->capture_finished ) {
+			return $content;
+		}
 		// Output-buffer callbacks may run several times when a theme or plugin
 		// flushes output. Never cache an intermediate chunk as a complete page.
 		if ( 0 !== ( $phase & PHP_OUTPUT_HANDLER_CLEAN ) ) {
@@ -22,13 +28,22 @@ final class PageCacheRuntime {
 			}
 			return $content;
 		}
+		if ( strlen( $content ) > self::MAX_CAPTURE_BYTES - strlen( $this->capture_buffer ) ) {
+			$this->capture_finished = true;
+			$this->capture_buffer = '';
+			return $content;
+		}
 		$this->capture_buffer .= $content;
-		if ( $this->capture_finished || 0 === ( $phase & PHP_OUTPUT_HANDLER_FINAL ) ) {
+		if ( 0 === ( $phase & PHP_OUTPUT_HANDLER_FINAL ) ) {
 			return $content;
 		}
 		$this->capture_finished = true;
 		if ( $this->request ) {
 			try {
+				if ( ! apply_filters( 'npe/cache/capture_response', true ) ) {
+					$this->capture_buffer = '';
+					return $content;
+				}
 				$headers = array();
 				foreach ( headers_list() as $line ) {
 					$parts = explode( ':', $line, 2 );

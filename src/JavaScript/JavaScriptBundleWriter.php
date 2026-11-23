@@ -59,7 +59,7 @@ final class JavaScriptBundleWriter {
 				. $this->minifier->minify( $source );
 		}
 
-		$content  = implode( "\n", $contents );
+		$content  = implode( "\n;\n", $contents );
 		$hash     = substr( hash( 'sha256', $content ), 0, 20 );
 		$filename = $layer . '-' . $hash . '.js';
 		$directory = trailingslashit( '' !== $directory ? $directory : $this->trusted_directory );
@@ -80,7 +80,8 @@ final class JavaScriptBundleWriter {
 		$target    = $directory . $filename;
 		// Atomic write is isolated to the plugin-owned generated asset directory.
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
-		if ( false === file_put_contents( $temporary, $content, LOCK_EX ) ) {
+		if ( strlen( $content ) !== file_put_contents( $temporary, $content, LOCK_EX ) ) {
+			if ( is_file( $temporary ) ) { unlink( $temporary ); }
 			throw new RuntimeException( 'Unable to write the temporary JavaScript bundle.' );
 		}
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename -- Atomic replacement on the same filesystem.

@@ -1,3 +1,10 @@
+## 2.6.0
+
+- Verify file availability, size, source identity, queue order, dependencies, and manifest freshness before replacing original assets with an opt-in bundle.
+- Preserve complete stylesheet rules in generated bundles, reject unsupported stylesheet syntax, and exclude truncated captures from analysis.
+- Route font hints through WordPress preload deduplication and bound retained page-cache capture. Old optimization manifests and page-cache records are invalidated by format version.
+- Add same-site Lighthouse laboratory report import with bounded mobile and desktop history, ranked estimates, and a repeatable median benchmark runner.
+
 ## 2.5.2
 
 - Treat only empty or comment-only `advanced-cache.php` files as safely replaceable inert placeholders, allowing NPE Early Cache to recover from stale files without weakening foreign-file ownership protection.

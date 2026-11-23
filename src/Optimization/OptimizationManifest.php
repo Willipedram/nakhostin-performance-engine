@@ -3,7 +3,7 @@
 namespace Nakhostin\PerformanceEngine\Optimization;
 
 final class OptimizationManifest {
-	private const VERSION = 3;
+	private const VERSION = 4;
 	/** @var array<string,mixed> */ private $data;
 
 	public function __construct( array $data ) { $data['manifest_version'] = self::VERSION; $this->data = $data; }

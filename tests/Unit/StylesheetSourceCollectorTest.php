@@ -20,4 +20,22 @@ final class StylesheetSourceCollectorTest extends TestCase {
 		$this->assertSame( 1, $result['skipped_files'] );
 		$this->assertSame( '.card{color:red}', $result['css'] );
 	}
+
+	public function test_oversized_source_is_excluded_instead_of_bundling_truncated_css(): void {
+		$previous = $GLOBALS['npe_test_remote_response'] ?? null;
+		$GLOBALS['npe_test_remote_response'] = array(
+			'response' => array( 'code' => 200 ),
+			'body'     => str_repeat( 'x', StylesheetSourceCollector::MAX_FILE_BYTES + 1 ),
+		);
+		try {
+			$result = ( new StylesheetSourceCollector() )->collect(
+				array( 'source_url' => 'https://example.com/', 'stylesheets' => array( '/assets/site.css' ) )
+			);
+			$this->assertSame( 0, $result['fetched_files'] );
+			$this->assertSame( 1, $result['skipped_files'] );
+			$this->assertSame( '', $result['css'] );
+		} finally {
+			$GLOBALS['npe_test_remote_response'] = $previous;
+		}
+	}
 }

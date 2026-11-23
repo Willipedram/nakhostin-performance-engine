@@ -28,7 +28,7 @@ page requirements, detected-component requirements, protected handles, explicit
 absence candidates, and the transitive dependencies of retained handles. Merely
 being globally registered never creates an actionable `keep / 0%` row.
 
-Capture completeness is explicit in manifest schema version 3. A capture is
+Capture completeness is explicit in manifest schema version 4. A capture is
 complete only when the bounded document has a trustworthy end and all required
 analysis stages complete. Failed, partial, truncated, or ambiguous captures may
 record observations but cannot infer absence. Explicit absence is actionable only
@@ -103,9 +103,9 @@ images, video, audio, or other media in this phase.
 
 ## Page-specific CSS and JavaScript bundles
 
-When **Build and serve page-specific CSS and JavaScript bundles** is enabled and Safe Mode is disabled, the asynchronous page-analysis worker may write content-addressed bundles under `wp-content/cache/nakhostin-performance-engine/assets/`. Normal frontend requests only read the saved manifest; they never parse source files.
+When **Build and serve page-specific CSS and JavaScript bundles** is enabled and Safe Mode is disabled, the asynchronous page-analysis worker may write content-addressed bundles under `wp-content/cache/nakhostin-performance-engine-assets/`. The worker checks public HTTP delivery and MIME type before allowing a bundle to be used. Frontend requests validate the saved manifest, generated file metadata, and the live queue. They do not parse source files. If validation fails, WordPress serves the original assets. NPE does not store HTML that references replacement bundles in its page cache.
 
-A CSS bundle is published only when every stylesheet observed in the rendered page was fetched from the same origin. Rules classified as required or dynamic are retained in source order, at-rules are preserved, and relative asset URLs are rewritten. If any stylesheet is unknown, external, unavailable, or truncated, NPE keeps the original stylesheets.
+A CSS bundle is published only when every stylesheet observed in the rendered page was fetched from the same origin. Every rule is kept in source order, and supported relative asset URLs are rewritten. Stylesheets with directives that depend on their original URL or document boundary stay on their original handles. If any stylesheet is unknown, external, unavailable, or truncated, NPE keeps the original stylesheets.
 
 A JavaScript bundle contains only local classic scripts with trusted source content and no inline/localized data. Dependency order is retained. jQuery handles (including distinct versions), modules, external scripts, protected WooCommerce scripts, and any handle needed by a retained script remain separate. This boundary is intentional: removing arbitrary functions from a JavaScript library cannot be proven safe from a server-side DOM snapshot.
 
@@ -113,7 +113,7 @@ Runtime replacement is fail-open. Missing/stale manifests, Safe Mode, logged-in 
 
 Bundle diagnostics pair `bundle_bytes` with a bounded status: `disabled`,
 `safe-mode`, `incomplete-source-capture`, `no-eligible-assets`,
-`external-or-unsafe-assets`, `source-unavailable`, `writer-failed`, or
+`external-or-unsafe-assets`, `source-unavailable`, `writer-failed`, `delivery-unverified`, or
 `generated`. Zero bytes is therefore not presented as a silent failure. Source
 fetching, graph traversal, parsing, and bundle writing remain worker-only;
 ordinary requests only validate and apply the precomputed manifest.
@@ -121,4 +121,4 @@ ordinary requests only validate and apply the precomputed manifest.
 
 ## Font rendering
 
-Generated CSS bundles normalize missing, `auto`, and `block` `font-display` declarations to `swap`, preventing invisible text while first-party fonts download. Existing `fallback` and `optional` declarations are respected. When page-aware font replacement is explicitly enabled outside Safe Mode, its reconstructed `@font-face` rules use the same policy and only required faces are emitted. NPE does not guess font metric overrides because incorrect ascent, descent, or size-adjust values can introduce layout shift.
+Generated CSS bundles preserve existing `font-display` declarations. When page-aware font replacement is explicitly enabled outside Safe Mode, its reconstructed `@font-face` rules use the same policy and only required faces are emitted. NPE does not guess font metric overrides because incorrect ascent, descent, or size-adjust values can introduce layout shift.

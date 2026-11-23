@@ -26,12 +26,13 @@ final class StylesheetSourceCollector {
 				continue;
 			}
 
+			$budget = min( self::MAX_FILE_BYTES, self::MAX_TOTAL_BYTES - $total );
 			$response = wp_safe_remote_get(
 				$url,
 				array(
 					'timeout'             => 8,
 					'redirection'         => 2,
-					'limit_response_size' => min( self::MAX_FILE_BYTES, self::MAX_TOTAL_BYTES - $total ),
+					'limit_response_size' => $budget + 1,
 					'user-agent'          => 'NPE CSS Intelligence/' . ( defined( 'NPE_VERSION' ) ? NPE_VERSION : 'development' ),
 				)
 			);
@@ -40,6 +41,10 @@ final class StylesheetSourceCollector {
 				continue;
 			}
 			$body = (string) wp_remote_retrieve_body( $response );
+			if ( strlen( $body ) > $budget ) {
+				$skipped[] = 'size-limit';
+				continue;
+			}
 			if ( '' === trim( $body ) ) {
 				continue;
 			}

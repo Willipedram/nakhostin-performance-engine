@@ -49,6 +49,7 @@ $npe_remove_site_data = static function () {
 	delete_option( 'npe_cache_warmup_queue_lock' );
 	delete_option( 'npe_cache_operations_state' );
 	delete_option( 'npe_performance_samples' );
+	delete_option( 'npe_lighthouse_history' );
 	delete_option( 'npe_dom_analysis_queue' );
 	delete_option( 'npe_dom_analysis_state' );
 	delete_option( 'npe_dom_analysis_queue_lock' );
@@ -72,6 +73,26 @@ $npe_remove_site_data = static function () {
 				$item->isDir() ? rmdir( $item->getPathname() ) : unlink( $item->getPathname() );
 			}
 			rmdir( $cache_directory );
+		}
+		$asset_directory = trailingslashit( WP_CONTENT_DIR ) . 'cache/nakhostin-performance-engine-assets';
+		if ( is_dir( $asset_directory ) && ! is_link( $asset_directory ) ) {
+			foreach ( array( 'css' => 'css', 'javascript' => 'js' ) as $folder => $extension ) {
+				$directory = $asset_directory . '/' . $folder;
+				if ( ! is_dir( $directory ) || is_link( $directory ) ) {
+					continue;
+				}
+				foreach ( new FilesystemIterator( $directory, FilesystemIterator::SKIP_DOTS ) as $file ) {
+					if ( $file->isFile() && preg_match( '/^(?:(?:core|component|page)-[a-f0-9]{20}\.' . $extension . '|index\.php|\.htaccess)$/D', $file->getFilename() ) ) {
+						unlink( $file->getPathname() );
+					}
+				}
+				if ( iterator_count( new FilesystemIterator( $directory, FilesystemIterator::SKIP_DOTS ) ) === 0 ) {
+					rmdir( $directory );
+				}
+			}
+			if ( iterator_count( new FilesystemIterator( $asset_directory, FilesystemIterator::SKIP_DOTS ) ) === 0 ) {
+				rmdir( $asset_directory );
+			}
 		}
 		// phpcs:enable WordPress.WP.AlternativeFunctions
 	}

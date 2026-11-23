@@ -1518,3 +1518,69 @@ msgstr ""
 
 msgid "NPE could not safely replace wp-config.php while preserving its ownership and permissions. Ask your host to enable WP_CACHE."
 msgstr ""
+
+msgid "Lighthouse laboratory history"
+msgstr ""
+
+msgid "Import Lighthouse JSON reports for this site. The table shows laboratory runs. Real-user Core Web Vitals and INP require field data."
+msgstr ""
+
+msgid "Lighthouse report saved."
+msgstr ""
+
+msgid "Report rejected. Check the site URL, file size, and required Lighthouse metrics."
+msgstr ""
+
+msgid "Lighthouse JSON"
+msgstr ""
+
+msgid "Run type"
+msgstr ""
+
+msgid "Baseline"
+msgstr ""
+
+msgid "Candidate"
+msgstr ""
+
+msgid "Import report"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Score"
+msgstr ""
+
+msgid "Discover the LCP resource earlier"
+msgstr ""
+
+msgid "Reduce render-blocking resources"
+msgstr ""
+
+msgid "Improve image delivery"
+msgstr ""
+
+msgid "Improve font display"
+msgstr ""
+
+msgid "Reduce duplicate JavaScript"
+msgstr ""
+
+msgid "Review unused JavaScript"
+msgstr ""
+
+msgid "Review unused CSS"
+msgstr ""
+
+msgid "Estimated opportunities from the latest imported run"
+msgstr ""
+
+msgid "Speed Index (ms)"
+msgstr ""
+
+msgid "Baseline and candidate medians"
+msgstr ""
+
+msgid "Each median uses the three most recently imported runs per phase for the same URL, profile, Lighthouse version, and configuration."
+msgstr ""

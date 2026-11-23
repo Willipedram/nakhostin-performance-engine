@@ -56,6 +56,15 @@ final class PageCacheRuntimeCaptureTest extends TestCase {
 		$this->assertSame( 'miss', $cache->lookup( $request )->status() );
 	}
 
+	public function test_oversized_flush_does_not_change_response_or_write_cache(): void {
+		list( $cache, $runtime, $request ) = $this->create_runtime();
+		$first = '<html><body>' . str_repeat( 'x', 2097152 );
+		$last = '</body></html>';
+		$this->assertSame( $first, $runtime->capture( $first, PHP_OUTPUT_HANDLER_FLUSH ) );
+		$this->assertSame( $last, $runtime->capture( $last, PHP_OUTPUT_HANDLER_FINAL ) );
+		$this->assertSame( 'miss', $cache->lookup( $request )->status() );
+	}
+
 	private function create_runtime(): array {
 		$store = new FilesystemCacheStore( $this->directory );
 		$cache = new PageCache( $store, new CacheKeyGenerator( new URLNormalizer(), new QueryPolicy() ), new CachePolicy(), new CacheMetrics( $this->directory . '/metrics.json' ) );

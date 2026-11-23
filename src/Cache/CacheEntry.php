@@ -8,8 +8,8 @@
 namespace Nakhostin\PerformanceEngine\Cache;
 
 final class CacheEntry {
-	// Reject records created before discarded output chunks were excluded.
-	public const VERSION = 4;
+	// Reject older HTML that could reference an unverified generated bundle.
+	public const VERSION = 5;
 	/** @var array */ private $data;
 
 	private function __construct( array $data ) { $this->data = $data; }

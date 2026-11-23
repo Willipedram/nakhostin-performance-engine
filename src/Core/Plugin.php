@@ -110,6 +110,7 @@ use Nakhostin\PerformanceEngine\Performance\PerformanceMonitor;
 use Nakhostin\PerformanceEngine\Performance\PerformanceStorage;
 use Nakhostin\PerformanceEngine\Performance\HookProfiler;
 use Nakhostin\PerformanceEngine\Performance\HookProfileStorage;
+use Nakhostin\PerformanceEngine\Optimization\BundleLocation;
 use Nakhostin\PerformanceEngine\Optimization\OptimizationCoordinator;
 use Nakhostin\PerformanceEngine\Optimization\OptimizationPolicy;
 use Nakhostin\PerformanceEngine\Optimization\OptimizationManifestStorage;
@@ -262,7 +263,9 @@ final class Plugin {
 		$this->services->set( DiagnosticsAdminPage::class, static function ( ServiceRegistry $services ): DiagnosticsAdminPage { return new DiagnosticsAdminPage( $services->get( Diagnostics::class ), $services->get( Capabilities::class ), null, $services->get( LiteSpeedGuestVaryProbe::class ) ); } );
 		$this->services->set( LogsAdminPage::class, static function ( ServiceRegistry $services ): LogsAdminPage { return new LogsAdminPage( $services->get( Settings::class ), $services->get( Capabilities::class ) ); } );
 		$this->services->set( CSSAnalyzer::class, new CSSAnalyzer() );
-		$this->services->set( CSSBundleWriter::class, static function (): CSSBundleWriter { $root = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : NPE_PATH . 'cache-data'; $url = defined( 'WP_CONTENT_URL' ) ? WP_CONTENT_URL : NPE_URL . 'cache-data'; return new CSSBundleWriter( trailingslashit( $root ) . 'cache/nakhostin-performance-engine/assets/css', trailingslashit( $url ) . 'cache/nakhostin-performance-engine/assets/css' ); } );
+		$this->services->set( CSSBundleWriter::class, static function (): CSSBundleWriter {
+			return new CSSBundleWriter( BundleLocation::directory() . '/css', BundleLocation::url() . '/css' );
+		} );
 		$this->services->set( CSSStorage::class, new CSSStorage() );
 		$this->services->set( StylesheetSourceCollector::class, new StylesheetSourceCollector() );
 		$this->services->set( FontAnalyzer::class, new FontAnalyzer() );
@@ -337,8 +340,7 @@ final class Plugin {
 		$this->services->set(
 			JavaScriptBundleWriter::class,
 			static function ( ServiceRegistry $services ): JavaScriptBundleWriter {
-				$root = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : NPE_PATH . 'cache-data';
-				return new JavaScriptBundleWriter( $services->get( ConservativeMinifier::class ), trailingslashit( $root ) . 'cache/nakhostin-performance-engine/assets/javascript' );
+				return new JavaScriptBundleWriter( $services->get( ConservativeMinifier::class ), BundleLocation::directory() . '/javascript' );
 			}
 		);
 		$this->services->set(
@@ -454,7 +456,7 @@ final class Plugin {
 		$this->services->set( AssetRuntimeOptimizer::class, new AssetRuntimeOptimizer() );
 		$this->services->set( JavaScriptRuntimeOptimizer::class, static function ( ServiceRegistry $services ): JavaScriptRuntimeOptimizer { return new JavaScriptRuntimeOptimizer( $services->get( ScriptStrategyApplier::class ), $services->get( ScriptSafetyPolicy::class ) ); } );
 		$this->services->set( OptimizationOwnershipResolver::class, static function ( ServiceRegistry $services ): OptimizationOwnershipResolver { return new OptimizationOwnershipResolver( array( new ExternalOptimizationProvider( (array) get_option( 'active_plugins', array() ) ), new LiteSpeedOptimizationProvider( $services->get( LiteSpeedDetector::class ) ), new NpeOptimizationProvider( $services->get( Settings::class ) ) ) ); } );
-		$this->services->set( OptimizationManifestBuilder::class, static function ( ServiceRegistry $services ): OptimizationManifestBuilder { $url = defined( 'WP_CONTENT_URL' ) ? WP_CONTENT_URL : NPE_URL . 'cache-data'; return new OptimizationManifestBuilder( $services->get( OptimizationManifestStorage::class ), $services->get( CriticalCSSGenerator::class ), $services->get( FontPreloadPlanner::class ), $services->get( AssetUsagePlanner::class ), $services->get( Settings::class ), $services->get( CSSBundleWriter::class ), $services->get( JavaScriptBundleWriter::class ), trailingslashit( $url ) . 'cache/nakhostin-performance-engine/assets' ); } );
+		$this->services->set( OptimizationManifestBuilder::class, static function ( ServiceRegistry $services ): OptimizationManifestBuilder { return new OptimizationManifestBuilder( $services->get( OptimizationManifestStorage::class ), $services->get( CriticalCSSGenerator::class ), $services->get( FontPreloadPlanner::class ), $services->get( AssetUsagePlanner::class ), $services->get( Settings::class ), $services->get( CSSBundleWriter::class ), $services->get( JavaScriptBundleWriter::class ), BundleLocation::url() ); } );
 		$this->services->set( OptimizationInvalidationSubscriber::class, static function ( ServiceRegistry $services ): OptimizationInvalidationSubscriber { return new OptimizationInvalidationSubscriber( $services->get( OptimizationManifestStorage::class ) ); } );
 		$this->services->set( OptimizationCoordinator::class, static function ( ServiceRegistry $services ): OptimizationCoordinator { return new OptimizationCoordinator( $services->get( Settings::class ), $services->get( OptimizationManifestStorage::class ), $services->get( OptimizationOwnershipResolver::class ), $services->get( OptimizationPolicy::class ), $services->get( CSSRuntimeOptimizer::class ), $services->get( JavaScriptRuntimeOptimizer::class ), $services->get( AssetRuntimeOptimizer::class ) ); } );
 		$this->services->set( OptimizationHealthCheck::class, static function ( ServiceRegistry $services ): OptimizationHealthCheck { return new OptimizationHealthCheck( $services->get( OptimizationManifestStorage::class ), $services->get( OptimizationOwnershipResolver::class ) ); } );
