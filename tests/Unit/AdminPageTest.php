@@ -75,4 +75,26 @@ final class AdminPageTest extends TestCase {
 		$this->assertMatchesRegularExpression( '/id="npe-settings-cache"[^>]*data-npe-section="cache"[^>]*>/', $output );
 		$this->assertMatchesRegularExpression( '/id="npe-settings-general"[^>]*hidden/', $output );
 	}
+
+	public function test_each_setting_has_a_label_and_contextual_help(): void {
+		$settings = new Settings();
+		$page = new AdminPage( $settings, new Diagnostics(), new Capabilities(), new FeatureFlags( $settings ) );
+		ob_start();
+		$page->render();
+		$output = (string) ob_get_clean();
+
+		$document = new \DOMDocument();
+		$document->loadHTML( '<meta charset="UTF-8">' . $output, LIBXML_NOERROR | LIBXML_NOWARNING );
+		$xpath = new \DOMXPath( $document );
+		$fields = $xpath->query( '//input[starts-with(@name, "npe_settings[") and @type != "hidden"] | //textarea[starts-with(@name, "npe_settings[")]' );
+		$this->assertGreaterThan( 0, $fields->length );
+		foreach ( $fields as $field ) {
+			$id = $field->getAttribute( 'id' );
+			$help_id = $field->getAttribute( 'aria-describedby' );
+			$this->assertNotSame( '', $id );
+			$this->assertSame( 1.0, $xpath->evaluate( 'count(//label[@for="' . $id . '"])' ) );
+			$this->assertNotSame( '', $help_id );
+			$this->assertNotSame( '', $xpath->evaluate( 'normalize-space(//details[summary]/p[@id="' . $help_id . '"])' ) );
+		}
+	}
 }

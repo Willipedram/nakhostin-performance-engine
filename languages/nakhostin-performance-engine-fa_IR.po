@@ -1489,3 +1489,45 @@ msgstr "شناسه تشخیصی advanced-cache.php"
 
 msgid "advanced-cache.php inspected bytes"
 msgstr "بایت‌های بررسی‌شده advanced-cache.php"
+
+msgid "Applies approved optimizations when a public page has fresh analysis. Pages without reliable analysis keep their original assets."
+msgstr "بهینه‌سازی‌های تأییدشده را در صفحات عمومی دارای تحلیل تازه اجرا می‌کند. فایل‌های صفحات بدون تحلیل معتبر دست‌نخورده می‌مانند."
+
+msgid "Keeps unknown files and prevents automatic unloading. Leave this enabled while checking compatibility."
+msgstr "فایل‌های ناشناخته را نگه می‌دارد و از حذف خودکار جلوگیری می‌کند. هنگام بررسی سازگاری، این گزینه را روشن بگذارید."
+
+msgid "With frontend optimization active and safe mode off, inserts stored first-screen CSS into the HTML for eligible pages."
+msgstr "وقتی بهینه‌سازی رابط سایت فعال و حالت ایمن خاموش باشد، CSS ذخیره‌شدهٔ نمای اول را برای صفحات واجد شرایط داخل HTML می‌گذارد."
+
+msgid "With safe mode off, allows NPE to skip stylesheets approved for removal by fresh page analysis. Check interactive elements after enabling."
+msgstr "وقتی حالت ایمن خاموش باشد، فایل‌های CSS که حذفشان در تحلیل تازهٔ صفحه تأیید شده بارگیری نمی‌شوند. پس از فعال‌سازی، عناصر تعاملی را بررسی کنید."
+
+msgid "Runs approved scripts after HTML parsing while preserving dependency order. This can make the page render sooner."
+msgstr "اسکریپت‌های تأییدشده را پس از خواندن HTML، با حفظ ترتیب وابستگی‌ها اجرا می‌کند تا صفحه زودتر نمایش داده شود."
+
+msgid "Records this experimental preference for diagnostics. The current version does not delay scripts when this is enabled."
+msgstr "این ترجیح آزمایشی را برای عیب‌یابی ثبت می‌کند. در نسخهٔ فعلی، روشن‌کردن آن زمان اجرای اسکریپت‌ها را تغییر نمی‌دهد."
+
+msgid "Skips approved files that analysis found unnecessary on this page. Safe mode prevents automatic unloading."
+msgstr "فایل‌های تأییدشده‌ای را که طبق تحلیل در این صفحه لازم نیستند بارگذاری نمی‌کند. حالت ایمن جلوی حذف خودکار را می‌گیرد."
+
+msgid "Asks the browser to fetch up to two important fonts earlier, which can reduce the time until the final text style appears."
+msgstr "از مرورگر می‌خواهد تا دو فونت مهم را زودتر دریافت کند تا متن سریع‌تر با ظاهر نهایی نمایش داده شود."
+
+msgid "Requires full page cache. NPE enables WP_CACHE where supported and installs its drop-in so public cache hits can skip normal WordPress startup. If setup is blocked, application caching remains available."
+msgstr "به کش تمام‌صفحه نیاز دارد. در پیکربندی‌های پشتیبانی‌شده، NPE گزینهٔ WP_CACHE را فعال و فایل کش زودهنگام را نصب می‌کند تا پاسخ کش‌شده بدون راه‌اندازی کامل وردپرس ارسال شود. اگر راه‌اندازی ممکن نباشد، کش سطح برنامه در دسترس می‌ماند."
+
+msgid "Lets NPE run its selected features independently. Coordinate overlapping features in the LiteSpeed dashboard."
+msgstr "امکانات انتخاب‌شدهٔ NPE مستقل اجرا می‌شوند. قابلیت‌های مشترک را در پیشخوان LiteSpeed هماهنگ کنید."
+
+msgid "Uses compatibility safeguards for features the plugins share. This is the default for mixed installations."
+msgstr "برای قابلیت‌های مشترک افزونه‌ها از محافظ‌های سازگاری استفاده می‌کند. این حالت پیش‌فرض است."
+
+msgid "Extends compatibility by sharing supported cache tags, lifetimes, and purge events with LiteSpeed."
+msgstr "علاوه بر محافظ‌های سازگاری، برچسب‌ها، زمان اعتبار و رویدادهای پاک‌سازی قابل پشتیبانی را با LiteSpeed به اشتراک می‌گذارد."
+
+msgid "Help for %s"
+msgstr "راهنمای %s"
+
+msgid "You have unsaved changes."
+msgstr "تغییرات هنوز ذخیره نشده‌اند."

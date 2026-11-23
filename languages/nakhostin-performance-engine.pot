@@ -1458,3 +1458,45 @@ msgstr ""
 
 msgid "advanced-cache.php inspected bytes"
 msgstr ""
+
+msgid "Applies approved optimizations when a public page has fresh analysis. Pages without reliable analysis keep their original assets."
+msgstr ""
+
+msgid "Keeps unknown files and prevents automatic unloading. Leave this enabled while checking compatibility."
+msgstr ""
+
+msgid "With frontend optimization active and safe mode off, inserts stored first-screen CSS into the HTML for eligible pages."
+msgstr ""
+
+msgid "With safe mode off, allows NPE to skip stylesheets approved for removal by fresh page analysis. Check interactive elements after enabling."
+msgstr ""
+
+msgid "Runs approved scripts after HTML parsing while preserving dependency order. This can make the page render sooner."
+msgstr ""
+
+msgid "Records this experimental preference for diagnostics. The current version does not delay scripts when this is enabled."
+msgstr ""
+
+msgid "Skips approved files that analysis found unnecessary on this page. Safe mode prevents automatic unloading."
+msgstr ""
+
+msgid "Asks the browser to fetch up to two important fonts earlier, which can reduce the time until the final text style appears."
+msgstr ""
+
+msgid "Requires full page cache. NPE enables WP_CACHE where supported and installs its drop-in so public cache hits can skip normal WordPress startup. If setup is blocked, application caching remains available."
+msgstr ""
+
+msgid "Lets NPE run its selected features independently. Coordinate overlapping features in the LiteSpeed dashboard."
+msgstr ""
+
+msgid "Uses compatibility safeguards for features the plugins share. This is the default for mixed installations."
+msgstr ""
+
+msgid "Extends compatibility by sharing supported cache tags, lifetimes, and purge events with LiteSpeed."
+msgstr ""
+
+msgid "Help for %s"
+msgstr ""
+
+msgid "You have unsaved changes."
+msgstr ""
