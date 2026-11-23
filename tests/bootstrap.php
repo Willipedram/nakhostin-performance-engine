@@ -19,3 +19,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/Fixtures/wordpress-stubs.php';
+require_once dirname( __DIR__ ) . '/nakhostin-performance-engine.php';

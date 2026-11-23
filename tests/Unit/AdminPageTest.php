@@ -15,6 +15,10 @@ use Nakhostin\PerformanceEngine\Infrastructure\Settings;
 use PHPUnit\Framework\TestCase;
 
 final class AdminPageTest extends TestCase {
+	protected function setUp(): void {
+		$GLOBALS['npe_test_can_manage'] = true;
+	}
+
 	public function test_output_is_nonce_protected_escaped_and_rtl_safe(): void {
 		$settings                        = new Settings();
 		$GLOBALS['npe_test_can_manage'] = true;

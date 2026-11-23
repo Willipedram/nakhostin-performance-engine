@@ -22,6 +22,41 @@ final class PageCacheRuntimeCaptureTest extends TestCase {
 	protected function tearDown(): void { if ( is_dir( $this->directory ) ) { $iterator = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $this->directory, \FilesystemIterator::SKIP_DOTS ), \RecursiveIteratorIterator::CHILD_FIRST ); foreach ( $iterator as $file ) { $file->isDir() ? rmdir( $file->getPathname() ) : unlink( $file->getPathname() ); } rmdir( $this->directory ); } }
 
 	public function test_flushed_chunks_are_cached_only_once_as_complete_document(): void {
+		list( $cache, $runtime, $request ) = $this->create_runtime();
+		$this->assertSame( '<html><body>first', $runtime->capture( '<html><body>first', 0 ) );
+		$this->assertSame( 'miss', $cache->lookup( $request )->status() );
+		$this->assertSame( ' second</body></html>', $runtime->capture( ' second</body></html>', PHP_OUTPUT_HANDLER_FINAL ) );
+		$hit = $cache->lookup( $request );
+		$this->assertSame( 'hit', $hit->status() );
+		$this->assertSame( '<html><body>first second</body></html>', $hit->entry()->content() );
+	}
+
+	public function test_cleaned_chunk_is_excluded_from_the_cached_response(): void {
+		list( $cache, $runtime, $request ) = $this->create_runtime();
+		ob_start();
+		ob_start( array( $runtime, 'capture' ) );
+		echo '<html><body>first';
+		ob_flush();
+		echo '<style>body{display:none}</style>';
+		ob_clean();
+		echo ' second</body></html>';
+		ob_end_flush();
+		$response = ob_get_clean();
+
+		$this->assertSame( '<html><body>first second</body></html>', $response );
+		$this->assertSame( $response, $cache->lookup( $request )->entry()->content() );
+	}
+
+	public function test_discarding_the_capture_buffer_does_not_write_a_cache_entry(): void {
+		list( $cache, $runtime, $request ) = $this->create_runtime();
+		ob_start( array( $runtime, 'capture' ) );
+		echo '<html><body>discarded</body></html>';
+		ob_end_clean();
+
+		$this->assertSame( 'miss', $cache->lookup( $request )->status() );
+	}
+
+	private function create_runtime(): array {
 		$store = new FilesystemCacheStore( $this->directory );
 		$cache = new PageCache( $store, new CacheKeyGenerator( new URLNormalizer(), new QueryPolicy() ), new CachePolicy(), new CacheMetrics( $this->directory . '/metrics.json' ) );
 		$runtime = new PageCacheRuntime( $cache, new CacheRequestFactory(), new CacheHeaderManager() );
@@ -30,11 +65,6 @@ final class PageCacheRuntimeCaptureTest extends TestCase {
 		$property->setAccessible( true );
 		$property->setValue( $runtime, $request );
 
-		$this->assertSame( '<html><body>first', $runtime->capture( '<html><body>first', 0 ) );
-		$this->assertSame( 'miss', $cache->lookup( $request )->status() );
-		$this->assertSame( ' second</body></html>', $runtime->capture( ' second</body></html>', PHP_OUTPUT_HANDLER_FINAL ) );
-		$hit = $cache->lookup( $request );
-		$this->assertSame( 'hit', $hit->status() );
-		$this->assertSame( '<html><body>first second</body></html>', $hit->entry()->content() );
+		return array( $cache, $runtime, $request );
 	}
 }

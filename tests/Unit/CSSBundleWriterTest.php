@@ -15,4 +15,23 @@ final class CSSBundleWriterTest extends TestCase {
 		$content = file_get_contents( $this->directory . '/' . $result['filename'] );
 		self::assertStringContainsString( '.hero{', $content ); self::assertStringContainsString( '.menu:hover{', $content ); self::assertStringContainsString( '@font-face{', $content ); self::assertStringContainsString( 'font-display:swap', $content ); self::assertStringNotContainsString( '.unused{', $content ); self::assertStringContainsString( 'https://example.test/theme/img/a.png', $content );
 	}
+
+	public function test_root_relative_url_preserves_origin_port_and_suffix(): void {
+		$writer = new CSSBundleWriter( $this->directory, 'https://example.test:8443/cache/css/' );
+		$manifest = new CSSManifest( array( 'used' => array( '.hero' ) ) );
+		$result = $writer->build(
+			array(
+				array(
+					'url' => 'https://example.test:8443/theme/css/site.css',
+					'css' => '.hero{background:url("/img/banner.svg?v=2#hero")}',
+				),
+			),
+			$manifest
+		);
+
+		self::assertStringContainsString(
+			'url("https://example.test:8443/img/banner.svg?v=2#hero")',
+			file_get_contents( $this->directory . '/' . $result['filename'] )
+		);
+	}
 }

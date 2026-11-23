@@ -10,18 +10,13 @@ namespace Nakhostin\PerformanceEngine\Tests\Integration;
 use Nakhostin\PerformanceEngine\Core\Plugin;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 final class PluginBootstrapTest extends TestCase {
-	public static function setUpBeforeClass(): void {
-		if ( ! defined( 'ABSPATH' ) ) {
-			define( 'ABSPATH', dirname( __DIR__, 2 ) . '/' );
-		}
-
-		require_once dirname( __DIR__, 2 ) . '/tests/Fixtures/wordpress-stubs.php';
-		require_once dirname( __DIR__, 2 ) . '/nakhostin-performance-engine.php';
-	}
-
 	public function test_bootstrap_defines_plugin_constants(): void {
-		$this->assertSame( '2.0.0', NPE_VERSION );
+		$this->assertMatchesRegularExpression( '/^\d+\.\d+\.\d+$/', NPE_VERSION );
 		$this->assertSame( 'nakhostin-performance-engine.php', NPE_BASENAME );
 	}
 

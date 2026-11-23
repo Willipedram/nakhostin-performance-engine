@@ -8,9 +8,8 @@
 namespace Nakhostin\PerformanceEngine\Cache;
 
 final class CacheEntry {
-	// Version 3 also invalidates HTML written before the stylesheet fail-open
-	// hardening. Older pages may contain legacy media=print defer markup.
-	public const VERSION = 3;
+	// Reject records created before discarded output chunks were excluded.
+	public const VERSION = 4;
 	/** @var array */ private $data;
 
 	private function __construct( array $data ) { $this->data = $data; }

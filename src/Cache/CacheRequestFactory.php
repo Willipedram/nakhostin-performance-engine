@@ -7,7 +7,10 @@ final class CacheRequestFactory {
 		$host = isset( $_SERVER['HTTP_HOST'] ) ? preg_replace( '/[^A-Za-z0-9.\-:\[\]]/', '', wp_unslash( $_SERVER['HTTP_HOST'] ) ) : (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST );
 		$uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
 		$url = ( is_ssl() ? 'https://' : 'http://' ) . $host . '/' . ltrim( $uri, '/' );
-		$headers = array(); if ( isset( $_SERVER['HTTP_AUTHORIZATION'] ) ) { $headers['Authorization'] = 'present'; }
+		$headers = array();
+		if ( '' !== ( $_SERVER['HTTP_AUTHORIZATION'] ?? '' ) || '' !== ( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '' ) ) {
+			$headers['Authorization'] = 'present';
+		}
 		$home_host    = strtolower( (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST ) );
 		$home_port    = (int) wp_parse_url( home_url( '/' ), PHP_URL_PORT );
 		$request_host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );

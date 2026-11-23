@@ -14,6 +14,14 @@ final class PageCacheRuntime {
 	public function capture( string $content, int $phase = 0 ): string {
 		// Output-buffer callbacks may run several times when a theme or plugin
 		// flushes output. Never cache an intermediate chunk as a complete page.
+		if ( 0 !== ( $phase & PHP_OUTPUT_HANDLER_CLEAN ) ) {
+			// Cleaned chunks are discarded by PHP and must never be replayed.
+			if ( 0 !== ( $phase & PHP_OUTPUT_HANDLER_FINAL ) ) {
+				$this->capture_finished = true;
+				$this->capture_buffer = '';
+			}
+			return $content;
+		}
 		$this->capture_buffer .= $content;
 		if ( $this->capture_finished || 0 === ( $phase & PHP_OUTPUT_HANDLER_FINAL ) ) {
 			return $content;
