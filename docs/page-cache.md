@@ -53,7 +53,7 @@ actually varies to avoid duplicate entries.
 ## Known limitations
 
 - Application fallback hits still incur WordPress bootstrap; only an installed and active early provider avoids it.
-- NPE does not edit `wp-config.php`; the operator must enable `WP_CACHE` before using the drop-in.
+- When both NPE page cache and Early Cache are enabled, NPE can enable `WP_CACHE` in a conventional, writable single-site `wp-config.php` from a privileged admin request. Setup resumes on the next admin request. Read-only or managed configurations and multisite require the hosting operator to enable the constant. NPE keeps the shared `WP_CACHE` setting on disable and removes only its own drop-in.
 - Early cache uses filesystem, not Redis/Memcached, so its hit path remains deterministic before object-cache bootstrap.
 - Anonymous pages containing application-specific personalization must be excluded or marked personalized by the calling integration.
 - Warmup relies on WordPress cron traffic and loopback HTTP availability.

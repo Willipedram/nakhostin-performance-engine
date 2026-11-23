@@ -1145,7 +1145,13 @@ msgid "NPE Early Cache was not installed because advanced-cache.php is owned by 
 msgstr ""
 
 
-msgid "NPE Early Cache is unavailable. Confirm that WP_CACHE is enabled and wp-content is writable; NPE is using the safe application-cache fallback."
+msgid "NPE enabled WP_CACHE. Early Cache setup will continue on the next admin request."
+msgstr ""
+
+msgid "NPE could not enable WP_CACHE in wp-config.php. Enable it in the hosting configuration to use Early Cache."
+msgstr ""
+
+msgid "NPE could not prepare Early Cache. Check that PHP can write to wp-content and the NPE cache directory. Application cache is available as a fallback."
 msgstr ""
 
 

@@ -42,8 +42,9 @@ ownership. A capable LiteSpeed deployment remains the preferred provider;
 foreign WordPress cache drop-ins remain untouched; otherwise administrators can
 explicitly enable NPE Early Cache. Its verified `advanced-cache.php` drop-in uses
 the filesystem and plain PHP on the hit path, so Apache, Nginx, generic PHP/FPM,
-and reverse-proxy deployments do not require a LiteSpeed API. `WP_CACHE` must
-already be enabled; NPE does not edit `wp-config.php`.
+and reverse-proxy deployments do not require a LiteSpeed API. When an administrator
+opts in, NPE can enable `WP_CACHE` in a conventional, writable single-site
+`wp-config.php`. Managed and multisite installations require host configuration.
 
 Version 2.0 turns stored analysis into an opt-in frontend runtime. During queued
 page analysis NPE precomputes a unified manifest containing critical CSS,

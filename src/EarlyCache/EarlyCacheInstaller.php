@@ -7,12 +7,16 @@ final class EarlyCacheInstaller {
 	private $detector; private $template; private $plugin_path;
 	public function __construct( DropInDetector $detector, string $template, string $plugin_path ) { $this->detector = $detector; $this->template = $template; $this->plugin_path = rtrim( $plugin_path, '/\\' ) . '/'; }
 	public function state(): array { return $this->detector->detect(); }
+	public function can_install(): bool {
+		return $this->detector->can_install() && is_readable( $this->template ) && is_writable( dirname( $this->detector->path() ) );
+	}
 	public function install(): array {
 		$state = $this->detector->detect();
 		if ( $state['exists'] && ! $state['npe_owned'] && empty( $state['replaceable'] ) ) { return array( 'success' => false, 'status' => 'external_dropin', 'owner' => $state['owner'] ); }
-		if ( ! is_readable( $this->template ) || ! is_dir( dirname( $state['path'] ) ) || ! is_writable( dirname( $state['path'] ) ) ) { return array( 'success' => false, 'status' => 'unwritable', 'owner' => $state['owner'] ); }
 		$contents = file_get_contents( $this->template ); if ( ! is_string( $contents ) ) { return array( 'success' => false, 'status' => 'template_unreadable', 'owner' => 'none' ); }
 		$contents = str_replace( '__NPE_PLUGIN_PATH__', var_export( $this->plugin_path, true ), $contents );
+		if ( $state['npe_owned'] && @file_get_contents( $state['path'] ) === $contents ) { return array( 'success' => true, 'status' => 'installed', 'owner' => 'npe' ); }
+		if ( ! $this->can_install() ) { return array( 'success' => false, 'status' => 'unwritable', 'owner' => $state['owner'] ); }
 		$temp = tempnam( dirname( $state['path'] ), '.npe-dropin-' );
 		$written = false !== $temp && false !== file_put_contents( $temp, $contents, LOCK_EX ) && rename( $temp, $state['path'] );
 		if ( false !== $temp && file_exists( $temp ) ) { unlink( $temp ); }
