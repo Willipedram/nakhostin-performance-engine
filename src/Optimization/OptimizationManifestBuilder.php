@@ -46,22 +46,56 @@ final class OptimizationManifestBuilder {
 		);
 		foreach ( $decisions as $handle => &$decision ) { $decision['type'] = 'script'; } unset( $decision );
 		$preloads = $font ? $this->fonts->plan( $font, 2 ) : array();
-		$approved = $this->settings->get( 'css.combine_enabled', false )
-			? array_intersect( ApprovedCSSRules::for_page( $url ), $css->to_array()['unused_candidates'] ?? array() ) : array();
-		$bundles = $this->bundle_plan( $javascript, $sources, $safe_mode, $capture_complete, $document_complete, $approved );
+		$learning = $this->settings->get( 'css.combine_enabled', false ) && $this->settings->get( 'optimization.learning', false );
+		$approved_rules = $this->settings->get( 'css.combine_enabled', false ) ? ApprovedCSSRules::for_page( $url ) : array();
+		$approved = array_values( array_intersect( $approved_rules, $css->to_array()['unused_candidates'] ?? array() ) );
+		$model = array();
+		if ( $learning ) {
+			$model = array( 'samples' => 0, 'required' => PageLearning::REQUIRED, 'unused' => array() );
+			if ( $document_complete && $capture_complete && true === ( $sources['learning_capture'] ?? false ) ) {
+				$identity = $this->learning_identity( $sources, $js, $approved_rules, $dom );
+				$model = ( new PageLearning() )->observe( $url, $identity, $approved );
+			}
+			$approved = $model['unused'];
+		}
+		$ready = $learning && $model['samples'] >= $model['required'];
+		$bundles = $learning && ! $ready
+			? array( 'css' => array( 'status' => 'learning' ), 'javascript' => array( 'status' => 'learning' ) )
+			: $this->bundle_plan( $javascript, $sources, $safe_mode, $capture_complete, $document_complete, $approved, $ready );
+
 		do_action( 'npe/optimization/css_plan', $bundles['css']['status'], count( $bundles['css']['source_urls'] ?? array() ), $sources['css_skip_reasons'] ?? array(), (int) ( $sources['css_collection_ms'] ?? 0 ) );
-		$summary = array( 'css' => array( 'observed' => (int) ( $css->to_array()['selector_count'] ?? 0 ), 'critical_bytes' => strlen( (string) ( $critical->to_array()['css'] ?? '' ) ), 'bundle_bytes' => (int) ( $bundles['css']['optimized_size'] ?? 0 ), 'bundle_status' => (string) $bundles['css']['status'], 'bundled_files' => count( $bundles['css']['source_urls'] ?? array() ), 'skipped' => $sources['css_skip_reasons'] ?? array(), 'collection_ms' => (int) ( $sources['css_collection_ms'] ?? 0 ) ), 'javascript' => array( 'observed' => count( (array) ( $js['observed'] ?? array() ) ), 'deferred' => count( (array) ( $js['deferred'] ?? array() ) ), 'bundle_bytes' => (int) ( $bundles['javascript']['optimized_size'] ?? 0 ), 'bundle_status' => (string) $bundles['javascript']['status'] ), 'fonts' => array( 'preloaded' => count( $preloads ) ) );
+		$summary = array( 'css' => array( 'observed' => (int) ( $css->to_array()['selector_count'] ?? 0 ), 'critical_bytes' => strlen( (string) ( $critical->to_array()['css'] ?? '' ) ), 'bundle_bytes' => (int) ( $bundles['css']['optimized_size'] ?? 0 ), 'source_bytes' => (int) ( $bundles['css']['original_size'] ?? 0 ), 'bundle_status' => (string) $bundles['css']['status'], 'bundled_files' => count( $bundles['css']['source_urls'] ?? array() ), 'skipped' => $sources['css_skip_reasons'] ?? array(), 'collection_ms' => (int) ( $sources['css_collection_ms'] ?? 0 ) ), 'javascript' => array( 'observed' => count( (array) ( $js['observed'] ?? array() ) ), 'deferred' => count( (array) ( $js['deferred'] ?? array() ) ), 'bundle_bytes' => (int) ( $bundles['javascript']['optimized_size'] ?? 0 ), 'source_bytes' => (int) ( $bundles['javascript']['original_size'] ?? 0 ), 'bundle_status' => (string) $bundles['javascript']['status'] ), 'fonts' => array( 'preloaded' => count( $preloads ) ) );
+		if ( $model ) {
+			$summary['learning'] = array( 'samples' => $model['samples'], 'required' => $model['required'] );
+		}
+		$previous = $this->storage->for_url( $url );
 		$saved = $this->storage->save( new OptimizationManifest( array( 'page_signature' => $signature, 'generated_at' => time(), 'source_url' => esc_url_raw( $url ), 'dom_signature' => (string) ( $dom['dom_signature'] ?? '' ), 'capture' => array( 'status' => $capture_complete ? 'complete' : (string) ( $sources['capture_status'] ?? 'incomplete' ), 'complete' => $capture_complete, 'document_complete' => $document_complete ), 'css' => array( 'critical' => $critical->to_array()['css'], 'stylesheets' => array(), 'bundle' => $bundles['css'] ), 'javascript' => array( 'manifest' => $js, 'bundle' => $bundles['javascript'] ), 'fonts' => array( 'preloads' => $preloads ), 'assets' => array( 'decisions' => array_values( $decisions ), 'scope' => 'page-relevant-only', 'global_registration_count' => (int) ( $js['registration_diagnostics']['registered'] ?? 0 ) ), 'components' => $this->component_ids( $components ), 'summary' => $summary ) ) );
-		if ( $saved && 'generated' === $bundles['css']['status'] ) {
+		$previous_active = $previous && ( 'generated' === ( $previous->section( 'css' )['bundle']['status'] ?? '' ) || 'generated' === ( $previous->section( 'javascript' )['bundle']['status'] ?? '' ) );
+		if ( $saved && ( $previous_active || 'generated' === $bundles['css']['status'] || 'generated' === $bundles['javascript']['status'] ) ) {
 			do_action( 'npe/optimization/css_ready', $url );
 		}
 		return $saved;
 	}
 
-	private function bundle_plan( JavaScriptManifest $javascript, array $sources, bool $safe_mode, bool $capture_complete, bool $document_complete, array $approved ): array {
+	private function learning_identity( array $sources, array $javascript, array $approved, array $dom ): string {
+		$styles = array();
+		foreach ( (array) ( $sources['css_files'] ?? array() ) as $file ) {
+			$styles[ $file['url'] ] = hash( 'sha256', $file['css'] );
+		}
+		$scripts = array();
+		foreach ( (array) ( $javascript['observed'] ?? array() ) as $handle ) {
+			$scripts[ $handle ] = array(
+				$javascript['assets'][ $handle ] ?? array(),
+				hash( 'sha256', (string) ( $sources['script_contents'][ $handle ] ?? '' ) ),
+			);
+		}
+		return hash( 'sha256', (string) wp_json_encode( array( $sources['css_order'] ?? array(), $styles, $scripts, $approved, $dom['versions'] ?? array() ) ) );
+	}
+
+	private function bundle_plan( JavaScriptManifest $javascript, array $sources, bool $safe_mode, bool $capture_complete, bool $document_complete, array $approved, bool $learned ): array {
 		$status = ! $this->settings->get( 'optimization.enabled', false ) || ! $this->settings->get( 'assets.bundle_enabled', false ) ? 'disabled' : ( $safe_mode ? 'safe-mode' : ( ! $capture_complete ? 'incomplete-source-capture' : 'no-eligible-assets' ) );
-		$result = array( 'css' => array( 'status' => $status ), 'javascript' => array( 'status' => $status ) );
-		$built = 'no-eligible-assets' === $status ? $this->build_bundles( $javascript, $sources ) : array();
+		$result = array( 'css' => array( 'status' => $status ), 'javascript' => array( 'status' => $learned ? 'no-eligible-assets' : $status ) );
+		$built = $learned || 'no-eligible-assets' === $status ? $this->build_bundles( $javascript, $sources ) : array();
 		if ( $this->settings->get( 'css.combine_enabled', false ) ) {
 			$result['css']['status'] = $document_complete ? 'no-eligible-assets' : 'incomplete-source-capture';
 			unset( $built['css'] );
@@ -81,6 +115,9 @@ final class OptimizationManifestBuilder {
 		foreach ( array( 'css', 'javascript' ) as $type ) {
 			if ( ! empty( $built[ $type ] ) ) {
 				$result[ $type ] = $built[ $type ];
+				if ( $learned && 'javascript' === $type && ! isset( $result[ $type ]['status'] ) && ( count( $result[ $type ]['handles'] ) < 2 || $result[ $type ]['optimized_size'] >= $result[ $type ]['original_size'] ) ) {
+					$result[ $type ]['status'] = 'no-size-benefit';
+				}
 				if ( ! isset( $result[ $type ]['status'] ) ) {
 					$result[ $type ]['status'] = $this->verify_delivery( $type, $built[ $type ] ) ? 'generated' : 'delivery-unverified';
 				}

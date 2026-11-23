@@ -16,7 +16,7 @@ final class DOMAnalysisQueue {
 	private const MAX_KNOWN_URLS = 100;
 	private const MAX_ATTEMPTS = 3;
 
-	public function enqueue( string $url, string $reason = 'frontend-request', int $cooldown = DAY_IN_SECONDS, bool $force = false ): bool {
+	public function enqueue( string $url, string $reason = 'frontend-request', int $cooldown = DAY_IN_SECONDS, bool $force = false, int $delay = 0, int $round = 0 ): bool {
 		$url = $this->normalize_url( $url );
 		if ( '' === $url ) {
 			return false;
@@ -30,7 +30,7 @@ final class DOMAnalysisQueue {
 
 		$id     = hash( 'sha256', $url );
 		$queued = $this->with_lock(
-			static function ( array $jobs, array $state ) use ( $id, $url, $reason, $force ): array {
+			static function ( array $jobs, array $state ) use ( $id, $url, $reason, $force, $delay, $round ): array {
 				$jobs = array_filter(
 					$jobs,
 					static function ( $job ): bool {
@@ -61,7 +61,8 @@ final class DOMAnalysisQueue {
 					'reason'       => sanitize_key( $reason ),
 					'status'       => 'pending',
 					'attempts'     => 0,
-					'available_at' => time(),
+					'available_at' => time() + max( 0, $delay ),
+					'round' => $round,
 					'created_at'   => time(),
 					'last_error'   => '',
 				);
@@ -78,7 +79,7 @@ final class DOMAnalysisQueue {
 			set_transient( $cooldown_key, 1, max( HOUR_IN_SECONDS, $cooldown ) );
 			// Make the event immediately eligible. DOMAutoLearning dispatches WP-Cron
 			// non-blockingly at shutdown so low-traffic sites do not remain at 0%.
-			$this->schedule( 0 );
+			$this->schedule( $delay );
 		}
 		return $queued;
 	}

@@ -9,13 +9,51 @@ use Nakhostin\PerformanceEngine\JavaScript\JavaScriptRuntimeOptimizer;
 final class OptimizationCoordinator {
 	private $settings; private $storage; private $owners; private $policy; private $css; private $javascript; private $assets; private $context; private $manifest; private $manifest_loaded = false; private $css_checked = false;
 	public function __construct( Settings $settings, OptimizationManifestStorage $storage, OptimizationOwnershipResolver $owners, OptimizationPolicy $policy, CSSRuntimeOptimizer $css, JavaScriptRuntimeOptimizer $javascript, AssetRuntimeOptimizer $assets ) { $this->settings = $settings; $this->storage = $storage; $this->owners = $owners; $this->policy = $policy; $this->css = $css; $this->javascript = $javascript; $this->assets = $assets; }
-	public function register(): void { add_filter( 'npe/css/optimization_enabled', array( $this, 'allow_css' ), 5 ); add_filter( 'npe/javascript/optimization_enabled', array( $this, 'allow_javascript' ), 5 ); add_filter( 'npe/fonts/optimization_enabled', array( $this, 'allow_fonts' ), 5 ); if ( $this->settings->get( 'css.combine_enabled', false ) || $this->settings->get( 'optimization.enabled', false ) ) { add_action( 'wp_print_styles', array( $this, 'apply_css_bundle' ), 999 ); } if ( ! $this->settings->get( 'optimization.enabled', false ) ) { return; } add_action( 'wp_enqueue_scripts', array( $this, 'apply_assets' ), 999 ); add_action( 'wp_head', array( $this, 'render_head' ), 2 ); if ( $this->settings->get( 'fonts.preload_enabled', false ) ) { add_filter( 'wp_preload_resources', array( $this, 'preload_fonts' ), 30 ); } }
+	public function register(): void {
+		add_filter( 'npe/css/optimization_enabled', array( $this, 'allow_css' ), 5 );
+		add_filter( 'npe/javascript/optimization_enabled', array( $this, 'allow_javascript' ), 5 );
+		add_filter( 'npe/fonts/optimization_enabled', array( $this, 'allow_fonts' ), 5 );
+		$enabled = $this->settings->get( 'optimization.enabled', false );
+		$combine = $this->settings->get( 'css.combine_enabled', false );
+		if ( $combine || $enabled ) {
+			add_action( 'wp_print_styles', array( $this, 'apply_css_bundle' ), 999 );
+		}
+		if ( $combine && $this->settings->get( 'optimization.learning', false ) ) {
+			add_action( 'wp_enqueue_scripts', array( $this, 'apply_learned_script_bundle' ), 998 );
+		}
+		if ( ! $enabled ) {
+			return;
+		}
+		add_action( 'wp_enqueue_scripts', array( $this, 'apply_assets' ), 999 );
+		add_action( 'wp_head', array( $this, 'render_head' ), 2 );
+		if ( $this->settings->get( 'fonts.preload_enabled', false ) ) {
+			add_filter( 'wp_preload_resources', array( $this, 'preload_fonts' ), 30 );
+		}
+	}
+
+	public function apply_learned_script_bundle(): void {
+		if ( isset( $_GET[ \Nakhostin\PerformanceEngine\DOM\PageAnalysisCoordinator::QUERY_ARG ] ) ) {
+			return;
+		}
+		$context = $this->context();
+		if ( $context->is_protected() ) {
+			return;
+		}
+		$manifest = $this->manifest();
+		if ( $manifest && ! $manifest->is_stale() ) {
+			$learning = $manifest->section( 'summary' )['learning'] ?? array();
+			if ( (int) ( $learning['samples'] ?? 0 ) >= PageLearning::REQUIRED ) {
+				$this->apply_bundles( $context, $manifest, 'javascript' );
+			}
+		}
+	}
+
 	public function allow_css( $enabled ): bool { return (bool) $enabled && ! in_array( $this->owners->owners( array( 'css' ) )['css'], array( 'external', 'litespeed' ), true ); }
 	public function allow_javascript( $enabled ): bool { return (bool) $enabled && ! in_array( $this->owners->owners( array( 'javascript' ) )['javascript'], array( 'external', 'litespeed' ), true ); }
 	public function allow_fonts( $enabled ): bool { return (bool) $enabled && ! in_array( $this->owners->owners( array( 'fonts' ) )['fonts'], array( 'external', 'litespeed' ), true ); }
-	public function context(): OptimizationContext { if ( $this->context ) { return $this->context; } $type = function_exists( 'is_cart' ) && is_cart() ? 'cart' : ( function_exists( 'is_checkout' ) && is_checkout() ? 'checkout' : ( function_exists( 'is_account_page' ) && is_account_page() ? 'account' : ( function_exists( 'is_product' ) && is_product() ? 'product' : ( function_exists( 'is_shop' ) && is_shop() ? 'shop' : 'page' ) ) ) ); $this->context = new OptimizationContext( array( 'url' => $this->url(), 'page_type' => $type, 'logged_in' => is_user_logged_in(), 'admin' => is_admin(), 'providers' => $this->owners->owners( array( 'css', 'javascript', 'fonts', 'assets' ) ) ) ); return $this->context; }
+	public function context(): OptimizationContext { if ( $this->context ) { return $this->context; } $type = function_exists( 'is_cart' ) && is_cart() ? 'cart' : ( function_exists( 'is_checkout' ) && is_checkout() ? 'checkout' : ( function_exists( 'is_account_page' ) && is_account_page() ? 'account' : ( function_exists( 'is_product' ) && is_product() ? 'product' : ( function_exists( 'is_shop' ) && is_shop() ? 'shop' : 'page' ) ) ) ); $this->context = new OptimizationContext( array( 'url' => $this->url(), 'page_type' => $type, 'logged_in' => is_user_logged_in(), 'admin' => is_admin(), 'analysis_probe' => isset( $_GET[ \Nakhostin\PerformanceEngine\DOM\PageAnalysisCoordinator::QUERY_ARG ] ), 'providers' => $this->owners->owners( array( 'css', 'javascript', 'fonts', 'assets' ) ) ) ); return $this->context; }
 	public function manifest(): ?OptimizationManifest { if ( ! $this->manifest_loaded ) { $this->manifest = $this->storage->for_url( $this->context()->get( 'url' ) ); $this->manifest_loaded = true; } return $this->manifest; }
-	public function apply_assets(): void { $context = $this->context(); if ( ! $this->settings->get( 'optimization.enabled', false ) || $context->is_protected() ) { return; } $manifest = $this->manifest(); $safe = (bool) $this->settings->get( 'optimization.safe_mode', true ); if ( ! $safe && $manifest && ! $manifest->is_stale() && true === ( $manifest->section( 'capture' )['complete'] ?? false ) && $this->settings->get( 'assets.bundle_enabled', false ) ) { $this->apply_bundles( $context, $manifest, 'javascript' ); } if ( $this->policy->allows( $context, $manifest, 'css', true )['allowed'] ) { $this->css->apply( $manifest->section( 'css' ), $safe || ! $this->settings->get( 'css.unused_css_enabled', false ) ); } if ( $this->policy->allows( $context, $manifest, 'javascript', (bool) $this->settings->get( 'javascript.defer_enabled', false ) )['allowed'] ) { $js = $manifest->section( 'javascript' ); if ( ! empty( $js['manifest'] ) ) { $this->javascript->apply( new JavaScriptManifest( $js['manifest'] ), $context->to_array(), true, (bool) $this->settings->get( 'assets.unload_enabled', false ) && ! $safe ); } } if ( $this->policy->allows( $context, $manifest, 'assets', (bool) $this->settings->get( 'assets.unload_enabled', false ) )['allowed'] && ! $safe ) { $this->assets->apply( $manifest->section( 'assets' )['decisions'] ?? array() ); } }
+	public function apply_assets(): void { $context = $this->context(); if ( ! $this->settings->get( 'optimization.enabled', false ) || $context->is_protected() ) { return; } $manifest = $this->manifest(); $safe = (bool) $this->settings->get( 'optimization.safe_mode', true ); if ( ! $this->settings->get( 'optimization.learning', false ) && ! $safe && $manifest && ! $manifest->is_stale() && true === ( $manifest->section( 'capture' )['complete'] ?? false ) && $this->settings->get( 'assets.bundle_enabled', false ) ) { $this->apply_bundles( $context, $manifest, 'javascript' ); } if ( $this->policy->allows( $context, $manifest, 'css', true )['allowed'] ) { $this->css->apply( $manifest->section( 'css' ), $safe || ! $this->settings->get( 'css.unused_css_enabled', false ) ); } if ( $this->policy->allows( $context, $manifest, 'javascript', (bool) $this->settings->get( 'javascript.defer_enabled', false ) )['allowed'] ) { $js = $manifest->section( 'javascript' ); if ( ! empty( $js['manifest'] ) ) { $this->javascript->apply( new JavaScriptManifest( $js['manifest'] ), $context->to_array(), true, (bool) $this->settings->get( 'assets.unload_enabled', false ) && ! $safe ); } } if ( $this->policy->allows( $context, $manifest, 'assets', (bool) $this->settings->get( 'assets.unload_enabled', false ) )['allowed'] && ! $safe ) { $this->assets->apply( $manifest->section( 'assets' )['decisions'] ?? array() ); } }
 	public function render_head(): void {
 		if ( $this->settings->get( 'optimization.safe_mode', true ) || ! $this->settings->get( 'css.critical_css_enabled', false ) ) {
 			return;
@@ -61,7 +99,9 @@ final class OptimizationCoordinator {
 		$manifest = $this->manifest();
 		$status = $manifest ? 'stale-or-incomplete' : 'manifest-missing';
 		if ( $manifest && ! $manifest->is_stale() && true === ( $manifest->section( 'capture' )['document_complete'] ?? $manifest->section( 'capture' )['complete'] ?? false ) ) {
-			$status = $this->apply_bundles( $context, $manifest, 'css' );
+			$evidence = $manifest->section( 'summary' )['learning'] ?? array();
+			$status = $this->settings->get( 'optimization.learning', false ) && (int) ( $evidence['samples'] ?? 0 ) < PageLearning::REQUIRED
+				? 'learning' : $this->apply_bundles( $context, $manifest, 'css' );
 		}
 		if ( $this->settings->get( 'debugging.enabled', false ) && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			if ( ! headers_sent() ) {
@@ -118,8 +158,11 @@ final class OptimizationCoordinator {
 					wp_dequeue_script( $handle );
 				}
 			}
-			// The next request must recheck the generated file and the live queue.
-			add_filter( 'npe/cache/capture_response', '__return_false' );
+			// Persist only bounded, relative references for cheap validation on cache hits.
+			add_filter( 'npe/cache/generated_assets', static function ( array $assets ) use ( $type, $bundle ): array {
+				$assets[ $type . '/' . $bundle['filename'] ] = $bundle['optimized_size'];
+				return $assets;
+			} );
 			return 'applied';
 		}
 		return 'unavailable';

@@ -86,7 +86,15 @@ final class CSSAdminPage {
 				<h2><?php echo esc_html__( 'Optimize a public page', 'nakhostin-performance-engine' ); ?></h2>
 				<p><?php echo esc_html__( 'Combine compatible stylesheets in the background. Stylesheet order and dynamic rules are preserved.', 'nakhostin-performance-engine' ); ?></p>
 				<?php if ( $summary ) : ?>
+					<?php if ( ! empty( $summary['learning']['required'] ) ) : ?>
+						<p><?php echo esc_html( sprintf( __( 'Learning observations: %1$d of %2$d · JavaScript bundle: %3$s', 'nakhostin-performance-engine' ), $summary['learning']['samples'], $summary['learning']['required'], $summary['javascript']['bundle_status'] ?? 'unknown' ) ); ?></p>
+					<?php endif; ?>
 					<p><?php echo esc_html( sprintf( __( 'Last CSS plan: %1$s · %2$d source files in the bundle', 'nakhostin-performance-engine' ), $summary['css']['bundle_status'] ?? 'unknown', (int) ( $summary['css']['bundled_files'] ?? 0 ) ) ); ?></p>
+					<?php foreach ( array( 'css' => 'CSS', 'javascript' => 'JavaScript' ) as $type => $label ) : ?>
+						<?php if ( 'generated' === ( $summary[ $type ]['bundle_status'] ?? '' ) ) : ?>
+							<p><?php echo esc_html( sprintf( __( '%1$s uncompressed bundle: %2$s → %3$s', 'nakhostin-performance-engine' ), $label, size_format( $summary[ $type ]['source_bytes'] ?? 0, 1 ), size_format( $summary[ $type ]['bundle_bytes'] ?? 0, 1 ) ) ); ?></p>
+						<?php endif; ?>
+					<?php endforeach; ?>
 					<p><?php echo esc_html( sprintf( __( 'Stylesheet collection: %d ms', 'nakhostin-performance-engine' ), (int) ( $summary['css']['collection_ms'] ?? 0 ) ) ); ?>
 					<?php if ( ! empty( $summary['css']['skipped'] ) ) : ?><code dir="ltr"><?php echo esc_html( wp_json_encode( $summary['css']['skipped'] ) ); ?></code><?php endif; ?></p>
 				<?php elseif ( $queued ) : ?>
@@ -98,6 +106,8 @@ final class CSSAdminPage {
 					<?php wp_nonce_field( DOMAdminPage::ACTION ); ?>
 					<p><label for="npe-css-page-url"><?php echo esc_html__( 'Public page URL', 'nakhostin-performance-engine' ); ?></label>
 					<input class="regular-text" dir="ltr" type="url" id="npe-css-page-url" name="source_url" value="<?php echo esc_attr( $page ); ?>" required></p>
+					<p><label><input type="checkbox" name="npe_page_cache" value="1"> <?php echo esc_html__( 'Enable public page cache. My public pages are not personalized for anonymous visitors.', 'nakhostin-performance-engine' ); ?></label></p>
+					<p><label><input type="checkbox" name="npe_learning" value="1"> <?php echo esc_html__( 'Learn this page before bundling CSS and JavaScript', 'nakhostin-performance-engine' ); ?></label></p>
 					<p><label><input type="checkbox" name="npe_lazy" value="1"> <?php echo esc_html__( 'Also enable native image and iframe lazy loading', 'nakhostin-performance-engine' ); ?></label></p>
 					<details class="npe-advanced"><summary><?php echo esc_html__( 'Approve unused CSS for this page', 'nakhostin-performance-engine' ); ?></summary>
 						<p><label><input type="checkbox" name="npe_css_update_approvals" value="1"> <?php echo esc_html__( 'Update the approved list for the URL above', 'nakhostin-performance-engine' ); ?></label></p>

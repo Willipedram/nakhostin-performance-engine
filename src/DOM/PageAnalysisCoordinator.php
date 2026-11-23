@@ -142,7 +142,7 @@ final class PageAnalysisCoordinator {
 			$font_manifest = null;
 			$document_complete = strlen( $html ) < DOMSnapshot::MAX_BYTES && 1 === preg_match( '/<\/body\s*>\s*<\/html\s*>\s*$/i', trim( $html ) );
 			if ( ! $document_complete ) { $complete = false; }
-			$analysis_sources = array( 'document_complete' => $document_complete, 'css_files' => array(), 'css_complete' => false, 'script_assets' => array(), 'script_contents' => array(), 'capture_complete' => false, 'capture_status' => $document_complete ? 'complete' : 'incomplete-document' );
+			$analysis_sources = array( 'learning_capture' => '' !== $token, 'document_complete' => $document_complete, 'css_files' => array(), 'css_complete' => false, 'script_assets' => array(), 'script_contents' => array(), 'capture_complete' => false, 'capture_status' => $document_complete ? 'complete' : 'incomplete-document' );
 
 			try {
 				$components = $this->components->ingest_manifest( $data );

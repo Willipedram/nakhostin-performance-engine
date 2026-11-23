@@ -121,7 +121,10 @@ final class CacheInvalidationSubscriber {
 		$new_cache = is_array( $new_value ) ? (array) ( $new_value['cache'] ?? array() ) : array();
 		$old_media = is_array( $old_value ) ? (bool) ( $old_value['media']['lazy_load'] ?? false ) : false;
 		$new_media = is_array( $new_value ) ? (bool) ( $new_value['media']['lazy_load'] ?? false ) : false;
-		if ( $old_cache !== $new_cache || $old_media !== $new_media ) {
+		$asset_groups = array_flip( array( 'optimization', 'css', 'javascript', 'assets', 'fonts' ) );
+		$old_assets = array_intersect_key( (array) $old_value, $asset_groups );
+		$new_assets = array_intersect_key( (array) $new_value, $asset_groups );
+		if ( $old_cache !== $new_cache || $old_media !== $new_media || $old_assets !== $new_assets ) {
 			$this->purges->request( PurgeRequest::create( 'full', 'all', 'cache_settings_changed' ) );
 		}
 	}

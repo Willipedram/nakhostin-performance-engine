@@ -9,12 +9,12 @@ namespace Nakhostin\PerformanceEngine\Cache;
 
 final class CacheEntry {
 	// Reject older HTML that could reference an unverified generated bundle.
-	public const VERSION = 5;
+	public const VERSION = 6;
 	/** @var array */ private $data;
 
 	private function __construct( array $data ) { $this->data = $data; }
 
-	public static function create( string $key, string $url, string $content, array $headers, int $ttl, int $stale_ttl, array $dependencies = array(), string $signature = '', ?int $now = null ): self {
+	public static function create( string $key, string $url, string $content, array $headers, int $ttl, int $stale_ttl, array $dependencies = array(), string $signature = '', ?int $now = null, array $assets = array() ): self {
 		$now = $now ?? time();
 		return new self(
 			array(
@@ -26,6 +26,7 @@ final class CacheEntry {
 				'stale_until'   => $now + max( 1, $ttl ) + max( 0, $stale_ttl ),
 				'signature'     => sanitize_key( $signature ),
 				'dependencies'  => array_values( array_unique( array_filter( array_map( 'sanitize_key', $dependencies ) ) ) ),
+				'assets'        => $assets,
 				'content_hash'  => hash( 'sha256', $content ),
 				'headers'       => self::safe_headers( $headers ),
 				'content'       => $content,
@@ -37,6 +38,8 @@ final class CacheEntry {
 		$required = array( 'cache_version', 'key', 'url', 'created_at', 'expires_at', 'stale_until', 'content_hash', 'headers', 'content' );
 		foreach ( $required as $field ) { if ( ! array_key_exists( $field, $data ) ) { return null; } }
 		if ( self::VERSION !== (int) $data['cache_version'] || ! is_string( $data['content'] ) || ! hash_equals( (string) $data['content_hash'], hash( 'sha256', $data['content'] ) ) ) { return null; }
+		$assets = $data['assets'] ?? array();
+		if ( ! is_array( $assets ) || ! GeneratedAssetReferences::available( $assets ) ) { return null; }
 		return new self( $data );
 	}
 

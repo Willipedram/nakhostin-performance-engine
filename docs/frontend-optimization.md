@@ -103,7 +103,7 @@ images, video, audio, or other media in this phase.
 
 ## Page-specific CSS and JavaScript bundles
 
-When **Build and serve page-specific CSS and JavaScript bundles** is enabled and Safe Mode is disabled, the asynchronous page-analysis worker may write content-addressed bundles under `wp-content/cache/nakhostin-performance-engine-assets/`. The worker checks public HTTP delivery and MIME type before allowing a bundle to be used. Frontend requests validate the saved manifest, generated file metadata, and the live queue. They do not parse source files. If validation fails, WordPress serves the original assets. NPE does not store HTML that references replacement bundles in its page cache.
+When **Build and serve page-specific CSS and JavaScript bundles** is enabled and Safe Mode is disabled, the asynchronous page-analysis worker may write content-addressed bundles under `wp-content/cache/nakhostin-performance-engine-assets/`. The worker checks public HTTP delivery and MIME type before allowing a bundle to be used. Frontend requests validate the saved manifest, generated file metadata, and the live queue. They do not parse source files. If validation fails, WordPress serves the original assets. Both NPE cache layers verify up to two generated-file references before serving cached HTML. If a referenced file is missing or its size changed, the request renders normally.
 
 A CSS bundle is published only when every stylesheet observed in the rendered page was fetched from the same origin. Every rule is kept in source order, and supported relative asset URLs are rewritten. Stylesheets with directives that depend on their original URL or document boundary stay on their original handles. If any stylesheet is unknown, external, unavailable, or truncated, NPE keeps the original stylesheets.
 
@@ -127,8 +127,17 @@ Generated CSS bundles preserve existing `font-display` declarations. When page-a
 
 Use **NPE → CSS → Optimize a public page** to enqueue analysis of one public URL. This enables the CSS-only combination mode without enabling JavaScript optimization or disabling Safe Mode. An optional checkbox enables WordPress-native lazy loading for supported public content images and iframes. WordPress still controls the eager loading window and high-priority image handling. Theme and builder markup that bypasses WordPress media processing is outside this option.
 
-The CSS worker considers up to 50 observed stylesheet URLs with an eight-second collection budget. It selects a compatible adjacent group and retains originals when its live queue, version, ownership or HTTP checks fail. A successful plan invalidates the page's NPE cache entry. HTML that uses a replacement bundle is still excluded from NPE page caching while the runtime rechecks the generated file.
+The CSS worker considers up to 50 observed stylesheet URLs with an eight-second collection budget. It selects a compatible adjacent group and retains originals when its live queue, version, ownership or HTTP checks fail. A successful plan invalidates the page's NPE cache entry. Optimized HTML may be cached. Each cache hit checks the generated local files recorded with the page.
 
 The advanced approval field accepts simple class selectors for an exact public URL. Approve only after checking browser coverage in mobile, desktop and interactive states. NPE removes an approved class rule only if analysis also classifies it as unused and the rule is standalone at the top level. Grouped selectors, nested rules and pseudo-states remain. Clear the approval list and queue the page again to restore those rules.
 
 The CSS screen shows worker status, number of sources, collection time and skipped-source counts. With redacted debugging and WP_DEBUG enabled, the worker writes the same summary to the configured WordPress log and the page source shows an NPE CSS runtime status comment.
+
+
+### Learn assets before publishing
+
+From **NPE → CSS**, select the learning checkbox, enter a public URL, and queue it. Public-page caching can also be enabled from this form when the administrator confirms that anonymous visitors receive the same content. The settings preserve existing cache ownership and WooCommerce exclusions.
+
+The background worker observes unbundled anonymous renders. It requires three compatible captures at least 30 seconds apart. The model compares ordered stylesheet identities and source digests, observed script identities and dependencies, version information, and the approved CSS list. Changed evidence resets the observation count. A candidate class remains eligible for removal only while absent from all compatible observations and explicitly approved. Missing script source, protected handles, modules, inline data and unsafe dependency order retain their original assets. A learned JavaScript bundle needs at least two eligible files and fewer uncompressed bytes than its sources.
+
+Learning stores bounded evidence per analyzed URL for seven days. The worker queues up to four follow-up scans per run. On a low-traffic site, completion depends on WP-Cron being invoked. This is incremental statistical evidence from server captures. It does not include browser execution coverage, responsive states, logged-in content, or interactions that occur after rendering.

@@ -1,3 +1,8 @@
+## 2.7.0
+
+- Add opt-in per-page learning from repeated anonymous captures and publish eligible CSS and smaller JavaScript bundles only after three stable observations.
+- Cache optimized HTML in both NPE cache layers with a fail-open check for generated CSS and JavaScript files.
+
 ## 2.6.2
 
 - Add a single background CSS optimization action, optional native media lazy loading, and page-scoped confirmed CSS pruning.

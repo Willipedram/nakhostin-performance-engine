@@ -56,7 +56,9 @@ final class FilesystemCacheStore implements PageCacheStoreInterface {
 
 	public function flush(): bool {
 		$ok = true;
-		foreach ( $this->files() as $file ) { if ( ! unlink( $file ) ) { $ok = false; } }
+		foreach ( $this->files() as $file ) {
+			if ( ! unlink( $file ) && is_file( $file ) ) { $ok = false; }
+		}
 		return $ok;
 	}
 
@@ -70,7 +72,20 @@ final class FilesystemCacheStore implements PageCacheStoreInterface {
 	}
 
 	private function path( string $key ): string { $hash = hash( 'sha256', $key ); return $this->directory . '/entries/' . substr( $hash, 0, 2 ) . '/' . $hash . '.php'; }
-	private function files(): array { if ( ! is_dir( $this->directory ) ) { return array(); } $iterator = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $this->directory, \FilesystemIterator::SKIP_DOTS ) ); $files = array(); foreach ( $iterator as $file ) { if ( $file->isFile() ) { $files[] = $file->getPathname(); } } return $files; }
+	private function files(): array {
+		$root = $this->directory . '/entries';
+		if ( ! is_dir( $root ) || is_link( $root ) ) { return array(); }
+		$files = array();
+		foreach ( new \FilesystemIterator( $root, \FilesystemIterator::SKIP_DOTS ) as $bucket ) {
+			if ( ! $bucket->isDir() || $bucket->isLink() || ! preg_match( '/^[a-f0-9]{2}$/D', $bucket->getFilename() ) ) { continue; }
+			foreach ( new \FilesystemIterator( $bucket->getPathname(), \FilesystemIterator::SKIP_DOTS ) as $file ) {
+				if ( $file->isFile() && ! $file->isLink() && preg_match( '/^[a-f0-9]{64}\.php$/D', $file->getFilename() ) ) {
+					$files[] = $file->getPathname();
+				}
+			}
+		}
+		return $files;
+	}
 	private function entries(): array { $entries = array(); foreach ( $this->files() as $file ) { if ( ! preg_match( '/\/[a-f0-9]{64}\.php$/', $file ) || ! is_readable( $file ) ) { continue; } $data = $this->decode( (string) file_get_contents( $file ) ); $entry = is_array( $data ) ? CacheEntry::from_array( $data ) : null; if ( $entry ) { $entries[] = $entry; } } return $entries; }
 	private function purge_matching( callable $callback ): int { $count = 0; foreach ( $this->entries() as $entry ) { if ( $callback( $entry ) && $this->delete( $entry->key() ) ) { ++$count; } } return $count; }
 	private function decode( string $contents ): ?array { $prefix = "<?php exit; ?>\n"; if ( 0 !== strpos( $contents, $prefix ) ) { return null; } $data = json_decode( substr( $contents, strlen( $prefix ) ), true ); return is_array( $data ) ? $data : null; }

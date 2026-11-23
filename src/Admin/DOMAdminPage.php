@@ -180,6 +180,12 @@ final class DOMAdminPage {
 			}
 			$options = $this->settings->all();
 			$options['css']['combine_enabled'] = true;
+			if ( isset( $_POST['npe_page_cache'] ) && '1' === $_POST['npe_page_cache'] ) {
+				$options['cache']['enabled'] = true;
+			}
+			if ( isset( $_POST['npe_learning'] ) && '1' === $_POST['npe_learning'] ) {
+				$options['optimization']['learning'] = true;
+			}
 			if ( isset( $_POST['npe_lazy'] ) && '1' === $_POST['npe_lazy'] ) {
 				$options['media']['lazy_load'] = true;
 			}
@@ -188,6 +194,7 @@ final class DOMAdminPage {
 				$this->redirect( 'analysis-failed' );
 			}
 			( new OptimizationManifestStorage() )->invalidate_url( $submitted_url );
+			do_action( 'npe/optimization/css_ready', $submitted_url );
 			$queued = $this->queue->enqueue( $submitted_url, 'manual-css', HOUR_IN_SECONDS, true );
 			wp_safe_redirect( add_query_arg( array( 'page' => CSSAdminPage::SLUG, 'npe_css_page' => $submitted_url, 'npe_css_queued' => $queued ? '1' : '0' ), admin_url( 'admin.php' ) ) );
 			exit;

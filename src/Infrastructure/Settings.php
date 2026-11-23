@@ -49,7 +49,7 @@ final class Settings {
 			'enabled' => false,
 			'preload_enabled' => false,
 		);
-		$defaults['optimization'] = array( 'enabled' => false, 'safe_mode' => true );
+		$defaults['optimization'] = array( 'enabled' => false, 'safe_mode' => true, 'learning' => false );
 		$defaults['assets'] = array( 'unload_enabled' => false, 'bundle_enabled' => false );
 		$defaults['css']['combine_enabled'] = false;
 		$defaults['media'] = array( 'lazy_load' => false );
@@ -142,6 +142,7 @@ final class Settings {
 		$sanitized['fonts']['enabled'] = $this->to_bool( $fonts['enabled'] ?? false );
 		$sanitized['fonts']['preload_enabled'] = $this->to_bool( $fonts['preload_enabled'] ?? false );
 		$optimization = isset( $input['optimization'] ) && is_array( $input['optimization'] ) ? $input['optimization'] : array();
+		$sanitized['optimization']['learning'] = $this->to_bool( $optimization['learning'] ?? false );
 		$sanitized['optimization']['enabled'] = $this->to_bool( $optimization['enabled'] ?? false );
 		$sanitized['optimization']['safe_mode'] = $this->to_bool( $optimization['safe_mode'] ?? true );
 		$assets = isset( $input['assets'] ) && is_array( $input['assets'] ) ? $input['assets'] : array();

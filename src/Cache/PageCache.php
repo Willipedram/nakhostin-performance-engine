@@ -15,9 +15,9 @@ final class PageCache {
 		if ( $entry->is_stale( $now ) ) { $this->metrics->record( 'stale_hits' ); do_action( 'npe/cache/lookup', 'stale' ); do_action( 'npe/cache/warmup_requested', array( $entry->url() ) ); return new CacheLookup( 'stale', 'expired', $entry, $key['key'], $key['url'] ); }
 		$this->store->delete( $key['key'] ); $this->metrics->record( 'misses' ); do_action( 'npe/cache/lookup', 'miss' ); return new CacheLookup( 'miss', 'expired', null, $key['key'], $key['url'] );
 	}
-	public function store( CacheRequest $request, string $content, array $headers = array(), int $status = 200, array $dependencies = array(), string $signature = '', bool $personalized = false, ?int $now = null ): bool {
-		if ( ! $this->policy->classify_request( $request )->is_cacheable() || ! $this->policy->classify_response( $status, $headers, $content, $personalized )->is_cacheable() ) { return false; }
+	public function store( CacheRequest $request, string $content, array $headers = array(), int $status = 200, array $dependencies = array(), string $signature = '', bool $personalized = false, ?int $now = null, array $assets = array() ): bool {
+		if ( ! GeneratedAssetReferences::available( $assets ) || ! $this->policy->classify_request( $request )->is_cacheable() || ! $this->policy->classify_response( $status, $headers, $content, $personalized )->is_cacheable() ) { return false; }
 		$key = $this->keys->generate( $request ); if ( ! $key['cacheable'] ) { return false; }
-		return $this->store->write( CacheEntry::create( $key['key'], $key['url'], $content, $headers, $this->ttl, $this->stale_ttl, $dependencies, $signature, $now ) );
+		return $this->store->write( CacheEntry::create( $key['key'], $key['url'], $content, $headers, $this->ttl, $this->stale_ttl, $dependencies, $signature, $now, $assets ) );
 	}
 }

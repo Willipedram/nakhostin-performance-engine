@@ -50,7 +50,10 @@ final class PageCacheRuntime {
 					if ( 2 === count( $parts ) ) { $headers[ trim( $parts[0] ) ] = trim( $parts[1] ); }
 				}
 				$dependencies = $this->dependencies ? $this->dependencies->collect() : array();
-				$this->cache->store( $this->request, $this->capture_buffer, $headers, http_response_code() ?: 200, $dependencies );
+				$assets = apply_filters( 'npe/cache/generated_assets', array() );
+				if ( is_array( $assets ) ) {
+					$this->cache->store( $this->request, $this->capture_buffer, $headers, http_response_code() ?: 200, $dependencies, '', false, null, $assets );
+				}
 			} catch ( \Throwable $error ) {
 				do_action( 'npe/cache/runtime_error', 'store' );
 			}

@@ -1653,3 +1653,21 @@ msgstr ""
 
 msgid "Use WordPress loading rules for supported images and iframes. Explicit eager loading and high priority are preserved."
 msgstr ""
+
+msgid "Enable public page cache. My public pages are not personalized for anonymous visitors."
+msgstr ""
+
+msgid "Learn this page before bundling CSS and JavaScript"
+msgstr ""
+
+msgid "Learn page assets"
+msgstr ""
+
+msgid "Require three compatible anonymous observations before publishing CSS and JavaScript bundles."
+msgstr ""
+
+msgid "Learning observations: %1$d of %2$d · JavaScript bundle: %3$s"
+msgstr ""
+
+msgid "%1$s uncompressed bundle: %2$s → %3$s"
+msgstr ""

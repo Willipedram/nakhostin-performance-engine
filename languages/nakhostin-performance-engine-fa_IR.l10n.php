@@ -537,5 +537,11 @@ return array (
     'Merge a verified group of adjacent stylesheets for an analyzed page. Safe Mode can remain on.' => 'گروهی از فایل‌های CSS کنار هم و تأییدشده را برای صفحهٔ بررسی‌شده ادغام می‌کند. حالت ایمن می‌تواند روشن بماند.',
     'Native media lazy loading' => 'بارگذاری تنبل بومی رسانه',
     'Use WordPress loading rules for supported images and iframes. Explicit eager loading and high priority are preserved.' => 'از قواعد وردپرس برای بارگذاری تصاویر و iframeهای پشتیبانی‌شده استفاده می‌کند. بارگذاری فوری و اولویت بالا حفظ می‌شوند.',
+    'Enable public page cache. My public pages are not personalized for anonymous visitors.' => 'کش صفحات عمومی را فعال کن. محتوای عمومی برای بازدیدکنندگان ناشناس شخصی‌سازی نمی‌شود.',
+    'Learn this page before bundling CSS and JavaScript' => 'پیش از بسته‌بندی CSS و جاوااسکریپت، این صفحه را یاد بگیر',
+    'Learn page assets' => 'یادگیری فایل‌های هر صفحه',
+    'Require three compatible anonymous observations before publishing CSS and JavaScript bundles.' => 'پیش از انتشار بسته‌های CSS و جاوااسکریپت، سه مشاهدهٔ سازگار از صفحه برای بازدیدکنندهٔ ناشناس لازم است.',
+    'Learning observations: %1$d of %2$d · JavaScript bundle: %3$s' => 'مشاهده‌های یادگیری: %1$d از %2$d · بستهٔ جاوااسکریپت: %3$s',
+    '%1$s uncompressed bundle: %2$s → %3$s' => 'بستهٔ فشرده‌نشدهٔ %1$s: %2$s ← %3$s',
   ),
 );

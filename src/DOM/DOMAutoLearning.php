@@ -8,6 +8,8 @@
 namespace Nakhostin\PerformanceEngine\DOM;
 
 use Nakhostin\PerformanceEngine\Infrastructure\Settings;
+use Nakhostin\PerformanceEngine\Optimization\OptimizationManifestStorage;
+use Nakhostin\PerformanceEngine\Optimization\PageLearning;
 
 final class DOMAutoLearning {
 	/** @var DOMAnalysisQueue */ private $queue;
@@ -75,6 +77,14 @@ final class DOMAutoLearning {
 			$job_started = microtime( true );
 			if ( $this->coordinator->request( (string) $job['url'] ) ) {
 				$this->queue->complete( (string) $job['id'], microtime( true ) - $job_started );
+				if ( $this->settings->get( 'optimization.learning', false ) && $this->settings->get( 'css.combine_enabled', false ) ) {
+					$manifest = ( new OptimizationManifestStorage() )->for_url( (string) $job['url'] );
+					$evidence = $manifest ? ( $manifest->section( 'summary' )['learning'] ?? array() ) : array();
+					$round = (int) ( $job['round'] ?? 0 );
+					if ( $evidence && (int) $evidence['samples'] < PageLearning::REQUIRED && $round < 4 ) {
+						$this->queue->enqueue( (string) $job['url'], 'adaptive-assets', HOUR_IN_SECONDS, true, PageLearning::INTERVAL, $round + 1 );
+					}
+				}
 			} else {
 				$error = $this->coordinator->last_error();
 				$this->queue->retry( (string) $job['id'], '' !== $error ? $error : 'analysis-failed' );

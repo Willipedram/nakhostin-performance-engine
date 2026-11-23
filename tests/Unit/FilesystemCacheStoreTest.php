@@ -5,6 +5,16 @@ use Nakhostin\PerformanceEngine\Cache\CacheEntry;
 use Nakhostin\PerformanceEngine\Cache\FilesystemCacheStore;
 use PHPUnit\Framework\TestCase;
 final class FilesystemCacheStoreTest extends TestCase {
+	public function test_flush_preserves_early_configuration_and_directory_protection(): void {
+		$store = new FilesystemCacheStore( $this->directory );
+		self::assertTrue( $store->write( CacheEntry::create( 'page', 'https://example.test/', '<html>test</html>', array(), 60, 0 ) ) );
+		$config = $this->directory . '/early-config.json';
+		file_put_contents( $config, '{"enabled":true}' );
+		self::assertTrue( $store->flush() );
+		self::assertNull( $store->read( 'page' ) );
+		self::assertSame( '{"enabled":true}', file_get_contents( $config ) );
+		self::assertFileExists( $this->directory . '/.htaccess' );
+	}
 	/** @var string */ private $directory;
 	protected function setUp(): void { $this->directory = sys_get_temp_dir() . '/npe-store-' . uniqid( '', true ); }
 	protected function tearDown(): void { if ( is_dir( $this->directory ) ) { $it = new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $this->directory, \FilesystemIterator::SKIP_DOTS ), \RecursiveIteratorIterator::CHILD_FIRST ); foreach ( $it as $file ) { $file->isDir() ? rmdir( $file->getPathname() ) : unlink( $file->getPathname() ); } rmdir( $this->directory ); } }
